@@ -1,0 +1,395 @@
+.sliceofparadise-detail {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Fixed background with Mockup */
+.sliceofparadise-detail__background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 1;
+  padding: var(--spacing-lg);
+}
+
+.sliceofparadise-detail__mockup {
+  max-width: 75%;
+  max-height: 75%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  position: absolute;
+}
+
+/* Incoming animations */
+.sliceofparadise-detail__mockup--in-right {
+  animation: slideInRight 0.75s ease-out forwards;
+}
+
+.sliceofparadise-detail__mockup--in-left {
+  animation: slideInLeft 0.75s ease-out forwards;
+}
+
+/* Outgoing animations */
+.sliceofparadise-detail__mockup--out-right {
+  animation: slideOutRight 0.75s ease-out forwards;
+}
+
+.sliceofparadise-detail__mockup--out-left {
+  animation: slideOutLeft 0.75s ease-out forwards;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 1;
+    transform: translateX(75vw);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 1;
+    transform: translateX(-75vw);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-75vw);
+  }
+}
+
+@keyframes slideOutLeft {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(75vw);
+  }
+}
+
+/* Content overlay */
+.sliceofparadise-detail__content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding-top: var(--spacing-xl);
+  padding-bottom: var(--spacing-xl);
+  pointer-events: auto;
+}
+
+/* Header section */
+.sliceofparadise-detail__header {
+  margin-bottom: var(--spacing-xl);
+}
+
+.sliceofparadise-detail__title-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+}
+
+.sliceofparadise-detail__title-button:hover {
+  opacity: 0.6;
+}
+
+.sliceofparadise-detail__title {
+  font-family: 'Helvetica', Arial, sans-serif;
+  font-weight: 400;
+  font-size: var(--font-4xl);
+  line-height: 1;
+  margin: 0;
+  margin-bottom: var(--spacing-sm);
+  text-align: left;
+}
+
+.sliceofparadise-detail__subtitle {
+  font-family: 'Helvetica', Arial, sans-serif;
+  font-weight: 100;
+  font-size: var(--font-2xl);
+  line-height: 1.2;
+  margin: 0;
+  animation: fadeIn 0.4s ease-out 0.35s forwards;
+  opacity: 0;
+}
+
+/* Text section with navigation */
+.sliceofparadise-detail__text-section {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0;
+  width: 100%;
+  flex: 1;
+}
+
+.sliceofparadise-detail__text-content {
+  flex: 1;
+  max-width: 60vw;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* Navigation arrows */
+.sliceofparadise-detail__arrow {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--spacing-sm);
+  transition: opacity var(--transition-fast);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sliceofparadise-detail__arrow--left {
+  left: 16vw;
+}
+
+.sliceofparadise-detail__arrow--right {
+  right: 16vw;
+}
+
+.sliceofparadise-detail__arrow:hover {
+  opacity: 0.6;
+}
+
+.sliceofparadise-detail__arrow:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.sliceofparadise-detail__arrow-icon {
+  width: clamp(2rem, 3vw, 3rem);
+  height: clamp(2rem, 3vw, 3rem);
+  display: block;
+}
+
+.sliceofparadise-detail__arrow-icon--flipped {
+  transform: scaleX(-1);
+}
+
+/* Description */
+.sliceofparadise-detail__description {
+  font-family: 'Helvetica', Arial, sans-serif;
+  font-weight: 400;
+  font-size: var(--font-sm);
+  line-height: 1.6;
+  text-align: center;
+  margin-top: 35vh;
+  margin-bottom: -2vh;
+  animation: textFadeInRight 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+.sliceofparadise-detail__description--transitioning-right {
+  animation: textFadeOutRight 0.3s ease-out forwards;
+}
+
+.sliceofparadise-detail__description--transitioning-left {
+  animation: textFadeOutLeft 0.3s ease-out forwards;
+}
+
+.sliceofparadise-detail__description--in-right {
+  animation: textFadeInRight 0.6s ease-out forwards;
+}
+
+.sliceofparadise-detail__description--in-left {
+  animation: textFadeInLeft 0.6s ease-out forwards;
+}
+
+@keyframes textFadeInRight {
+  0% {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes textFadeOutRight {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+}
+
+@keyframes textFadeInLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes textFadeOutLeft {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+}
+
+/* Indicator dots */
+.sliceofparadise-detail__indicators {
+  display: flex;
+  gap: 1vw;
+  justify-content: center;
+}
+
+.sliceofparadise-detail__dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #d9d9d9;
+  border: none;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.sliceofparadise-detail__dot--active {
+  background: var(--color-black);
+}
+
+.sliceofparadise-detail__dot--switching {
+  animation: dotSwitchOut 0.75s ease-out forwards;
+}
+
+.sliceofparadise-detail__dot--switching-in {
+  animation: dotSwitchIn 0.75s ease-out forwards;
+}
+
+.sliceofparadise-detail__dot:hover:not(.sliceofparadise-detail__dot--active) {
+  background: #999;
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Dot switch out animation */
+@keyframes dotSwitchOut {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  51% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Dot switch in animation */
+@keyframes dotSwitchIn {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  51% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+  .sliceofparadise-detail__mockup-section {
+    gap: var(--spacing-md);
+  }
+}
+
+@media (max-width: 768px) {
+  .sliceofparadise-detail {
+    padding-top: var(--spacing-lg);
+  }
+
+  .sliceofparadise-detail__title {
+    font-size: var(--font-3xl);
+  }
+
+  .sliceofparadise-detail__subtitle {
+    font-size: var(--font-xl);
+  }
+
+  .sliceofparadise-detail__arrow {
+    font-size: var(--font-xl);
+    padding: var(--spacing-xs);
+  }
+
+  .sliceofparadise-detail__description {
+    font-size: var(--font-sm);
+    text-align: left;
+  }
+
+  .sliceofparadise-detail__dot {
+    width: 12px;
+    height: 12px;
+  }
+}

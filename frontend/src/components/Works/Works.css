@@ -1,0 +1,108 @@
+.works {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background-color: #ffffff;
+  overflow: hidden;
+}
+
+.works--filtered {
+  height: auto;
+  overflow: visible;
+  min-height: 100vh;
+}
+
+/* Title */
+.works__title {
+  position: absolute;
+  font-family: 'Helvetica', sans-serif;
+  font-size: var(--font-works-title);
+  font-weight: 700;
+  line-height: normal;
+  color: #000000;
+  right: 0vw;
+  top: clamp(4rem, 6.3vw, 5.6875rem);
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* Main container with filters and description */
+.works__container {
+  height: 100vh;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  padding: clamp(12rem, 21vw, 18.75rem) var(--container-padding) clamp(4rem, 7vw, 6.25rem);
+  transition: var(--transition-slow);
+}
+
+.works__container--filtered {
+  padding-top: clamp(14rem, 24vw, 21.875rem);
+  padding-bottom: var(--spacing-lg);
+}
+
+/* Filter buttons - left side */
+.works__filters {
+  position: absolute;
+  left: 0vw;
+  bottom: 8vh;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7vh;
+  transition: var(--transition-slow);
+}
+
+.works__filters--filtered {
+  bottom: 40vh;
+}
+
+.works__filters__btn {
+  font-family: 'Helvetica', sans-serif;
+  font-weight: 700;
+  line-height: normal;
+  color: #000000;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  transition: font-size var(--transition-fast);
+  margin: 0;
+}
+
+.works__filters__btn--small {
+  font-size: var(--font-xl);
+}
+
+.works__filters__btn--large {
+  font-size: var(--font-3xl);
+}
+
+.works__filters__btn--active {
+  font-weight: 700;
+}
+
+.works__filters__btn:hover {
+  opacity: 0.6;
+}
+
+.works__nav {
+  margin-top: var(--spacing-md);
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+.works__nav a {
+  font-family: 'Helvetica', sans-serif;
+  font-size: var(--font-sm);
+  font-weight: 700;
+  color: #000000;
+  text-decoration: none;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.works__nav a:hover {
+  opacity: 0.6;
+}

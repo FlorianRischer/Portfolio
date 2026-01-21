@@ -1,0 +1,123 @@
+@import url('https://fonts.googleapis.com/css2?family=Paytone+One&display=swap');
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: white;
+  padding: var(--spacing-xs) 0;
+}
+
+.header__container {
+  max-width: var(--max-width-content);
+  margin: 0 auto;
+  padding: 0 var(--container-padding);
+  padding-left: 0;
+  padding-right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.header__left {
+  display: flex;
+  align-items: center;
+  gap: clamp(1rem, 2vw, 1.875rem);
+  flex-wrap: wrap;
+}
+
+.header__logo {
+  font-family: 'Paytone One', sans-serif;
+  align-items: center;
+  font-size: 1vw;
+  font-weight: 400;
+  color: black;
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  margin-bottom: 0.6vh;
+}
+
+.header__subtitle {
+  font-family: 'Helvetica', Arial, sans-serif;
+  font-size: clamp(0.625rem, 1vw, 0.875rem);
+  font-weight: 700;
+  color: black;
+  white-space: nowrap;
+}
+
+.header__nav-list {
+  display: flex;
+  gap: clamp(1rem, 2vw, 1.875rem);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header__nav-item a {
+  text-decoration: none;
+  color: black;
+  font-family: 'Helvetica', Arial, sans-serif;
+  font-size: clamp(0.75rem, 1vw, 0.875rem);
+  font-weight: 700;
+  transition: var(--transition-fast);
+}
+
+.header__nav-item a:hover {
+  opacity: 0.6;
+}
+
+.header__nav-item--auth {
+  margin-left: clamp(0.5rem, 1vw, 1rem);
+}
+
+.header__auth-btn {
+  background: none;
+  border: 2px solid black;
+  border-radius: 4px;
+  padding: 0.25rem 0.75rem;
+  color: black;
+  font-family: 'Helvetica', Arial, sans-serif;
+  font-size: clamp(0.75rem, 1vw, 0.875rem);
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.header__auth-btn:hover {
+  background-color: black;
+  color: white;
+}
+
+.header__auth-link {
+  display: inline-block;
+  border: 2px solid black;
+  border-radius: 4px;
+  padding: 0.25rem 0.75rem;
+  color: black;
+  font-family: 'Helvetica', Arial, sans-serif;
+  font-size: clamp(0.75rem, 1vw, 0.875rem);
+  font-weight: 700;
+  text-decoration: none;
+  transition: var(--transition-fast);
+}
+
+.header__auth-link:hover {
+  background-color: black;
+  color: white;
+  opacity: 1;
+}
+
+.header__line {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 3px;
+  background: black;
+  width: var(--max-width-content);
+}
+

@@ -1,0 +1,414 @@
+.mockup-carousel {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Fixed background with Mockup */
+.mockup-carousel__background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  cursor: zoom-in;
+  z-index: 1;
+  padding: var(--spacing-lg);
+  transition: background-color var(--transition-slow);
+}
+
+.mockup-carousel__background--zoomed {
+  background-color: rgba(255, 255, 255, 0.95);
+  cursor: zoom-out;
+  z-index: 100;
+}
+
+.mockup-carousel__mockup {
+  --mockup-scale: 1;
+  max-width: 80%;
+  max-height: 80%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  position: absolute;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.6s cubic-bezier(0.4, 0, 0.2, 1), max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: scale(var(--mockup-scale));
+}
+
+/* Clickable overlay above mockup */
+.mockup-carousel__click-area {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40vw;
+  height: 50vh;
+  z-index: 10;
+  cursor: zoom-in;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.mockup-carousel__click-area--zoomed {
+  width: 100vw;
+  height: 100vh;
+  cursor: zoom-out;
+  z-index: 101;
+}
+
+.mockup-carousel__mockup--zoomed {
+  max-width: 100%;
+  max-height: 100%;
+  transform: scale(6);
+}
+
+/* Content hidden when zoomed */
+.mockup-carousel__content--hidden {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease-out;
+}
+
+/* Incoming animations */
+.mockup-carousel__mockup--in-right {
+  animation: carouselSlideInRight 0.75s ease-out forwards;
+}
+
+.mockup-carousel__mockup--in-left {
+  animation: carouselSlideInLeft 0.75s ease-out forwards;
+}
+
+/* Outgoing animations */
+.mockup-carousel__mockup--out-right {
+  animation: carouselSlideOutRight 0.75s ease-out forwards;
+}
+
+.mockup-carousel__mockup--out-left {
+  animation: carouselSlideOutLeft 0.75s ease-out forwards;
+}
+
+@keyframes carouselSlideInRight {
+  from {
+    opacity: 1;
+    transform: translateX(70vw) scale(var(--mockup-scale));
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(var(--mockup-scale));
+  }
+}
+
+@keyframes carouselSlideInLeft {
+  from {
+    opacity: 1;
+    transform: translateX(-70vw) scale(var(--mockup-scale));
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(var(--mockup-scale));
+  }
+}
+
+@keyframes carouselSlideOutRight {
+  from {
+    opacity: 1;
+    transform: translateX(0) scale(var(--mockup-scale));
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-70vw) scale(var(--mockup-scale));
+  }
+}
+
+@keyframes carouselSlideOutLeft {
+  from {
+    opacity: 1;
+    transform: translateX(0) scale(var(--mockup-scale));
+  }
+  to {
+    opacity: 1;
+    transform: translateX(70vw) scale(var(--mockup-scale));
+  }
+}
+
+/* Content overlay */
+.mockup-carousel__content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding-top: var(--spacing-xl);
+  padding-bottom: var(--spacing-xl);
+  pointer-events: none;
+}
+
+.mockup-carousel__content > * {
+  pointer-events: auto;
+}
+
+/* Header section */
+.mockup-carousel__header {
+  margin-bottom: var(--spacing-xl);
+  text-align: center;
+}
+
+.mockup-carousel__title-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+}
+
+.mockup-carousel__title-button:hover {
+  opacity: 0.6;
+}
+
+.mockup-carousel__title {
+  font-family: 'Helvetica', Arial, sans-serif;
+  font-weight: 400;
+  font-size: var(--font-4xl);
+  line-height: 1;
+  margin: 0;
+  margin-bottom: var(--spacing-sm);
+}
+
+/* Text section with navigation */
+.mockup-carousel__text-section {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0;
+  width: 100%;
+  flex: 1;
+}
+
+.mockup-carousel__text-content {
+  flex: 1;
+  max-width: 60vw;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* Navigation arrows */
+.mockup-carousel__arrow {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--spacing-sm);
+  transition: opacity var(--transition-fast);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mockup-carousel__arrow--left {
+  left: 16vw;
+}
+
+.mockup-carousel__arrow--right {
+  right: 16vw;
+}
+
+.mockup-carousel__arrow:hover {
+  opacity: 0.6;
+}
+
+.mockup-carousel__arrow:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.mockup-carousel__arrow-icon {
+  width: clamp(2rem, 3vw, 3rem);
+  height: clamp(2rem, 3vw, 3rem);
+  display: block;
+}
+
+.mockup-carousel__arrow-icon--flipped {
+  transform: scaleX(-1);
+}
+
+/* Description */
+.mockup-carousel__description {
+  font-family: 'Helvetica', Arial, sans-serif;
+  font-weight: 400;
+  font-size: var(--font-sm);
+  line-height: 1.4;
+  text-align: center;
+  margin-top: 45vh;
+  margin-bottom: -2vh;
+  animation: carouselTextFadeInRight 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+.mockup-carousel__description--transitioning-right {
+  animation: carouselTextFadeOutRight 0.3s ease-out forwards;
+}
+
+.mockup-carousel__description--transitioning-left {
+  animation: carouselTextFadeOutLeft 0.3s ease-out forwards;
+}
+
+.mockup-carousel__description--in-right {
+  animation: carouselTextFadeInRight 0.6s ease-out forwards;
+}
+
+.mockup-carousel__description--in-left {
+  animation: carouselTextFadeInLeft 0.6s ease-out forwards;
+}
+
+@keyframes carouselTextFadeInRight {
+  0% {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes carouselTextFadeOutRight {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+}
+
+@keyframes carouselTextFadeInLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes carouselTextFadeOutLeft {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+}
+
+/* Indicator dots */
+.mockup-carousel__indicators {
+  display: flex;
+  gap: 1vw;
+  justify-content: center;
+}
+
+.mockup-carousel__dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #d9d9d9;
+  border: none;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.mockup-carousel__dot--active {
+  background: var(--color-black);
+}
+
+.mockup-carousel__dot--switching {
+  animation: carouselDotSwitchOut 0.75s ease-out forwards;
+}
+
+.mockup-carousel__dot--switching-in {
+  animation: carouselDotSwitchIn 0.75s ease-out forwards;
+}
+
+.mockup-carousel__dot:hover:not(.mockup-carousel__dot--active) {
+  background: #999;
+}
+
+/* Dot switch animations */
+@keyframes carouselDotSwitchOut {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  51% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes carouselDotSwitchIn {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  51% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .mockup-carousel {
+    padding-top: var(--spacing-lg);
+  }
+
+  .mockup-carousel__title {
+    font-size: var(--font-3xl);
+  }
+
+  .mockup-carousel__arrow {
+    font-size: var(--font-xl);
+    padding: var(--spacing-xs);
+  }
+
+  .mockup-carousel__description {
+    font-size: var(--font-sm);
+    text-align: left;
+  }
+
+  .mockup-carousel__dot {
+    width: 12px;
+    height: 12px;
+  }
+}

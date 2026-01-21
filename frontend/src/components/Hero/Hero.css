@@ -1,0 +1,118 @@
+.hero {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: clamp(4rem, 5vw, 4.375rem) var(--container-padding);
+  padding-bottom: 0;
+  background: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero__container {
+  max-width: var(--max-width-content);
+  height: 100vh;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-lg);
+  align-items: center;
+  width: 100%;
+  position: relative;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Image Composition Section */
+.hero__image-section {
+  position: relative;
+  height: 100%;
+  min-height: clamp(25rem, 55vh, 50rem);
+  overflow: visible;
+}
+
+.hero__composition {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.hero__arrow {
+  position: absolute;
+  width: 57vw;
+  height: auto;
+  bottom: 3.7vh;
+  left: 3vw;
+  transform: rotate(2deg);
+  z-index: 4;
+}
+
+.hero__vector {
+  position: absolute;
+  width: 21vw;
+  height: auto;
+  bottom: 3.5vw;
+  left: 9.1vw;
+  z-index: 0;
+}
+
+.hero__profile {
+  position: absolute;
+  width: 45vw;
+  height: auto;
+  bottom: 0vh;
+  z-index: 2;
+}
+
+/* Content Section */
+.hero__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  align-items: flex-end;
+  text-align: right;
+  padding: 0;
+}
+
+.hero__nav-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  align-items: flex-end;
+}
+
+.hero__nav-btn {
+  font-family: 'Helvetica', Arial, sans-serif;
+  font-size: var(--font-hero);
+  font-weight: 700;
+  color: transparent;
+  -webkit-text-stroke: clamp(1px, 0.14vw, 2px) black;
+  background: none;
+  border: none;
+  cursor: pointer;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  transition: var(--transition-fast);
+}
+
+.hero__nav-btn:hover {
+  color: black;
+  -webkit-text-stroke: clamp(1px, 0.14vw, 2px) black;
+  transform: translateX(-0.625rem);
+}
+
+.hero__intro {
+  max-width: 19vw;
+  text-align: justify;
+}
+
+.hero__intro-text {
+  font-family: 'Helvetica', Arial, sans-serif;
+  font-size: var(--font-base);
+  font-weight: 700;
+  color: black;
+  margin: 0;
+  line-height: 1.4;
+}
+
+

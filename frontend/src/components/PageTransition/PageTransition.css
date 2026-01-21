@@ -1,0 +1,37 @@
+/* Page transition styles */
+
+.transition {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.transition-row {
+  flex: 1;
+  display: flex;
+}
+
+.transition-row.row-1 .block {
+  transform-origin: top;
+}
+
+.transition-row.row-2 .block {
+  transform-origin: bottom;
+}
+
+.block {
+  flex: 1;
+  background-color: #4865e8;
+  transform: scaleY(0);
+  will-change: transform;
+  visibility: hidden;
+  /* GPU acceleration for consistent animation speed */
+  backface-visibility: hidden;
+  perspective: 1000px;
+}

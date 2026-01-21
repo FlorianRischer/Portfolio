@@ -1,0 +1,38 @@
+/* Base filter button styles - reusable across pages */
+.filter-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.375rem, 0.7vw, 0.625rem);
+  transition: var(--transition-slow);
+}
+
+.filter-buttons__btn {
+  font-family: 'Helvetica', sans-serif;
+  font-weight: 700;
+  line-height: normal;
+  color: #000000;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  transition: font-size var(--transition-fast);
+  margin: 0;
+}
+
+.filter-buttons__btn--small {
+  font-size: var(--font-xl);
+}
+
+.filter-buttons__btn--large {
+  font-size: var(--font-3xl);
+}
+
+.filter-buttons__btn--active {
+  font-weight: 700;
+}
+
+.filter-buttons__btn:hover {
+  opacity: 0.6;
+}
