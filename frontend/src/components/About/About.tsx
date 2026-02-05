@@ -238,7 +238,6 @@ export default function About() {
           </div>
           <div className="about__skill-name-line">
             <span className="about__skill-name">{skill.name}</span>
-            <span className="about__skill-rating">{skill.level}/5</span>
           </div>
         </button>
       );
@@ -267,8 +266,6 @@ export default function About() {
           </div>
           <div className="about__skill-info">
             <span className="about__skill-name">{skill.name}</span>
-            <span className="about__skill-level">{skill.level}/5</span>
-            <span className="about__skill-rating">{skill.level}/5</span>
           </div>
         </div>
       </button>

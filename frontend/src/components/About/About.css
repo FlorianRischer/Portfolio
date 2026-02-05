@@ -203,6 +203,7 @@
   gap: clamp(2rem, 4vw, 3.5rem);
   max-height: 60vh;
   overflow-y: auto;
+  overflow-x: visible;
   padding-top: clamp(2rem, 3vw, 3rem);
   padding-bottom: clamp(2rem, 3vw, 3rem);
   scrollbar-width: none;
@@ -383,27 +384,6 @@
 
 .about__section--visible.about__section--skill-selected .about__skill:not(.about__skill--selected) .about__skill-name {
   opacity: 0.6;
-}
-
-.about__skill-level {
-  font-family: 'Helvetica', sans-serif;
-  font-size: var(--font-xl);
-  font-weight: 400;
-  color: #000000;
-}
-
-.about__skill-rating {
-  font-family: 'Helvetica', sans-serif;
-  font-size: var(--font-base);
-  font-weight: 700;
-  color: #000000;
-  opacity: 0;
-  transition: opacity var(--transition-fast);
-}
-
-.about__skill:hover .about__skill-rating,
-.about__skill--selected .about__skill-rating {
-  opacity: 1;
 }
 
 /* Resume Section Content */

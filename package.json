@@ -4,15 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently -n \"backend,frontend\" -c \"yellow,cyan\" \"npm run dev:backend\" \"npm run dev:frontend\"",
-    "dev:frontend": "cd frontend && vite",
-    "dev:backend": "cd backend && npm run dev",
+    "dev": "cd frontend && vite",
     "build": "cd frontend && tsc -b && vite build",
-    "build:backend": "cd backend && npm run build",
-    "lint": "eslint .",
     "preview": "cd frontend && vite preview",
-    "seed": "cd backend && npm run seed",
-    "seed:images": "cd backend && npm run seed:images",
+    "lint": "eslint .",
+    "deploy": "npm run build && npx wrangler pages deploy frontend/dist --project-name=portfolio",
+    "deploy:worker": "cd workers && npx wrangler deploy",
     "prepare": "husky install"
   },
   "dependencies": {
@@ -27,7 +24,6 @@
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
-    "concurrently": "^9.2.1",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",

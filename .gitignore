@@ -4,12 +4,11 @@ node_modules/
 # Build outputs
 dist/
 frontend/dist/
-backend/dist/
+workers/dist/
 
 # Environment files
 .env
 .env.local
-.env.production
 .env.*.local
 
 # IDE
@@ -22,9 +21,6 @@ Thumbs.db
 
 # Cloudflare
 .wrangler/
-
-# Backend exports (can contain large files)
-backend/exports/images/
 
 # Logs
 *.log
