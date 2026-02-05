@@ -2,24 +2,15 @@
 // API Base URL - in production, this would come from environment variables
 const API_BASE_URL = 'http://localhost:3001/api';
 
-// Token key for localStorage
-const TOKEN_KEY = 'portfolio_jwt_token';
-
-// Helper to get auth token from localStorage
-const getAuthToken = (): string | null => {
-  return localStorage.getItem(TOKEN_KEY);
-};
-
 // Helper to get image URL from slug
 export const getImageUrl = (slug: string): string => {
   return `${API_BASE_URL}/images/${slug}`;
 };
 
-// Generic fetch wrapper with error handling and JWT support
+// Generic fetch wrapper with error handling
 async function fetchAPI<T>(
   endpoint: string,
-  options: RequestInit = {},
-  requiresAuth: boolean = true
+  options: RequestInit = {}
 ): Promise<{ success: boolean; data?: T; error?: string; status?: number }> {
   try {
     const headers: Record<string, string> = {
@@ -32,36 +23,10 @@ async function fetchAPI<T>(
       Object.assign(headers, customHeaders);
     }
 
-    // Add Authorization header if token exists and auth is required
-    if (requiresAuth) {
-      const token = getAuthToken();
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-    }
-
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       headers,
       ...options,
     });
-
-    // Handle 401 Unauthorized - redirect to login
-    if (response.status === 401) {
-      // Clear stored auth data
-      localStorage.removeItem(TOKEN_KEY);
-      localStorage.removeItem('portfolio_user');
-      
-      // Redirect to login page
-      if (window.location.pathname !== '/login' && window.location.pathname !== '/') {
-        window.location.href = '/login';
-      }
-      
-      return {
-        success: false,
-        error: 'Session expired. Please log in again.',
-        status: 401,
-      };
-    }
 
     const result = await response.json();
 
@@ -202,56 +167,9 @@ export const imagesAPI = {
   },
 };
 
-// Auth Types
-export interface AuthUser {
-  id: string;
-  email: string;
-  name: string;
-}
-
-export interface LoginResponse {
-  token: string;
-  user: AuthUser;
-}
-
-export interface SignupData {
-  email: string;
-  password: string;
-  name: string;
-}
-
-// Auth API
-export const authAPI = {
-  // Login - get JWT token
-  login: (email: string, password: string) => {
-    return fetchAPI<LoginResponse>('/auth/login', {
-      method: 'POST',
-      body: JSON.stringify({ email, password }),
-    }, false);
-  },
-
-  // Signup - create new user
-  signup: (data: SignupData) => {
-    return fetchAPI<LoginResponse>('/auth/signup', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    }, false);
-  },
-
-  // Verify - check if token is valid
-  verify: (token: string) => {
-    return fetchAPI<AuthUser>('/auth/verify', {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    }, false);
-  },
-};
-
 export default {
   projects: projectsAPI,
   skills: skillsAPI,
   messages: messagesAPI,
   images: imagesAPI,
-  auth: authAPI,
 };

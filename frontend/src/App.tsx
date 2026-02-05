@@ -3,9 +3,6 @@ import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'r
 import { useEffect } from 'react';
 import Header from './components/Header';
 import { TransitionProvider } from './components/PageTransition/TransitionContext';
-import { AuthProvider, useAuth } from './context/AuthContext';
-import ProtectedRoute from './components/ProtectedRoute';
-import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
 import WorksPage from './pages/WorksPage';
 import SoundcloudDetailPage from './pages/SoundcloudDetailPage';
@@ -15,17 +12,6 @@ import AboutPage from './pages/AboutPage';
 import { imagesAPI } from './services/api';
 import './styles/global.css';
 import './components/PageTransition/PageTransition.css';
-
-// Redirect component that checks auth status
-function RootRedirect() {
-  const { isAuthenticated, isLoading } = useAuth();
-  
-  if (isLoading) {
-    return null; // Show nothing while checking auth
-  }
-  
-  return isAuthenticated ? <Navigate to="/home" replace /> : <Navigate to="/login" replace />;
-}
 
 function AppContent() {
   const location = useLocation();
@@ -52,51 +38,21 @@ function AppContent() {
     }
   }, []);
 
-  // Always show header except on root redirect
-  const showHeader = location.pathname !== '/';
-
   return (
     <TransitionProvider>
       <div className="app">
-        {showHeader && <Header />}
+        <Header />
         <Routes>
-          {/* Root redirect based on auth status */}
-          <Route path="/" element={<RootRedirect />} />
+          {/* Redirect root to home */}
+          <Route path="/" element={<Navigate to="/home" replace />} />
           
           {/* Public routes */}
-          <Route path="/login" element={<LoginPage />} />
-          
-          {/* Protected routes */}
-          <Route path="/home" element={
-            <ProtectedRoute>
-              <HomePage />
-            </ProtectedRoute>
-          } />
-          <Route path="/works" element={
-            <ProtectedRoute>
-              <WorksPage />
-            </ProtectedRoute>
-          } />
-          <Route path="/works/soundcloud" element={
-            <ProtectedRoute>
-              <SoundcloudDetailPage />
-            </ProtectedRoute>
-          } />
-          <Route path="/works/slice-of-paradise" element={
-            <ProtectedRoute>
-              <SliceOfParadiseDetailPage />
-            </ProtectedRoute>
-          } />
-          <Route path="/about" element={
-            <ProtectedRoute>
-              <AboutPage />
-            </ProtectedRoute>
-          } />
-          <Route path="/contact" element={
-            <ProtectedRoute>
-              <ContactPage />
-            </ProtectedRoute>
-          } />
+          <Route path="/home" element={<HomePage />} />
+          <Route path="/works" element={<WorksPage />} />
+          <Route path="/works/soundcloud" element={<SoundcloudDetailPage />} />
+          <Route path="/works/slice-of-paradise" element={<SliceOfParadiseDetailPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/contact" element={<ContactPage />} />
         </Routes>
       </div>
     </TransitionProvider>
@@ -106,9 +62,7 @@ function AppContent() {
 function App() {
   return (
     <Router>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
+      <AppContent />
     </Router>
   );
 }

@@ -70,47 +70,6 @@
   opacity: 0.6;
 }
 
-.header__nav-item--auth {
-  margin-left: clamp(0.5rem, 1vw, 1rem);
-}
-
-.header__auth-btn {
-  background: none;
-  border: 2px solid black;
-  border-radius: 4px;
-  padding: 0.25rem 0.75rem;
-  color: black;
-  font-family: 'Helvetica', Arial, sans-serif;
-  font-size: clamp(0.75rem, 1vw, 0.875rem);
-  font-weight: 700;
-  cursor: pointer;
-  transition: var(--transition-fast);
-}
-
-.header__auth-btn:hover {
-  background-color: black;
-  color: white;
-}
-
-.header__auth-link {
-  display: inline-block;
-  border: 2px solid black;
-  border-radius: 4px;
-  padding: 0.25rem 0.75rem;
-  color: black;
-  font-family: 'Helvetica', Arial, sans-serif;
-  font-size: clamp(0.75rem, 1vw, 0.875rem);
-  font-weight: 700;
-  text-decoration: none;
-  transition: var(--transition-fast);
-}
-
-.header__auth-link:hover {
-  background-color: black;
-  color: white;
-  opacity: 1;
-}
-
 .header__line {
   position: absolute;
   bottom: 0;
