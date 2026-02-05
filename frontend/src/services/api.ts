@@ -1,6 +1,6 @@
 // Author: Florian Rischer
-// API Base URL - in production, this would come from environment variables
-const API_BASE_URL = 'http://localhost:3001/api';
+// API Base URL - uses environment variable in production
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
 
 // Helper to get image URL from slug
 export const getImageUrl = (slug: string): string => {

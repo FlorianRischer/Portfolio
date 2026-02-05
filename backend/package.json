@@ -9,7 +9,7 @@
     "start": "node dist/server.js",
     "seed": "ts-node src/seed/seed.ts",
     "seed:images": "ts-node src/seed/seedImages.ts",
-    "seed:users": "ts-node src/seed/seedUsers.ts",
+    "export": "ts-node src/scripts/export-to-cloudflare.ts",
     "lint": "eslint src/**/*.ts"
   },
   "dependencies": {
