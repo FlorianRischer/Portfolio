@@ -214,6 +214,39 @@
     </div>
   </div>
   
+  <!-- Edit Screen Modal -->
+  <div id="edit-screen-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Edit Screen</h2>
+        <button class="modal-close" onclick="closeModal('edit-screen-modal')">&times;</button>
+      </div>
+      <form id="edit-screen-form" onsubmit="updateScreen(event)">
+        <input type="hidden" id="edit-screen-project-slug">
+        <input type="hidden" id="edit-screen-index">
+        <div class="form-group">
+          <label>Screen Title</label>
+          <input type="text" id="edit-screen-title" required>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="edit-screen-description" required></textarea>
+        </div>
+        <div class="form-group">
+          <label>Current Image</label>
+          <div id="edit-screen-current-image" style="margin: 0.5rem 0;">
+            <img id="edit-screen-preview" style="max-width: 200px; border: 1px solid #000;">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Replace Image (optional)</label>
+          <input type="file" id="edit-screen-file" accept="image/*">
+        </div>
+        <button type="submit" class="btn btn-primary">Update Screen</button>
+      </form>
+    </div>
+  </div>
+  
   <!-- Image Modal -->
   <div id="image-modal" class="modal">
     <div class="modal-content">
@@ -309,12 +342,16 @@
           ${p.screens.length ? `
             <div class="screens-list">
               <strong>Screens (${p.screens.length}):</strong>
-              ${p.screens.map(s => `
+              ${p.screens.map((s, i) => `
                 <div class="screen-item">
                   <img src="https://portfolio-api.flo62616.workers.dev${s.imageUrl}" alt="${s.title}">
                   <div class="screen-info">
                     <div class="screen-title">${s.title}</div>
                     <div class="card-meta">${s.description.substring(0, 100)}...</div>
+                  </div>
+                  <div class="actions" style="flex-shrink: 0;">
+                    <button class="btn btn-sm" onclick="editScreen('${p.slug}', ${i}, '${s.title.replace(/'/g, "\\'")}', \`${s.description.replace(/`/g, "\\`")}\`, '${s.imageUrl}')">Edit</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteScreen('${p.slug}', ${i}, '${s.title.replace(/'/g, "\\'")}')">×</button>
                   </div>
                 </div>
               `).join('')}
@@ -343,7 +380,7 @@
                 <div class="card-meta">${img.slug}</div>
                 <span class="tag">${img.category}</span>
                 <div style="margin-top: 0.5rem;">
-                  <button class="btn btn-sm" onclick="replaceImage('${img.slug}', '${img.name}')">Replace</button>
+                  <button class="btn btn-sm" onclick="replaceImage('${img.slug}', '${img.name.replace(/'/g, "\\'")}')">Replace</button>
                 </div>
               </div>
             </div>
@@ -509,6 +546,49 @@
       loadProjects();
     }
     
+    // Edit Screen
+    function editScreen(projectSlug, index, title, description, imageUrl) {
+      document.getElementById('edit-screen-project-slug').value = projectSlug;
+      document.getElementById('edit-screen-index').value = index;
+      document.getElementById('edit-screen-title').value = title;
+      document.getElementById('edit-screen-description').value = description;
+      document.getElementById('edit-screen-preview').src = `https://portfolio-api.flo62616.workers.dev${imageUrl}`;
+      document.getElementById('edit-screen-file').value = '';
+      openModal('edit-screen-modal');
+    }
+    
+    async function updateScreen(e) {
+      e.preventDefault();
+      const projectSlug = document.getElementById('edit-screen-project-slug').value;
+      const index = document.getElementById('edit-screen-index').value;
+      const title = document.getElementById('edit-screen-title').value;
+      const description = document.getElementById('edit-screen-description').value;
+      const file = document.getElementById('edit-screen-file').files[0];
+      
+      const formData = new FormData();
+      formData.append('title', title);
+      formData.append('description', description);
+      if (file) {
+        formData.append('file', file);
+      }
+      
+      await fetch(`${API}/api/projects/${projectSlug}/screens/${index}`, {
+        method: 'PUT',
+        body: formData
+      });
+      
+      showToast('Screen updated!');
+      closeModal('edit-screen-modal');
+      loadProjects();
+    }
+    
+    async function deleteScreen(projectSlug, index, title) {
+      if (!confirm(`Delete screen "${title}"?`)) return;
+      await fetch(`${API}/api/projects/${projectSlug}/screens/${index}`, { method: 'DELETE' });
+      showToast('Screen deleted!');
+      loadProjects();
+    }
+    
     // Images
     function openAddImage() {
       document.getElementById('image-modal-title').textContent = 'Upload Image';
@@ -548,25 +628,37 @@
     async function saveImage(e) {
       e.preventDefault();
       const editSlug = document.getElementById('image-edit-slug').value;
+      const file = document.getElementById('image-file').files[0];
+      
+      if (!file) {
+        showToast('Please select a file');
+        return;
+      }
       
       if (editSlug) {
         // Replace existing image
         const formData = new FormData();
-        formData.append('file', document.getElementById('image-file').files[0]);
+        formData.append('file', file);
         
-        await fetch(`${API}/api/images/${editSlug}`, {
+        const res = await fetch(`${API}/api/images/${editSlug}`, {
           method: 'PUT',
           body: formData
         });
         
-        showToast('Image replaced!');
+        if (res.ok) {
+          showToast('Image replaced!');
+        } else {
+          const err = await res.json();
+          showToast('Error: ' + (err.error || 'Replace failed'));
+          return;
+        }
       } else {
         // Upload new image
         const formData = new FormData();
         formData.append('name', document.getElementById('image-name').value);
         formData.append('slug', document.getElementById('image-slug').value);
         formData.append('category', document.getElementById('image-category').value);
-        formData.append('file', document.getElementById('image-file').files[0]);
+        formData.append('file', file);
         
         await fetch(`${API}/api/images`, {
           method: 'POST',

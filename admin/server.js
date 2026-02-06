@@ -333,6 +333,85 @@ app.post('/api/projects/:slug/screens-existing', (req, res) => {
   res.json({ success: true });
 });
 
+// Update a screen in a project
+app.put('/api/projects/:slug/screens/:screenIndex', upload.single('file'), (req, res) => {
+  const { title, description } = req.body;
+  const projectSlug = req.params.slug;
+  const screenIndex = parseInt(req.params.screenIndex);
+  
+  // Get current project
+  const projects = executeD1(`SELECT screens FROM projects WHERE slug='${projectSlug}'`);
+  const currentScreens = JSON.parse(projects[0]?.screens || '[]');
+  
+  if (screenIndex < 0 || screenIndex >= currentScreens.length) {
+    if (req.file) fs.unlinkSync(req.file.path);
+    return res.status(404).json({ error: 'Screen not found' });
+  }
+  
+  // Update title and description
+  if (title) currentScreens[screenIndex].title = title;
+  if (description) currentScreens[screenIndex].description = description;
+  
+  // If new file uploaded, replace the image
+  if (req.file) {
+    const safeTitle = (title || currentScreens[screenIndex].title).toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    const sanitizedProjectSlug = projectSlug.replace(/\s+/g, '-').replace(/[^a-z0-9-]/gi, '').toLowerCase();
+    const ext = path.extname(req.file.originalname);
+    const imageSlug = `project-${sanitizedProjectSlug}-${safeTitle}`;
+    const filename = `${imageSlug}${ext}`;
+    
+    const uploadedFilename = uploadToR2(req.file.path, filename);
+    if (!uploadedFilename) {
+      fs.unlinkSync(req.file.path);
+      return res.status(500).json({ error: 'Upload failed' });
+    }
+    
+    // Update or create image in D1
+    const existingImages = executeD1(`SELECT id FROM images WHERE slug='${imageSlug}'`);
+    const mimeType = ext === '.png' ? 'image/png' : ext === '.jpg' || ext === '.jpeg' ? 'image/jpeg' : 'image/svg+xml';
+    
+    if (existingImages.length > 0) {
+      executeD1(`UPDATE images SET filename='${uploadedFilename}', mimeType='${mimeType}', size=${req.file.size} WHERE slug='${imageSlug}'`);
+    } else {
+      const imageId = generateId();
+      executeD1(`INSERT INTO images (id, name, slug, category, mimeType, size, filename) VALUES ('${imageId}', '${(title || currentScreens[screenIndex].title).replace(/'/g, "''")}', '${imageSlug}', 'project', '${mimeType}', ${req.file.size}, '${uploadedFilename}')`);
+      currentScreens[screenIndex]._id = imageId;
+    }
+    
+    currentScreens[screenIndex].imageUrl = `/api/images/${imageSlug}`;
+    currentScreens[screenIndex].imageFilename = uploadedFilename;
+    
+    fs.unlinkSync(req.file.path);
+  }
+  
+  // Update project
+  executeD1(`UPDATE projects SET screens='${JSON.stringify(currentScreens).replace(/'/g, "''")}', updatedAt='${new Date().toISOString()}' WHERE slug='${projectSlug}'`);
+  
+  res.json({ success: true });
+});
+
+// Delete a screen from a project
+app.delete('/api/projects/:slug/screens/:screenIndex', (req, res) => {
+  const projectSlug = req.params.slug;
+  const screenIndex = parseInt(req.params.screenIndex);
+  
+  // Get current project
+  const projects = executeD1(`SELECT screens FROM projects WHERE slug='${projectSlug}'`);
+  const currentScreens = JSON.parse(projects[0]?.screens || '[]');
+  
+  if (screenIndex < 0 || screenIndex >= currentScreens.length) {
+    return res.status(404).json({ error: 'Screen not found' });
+  }
+  
+  // Remove screen at index
+  currentScreens.splice(screenIndex, 1);
+  
+  // Update project
+  executeD1(`UPDATE projects SET screens='${JSON.stringify(currentScreens).replace(/'/g, "''")}', updatedAt='${new Date().toISOString()}' WHERE slug='${projectSlug}'`);
+  
+  res.json({ success: true });
+});
+
 app.listen(PORT, () => {
   console.log(`\n🎨 Portfolio Admin running at http://localhost:${PORT}\n`);
 });
