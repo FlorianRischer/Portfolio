@@ -41,18 +41,6 @@
   padding-bottom: var(--spacing-lg);
 }
 
-/* Filter buttons - left side */
-.works__filters {
-  position: absolute;
-  left: 0vw;
-  bottom: 8vh;
-  transition: var(--transition-slow);
-}
-
-.works__filters--filtered {
-  bottom: 40vh;
-}
-
 .works__nav {
   margin-top: var(--spacing-md);
   display: flex;

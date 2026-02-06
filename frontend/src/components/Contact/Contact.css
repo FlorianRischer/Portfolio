@@ -64,14 +64,7 @@
   padding-bottom: var(--spacing-lg);
 }
 
-/* Filter buttons - left side */
-.contact__filters {
-  position: absolute;
-  left: 0vw;
-  bottom: 8vh;
-  transition: var(--transition-slow);
-}
-
+/* Filter buttons - Override positions for different states */
 .contact__filters--socials-active {
   bottom: 32vh;
 }

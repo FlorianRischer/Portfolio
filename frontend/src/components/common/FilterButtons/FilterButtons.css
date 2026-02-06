@@ -4,6 +4,15 @@
   flex-direction: column;
   gap: 1.5vh;
   transition: var(--transition-slow);
+  /* Default positioning - can be overridden by page-specific styles */
+  position: absolute;
+  left: 0vw;
+  bottom: 8vh;
+}
+
+/* Default filtered state - moves buttons up */
+.filter-buttons--filtered {
+  bottom: 40vh;
 }
 
 .filter-buttons__btn {
