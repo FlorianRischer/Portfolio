@@ -218,19 +218,20 @@
   <div id="image-modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>Upload Image</h2>
+        <h2 id="image-modal-title">Upload Image</h2>
         <button class="modal-close" onclick="closeModal('image-modal')">&times;</button>
       </div>
       <form id="image-form" onsubmit="saveImage(event)">
-        <div class="form-group">
+        <input type="hidden" id="image-edit-slug">
+        <div class="form-group" id="image-name-group">
           <label>Name</label>
           <input type="text" id="image-name" required>
         </div>
-        <div class="form-group">
+        <div class="form-group" id="image-slug-group">
           <label>Slug</label>
           <input type="text" id="image-slug" required pattern="[a-z0-9-]+">
         </div>
-        <div class="form-group">
+        <div class="form-group" id="image-category-group">
           <label>Category</label>
           <select id="image-category" required>
             <option value="project">Project</option>
@@ -243,7 +244,11 @@
           <label>File</label>
           <input type="file" id="image-file" accept="image/*" required>
         </div>
-        <button type="submit" class="btn btn-primary">Upload</button>
+        <div id="image-current-preview" style="margin-bottom: 1rem; display: none;">
+          <label>Current Image:</label>
+          <img id="image-preview-img" style="max-width: 200px; display: block; margin-top: 0.5rem; border: 1px solid #000;">
+        </div>
+        <button type="submit" class="btn btn-primary" id="image-submit-btn">Upload</button>
       </form>
     </div>
   </div>
@@ -337,6 +342,9 @@
                 <strong>${img.name}</strong>
                 <div class="card-meta">${img.slug}</div>
                 <span class="tag">${img.category}</span>
+                <div style="margin-top: 0.5rem;">
+                  <button class="btn btn-sm" onclick="replaceImage('${img.slug}', '${img.name}')">Replace</button>
+                </div>
               </div>
             </div>
           `).join('')}
@@ -503,24 +511,71 @@
     
     // Images
     function openAddImage() {
+      document.getElementById('image-modal-title').textContent = 'Upload Image';
       document.getElementById('image-form').reset();
+      document.getElementById('image-edit-slug').value = '';
+      document.getElementById('image-name-group').style.display = 'block';
+      document.getElementById('image-slug-group').style.display = 'block';
+      document.getElementById('image-category-group').style.display = 'block';
+      document.getElementById('image-current-preview').style.display = 'none';
+      document.getElementById('image-submit-btn').textContent = 'Upload';
+      document.getElementById('image-file').required = true;
+      // Restore required on fields
+      document.getElementById('image-name').required = true;
+      document.getElementById('image-slug').required = true;
+      document.getElementById('image-category').required = true;
+      openModal('image-modal');
+    }
+    
+    function replaceImage(slug, name) {
+      document.getElementById('image-modal-title').textContent = `Replace: ${name}`;
+      document.getElementById('image-form').reset();
+      document.getElementById('image-edit-slug').value = slug;
+      document.getElementById('image-name-group').style.display = 'none';
+      document.getElementById('image-slug-group').style.display = 'none';
+      document.getElementById('image-category-group').style.display = 'none';
+      document.getElementById('image-current-preview').style.display = 'block';
+      document.getElementById('image-preview-img').src = `https://portfolio-api.flo62616.workers.dev/api/images/${slug}`;
+      document.getElementById('image-submit-btn').textContent = 'Replace Image';
+      document.getElementById('image-file').required = true;
+      // Remove required from hidden fields
+      document.getElementById('image-name').required = false;
+      document.getElementById('image-slug').required = false;
+      document.getElementById('image-category').required = false;
       openModal('image-modal');
     }
     
     async function saveImage(e) {
       e.preventDefault();
-      const formData = new FormData();
-      formData.append('name', document.getElementById('image-name').value);
-      formData.append('slug', document.getElementById('image-slug').value);
-      formData.append('category', document.getElementById('image-category').value);
-      formData.append('file', document.getElementById('image-file').files[0]);
+      const editSlug = document.getElementById('image-edit-slug').value;
       
-      await fetch(`${API}/api/images`, {
-        method: 'POST',
-        body: formData
-      });
+      if (editSlug) {
+        // Replace existing image
+        const formData = new FormData();
+        formData.append('file', document.getElementById('image-file').files[0]);
+        
+        await fetch(`${API}/api/images/${editSlug}`, {
+          method: 'PUT',
+          body: formData
+        });
+        
+        showToast('Image replaced!');
+      } else {
+        // Upload new image
+        const formData = new FormData();
+        formData.append('name', document.getElementById('image-name').value);
+        formData.append('slug', document.getElementById('image-slug').value);
+        formData.append('category', document.getElementById('image-category').value);
+        formData.append('file', document.getElementById('image-file').files[0]);
+        
+        await fetch(`${API}/api/images`, {
+          method: 'POST',
+          body: formData
+        });
+        
+        showToast('Image uploaded!');
+      }
       
-      showToast('Image uploaded!');
       closeModal('image-modal');
       loadImages();
       populateImageSelects(); // Refresh selects

@@ -219,6 +219,40 @@ app.post('/api/images', upload.single('file'), (req, res) => {
   res.json({ success: true, id, slug, url: `/api/images/${slug}` });
 });
 
+// Replace existing image (upload new file with same slug)
+app.put('/api/images/:slug', upload.single('file'), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'No file' });
+  
+  const imageSlug = req.params.slug;
+  
+  // Check if image exists
+  const existingImages = executeD1(`SELECT * FROM images WHERE slug='${imageSlug}'`);
+  if (existingImages.length === 0) {
+    fs.unlinkSync(req.file.path);
+    return res.status(404).json({ error: 'Image not found' });
+  }
+  
+  const existingImage = existingImages[0];
+  const ext = path.extname(req.file.originalname);
+  const newFilename = `${imageSlug}${ext}`;
+  
+  // Upload new file to R2 (will overwrite if same filename)
+  const uploadedFilename = uploadToR2(req.file.path, newFilename);
+  if (!uploadedFilename) {
+    fs.unlinkSync(req.file.path);
+    return res.status(500).json({ error: 'Upload failed' });
+  }
+  
+  // Update D1 with new file info
+  const mimeType = ext === '.png' ? 'image/png' : ext === '.jpg' || ext === '.jpeg' ? 'image/jpeg' : ext === '.webp' ? 'image/webp' : 'image/svg+xml';
+  executeD1(`UPDATE images SET filename='${uploadedFilename}', mimeType='${mimeType}', size=${req.file.size} WHERE slug='${imageSlug}'`);
+  
+  // Cleanup
+  fs.unlinkSync(req.file.path);
+  
+  res.json({ success: true, slug: imageSlug, filename: uploadedFilename, url: `/api/images/${imageSlug}` });
+});
+
 // Add screen to project
 app.post('/api/projects/:slug/screens', upload.single('file'), (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'No file' });
