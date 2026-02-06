@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import ProjectCard from './ProjectCard';
 import './ProjectGrid.css';
 import { projectsAPI, imagesAPI, type Project as APIProject } from '../../services/api';
-import { getTechnologyIcons } from '../../services/technologyIcons';
 
 export interface Project {
   id: string;
