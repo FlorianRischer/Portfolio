@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio Admin</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Helvetica', sans-serif; background: #f5f5f5; padding: 2rem; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    h1 { font-size: 2rem; margin-bottom: 2rem; }
+    h2 { font-size: 1.5rem; margin: 2rem 0 1rem; border-bottom: 2px solid #000; padding-bottom: 0.5rem; }
+    
+    .tabs { display: flex; gap: 1rem; margin-bottom: 2rem; }
+    .tab { padding: 0.75rem 1.5rem; background: #fff; border: 2px solid #000; cursor: pointer; font-weight: 700; }
+    .tab.active { background: #000; color: #fff; }
+    
+    .card { background: #fff; border: 2px solid #000; padding: 1.5rem; margin-bottom: 1rem; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+    .card-title { font-size: 1.25rem; font-weight: 700; }
+    .card-meta { font-size: 0.875rem; color: #666; }
+    
+    .btn { padding: 0.5rem 1rem; border: 2px solid #000; background: #fff; cursor: pointer; font-weight: 700; transition: all 0.2s; }
+    .btn:hover { background: #000; color: #fff; }
+    .btn-primary { background: #000; color: #fff; }
+    .btn-primary:hover { background: #333; }
+    .btn-danger { border-color: #c00; color: #c00; }
+    .btn-danger:hover { background: #c00; color: #fff; }
+    .btn-sm { padding: 0.25rem 0.5rem; font-size: 0.875rem; }
+    
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-weight: 700; margin-bottom: 0.25rem; }
+    .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 0.5rem; border: 2px solid #000; font-family: inherit; }
+    .form-group textarea { min-height: 100px; resize: vertical; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    
+    .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 100; }
+    .modal.open { display: flex; }
+    .modal-content { background: #fff; padding: 2rem; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; border: 3px solid #000; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+    .modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; }
+    
+    .screens-list { display: grid; gap: 1rem; margin-top: 1rem; }
+    .screen-item { display: flex; gap: 1rem; padding: 1rem; border: 1px solid #ddd; }
+    .screen-item img { width: 100px; height: 60px; object-fit: cover; border: 1px solid #000; }
+    .screen-info { flex: 1; }
+    .screen-title { font-weight: 700; }
+    
+    .tag { display: inline-block; padding: 0.25rem 0.5rem; background: #eee; border: 1px solid #000; font-size: 0.75rem; margin: 0.25rem 0.25rem 0.25rem 0; }
+    .featured { background: #000; color: #fff; }
+    
+    .actions { display: flex; gap: 0.5rem; }
+    
+    .empty { text-align: center; padding: 3rem; color: #666; }
+    
+    .toast { position: fixed; bottom: 2rem; right: 2rem; padding: 1rem 2rem; background: #000; color: #fff; display: none; }
+    .toast.show { display: block; }
+    
+    .image-picker { display: flex; gap: 0.5rem; align-items: center; margin-top: 0.5rem; }
+    .image-picker select { flex: 1; }
+    .image-picker-preview { width: 60px; height: 40px; object-fit: cover; border: 1px solid #000; }
+    .upload-option { display: flex; gap: 1rem; margin-bottom: 0.5rem; }
+    .upload-option label { display: flex; align-items: center; gap: 0.25rem; font-weight: normal; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎨 Portfolio Admin</h1>
+    
+    <div class="tabs">
+      <button class="tab active" data-tab="projects">Projects</button>
+      <button class="tab" data-tab="images">Images</button>
+    </div>
+    
+    <!-- Projects Tab -->
+    <div id="projects-tab">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2 style="margin: 0; border: none; padding: 0;">Projects</h2>
+        <button class="btn btn-primary" onclick="openAddProject()">+ Add Project</button>
+      </div>
+      <div id="projects-list"></div>
+    </div>
+    
+    <!-- Images Tab -->
+    <div id="images-tab" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2 style="margin: 0; border: none; padding: 0;">Images</h2>
+        <button class="btn btn-primary" onclick="openAddImage()">+ Upload Image</button>
+      </div>
+      <div id="images-list"></div>
+    </div>
+  </div>
+  
+  <!-- Project Modal -->
+  <div id="project-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="project-modal-title">Add Project</h2>
+        <button class="modal-close" onclick="closeModal('project-modal')">&times;</button>
+      </div>
+      <form id="project-form" onsubmit="saveProject(event)">
+        <input type="hidden" id="project-edit-slug">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Title</label>
+            <input type="text" id="project-title" required>
+          </div>
+          <div class="form-group">
+            <label>Slug</label>
+            <input type="text" id="project-slug" required pattern="[a-z0-9-]+">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Short Description</label>
+          <input type="text" id="project-short-desc" required>
+        </div>
+        <div class="form-group">
+          <label>Full Description</label>
+          <textarea id="project-description" required></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Category</label>
+            <select id="project-category" required>
+              <option value="ux-design">UX Design</option>
+              <option value="ui-design">UI Design</option>
+              <option value="branding">Branding</option>
+              <option value="web-development">Web Development</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Order</label>
+            <input type="number" id="project-order" value="0">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Technologies (comma-separated)</label>
+          <input type="text" id="project-technologies" placeholder="Figma, React, TypeScript">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Live URL (optional)</label>
+            <input type="url" id="project-live-url">
+          </div>
+          <div class="form-group">
+            <label>GitHub URL (optional)</label>
+            <input type="url" id="project-github-url">
+          </div>
+        </div>
+        <div class="form-group">
+          <label><input type="checkbox" id="project-featured"> Featured</label>
+        </div>
+        <div class="form-group">
+          <label>Mockup Image</label>
+          <div class="upload-option">
+            <label><input type="radio" name="mockup-source" value="upload" checked onchange="toggleMockupSource()"> Upload new</label>
+            <label><input type="radio" name="mockup-source" value="existing" onchange="toggleMockupSource()"> Use existing</label>
+          </div>
+          <div id="mockup-upload-section">
+            <input type="file" id="project-mockup" accept="image/*">
+          </div>
+          <div id="mockup-existing-section" style="display: none;">
+            <div class="image-picker">
+              <select id="project-mockup-existing" onchange="previewMockupSelection()">
+                <option value="">-- Select image --</option>
+              </select>
+              <img id="mockup-existing-preview" class="image-picker-preview" style="display: none;">
+            </div>
+          </div>
+          <div id="project-mockup-preview" style="margin-top: 0.5rem;"></div>
+        </div>
+        <button type="submit" class="btn btn-primary">Save Project</button>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Screen Modal -->
+  <div id="screen-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Add Screen</h2>
+        <button class="modal-close" onclick="closeModal('screen-modal')">&times;</button>
+      </div>
+      <form id="screen-form" onsubmit="saveScreen(event)">
+        <input type="hidden" id="screen-project-slug">
+        <div class="form-group">
+          <label>Screen Title</label>
+          <input type="text" id="screen-title" required>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="screen-description" required></textarea>
+        </div>
+        <div class="form-group">
+          <label>Image</label>
+          <div class="upload-option">
+            <label><input type="radio" name="screen-source" value="upload" checked onchange="toggleScreenSource()"> Upload new</label>
+            <label><input type="radio" name="screen-source" value="existing" onchange="toggleScreenSource()"> Use existing</label>
+          </div>
+          <div id="screen-upload-section">
+            <input type="file" id="screen-file" accept="image/*">
+          </div>
+          <div id="screen-existing-section" style="display: none;">
+            <div class="image-picker">
+              <select id="screen-existing" onchange="previewScreenSelection()">
+                <option value="">-- Select image --</option>
+              </select>
+              <img id="screen-existing-preview" class="image-picker-preview" style="display: none;">
+            </div>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Screen</button>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Image Modal -->
+  <div id="image-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Upload Image</h2>
+        <button class="modal-close" onclick="closeModal('image-modal')">&times;</button>
+      </div>
+      <form id="image-form" onsubmit="saveImage(event)">
+        <div class="form-group">
+          <label>Name</label>
+          <input type="text" id="image-name" required>
+        </div>
+        <div class="form-group">
+          <label>Slug</label>
+          <input type="text" id="image-slug" required pattern="[a-z0-9-]+">
+        </div>
+        <div class="form-group">
+          <label>Category</label>
+          <select id="image-category" required>
+            <option value="project">Project</option>
+            <option value="skill">Skill</option>
+            <option value="general">General</option>
+            <option value="icon">Icon</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>File</label>
+          <input type="file" id="image-file" accept="image/*" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Upload</button>
+      </form>
+    </div>
+  </div>
+  
+  <div id="toast" class="toast"></div>
+  
+  <script>
+    const API = '';
+    
+    // Tab switching
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('projects-tab').style.display = tab.dataset.tab === 'projects' ? 'block' : 'none';
+        document.getElementById('images-tab').style.display = tab.dataset.tab === 'images' ? 'block' : 'none';
+      });
+    });
+    
+    // Toast
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+    
+    // Modal
+    function openModal(id) { document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+    
+    // Load Projects
+    async function loadProjects() {
+      const res = await fetch(`${API}/api/projects`);
+      const projects = await res.json();
+      
+      const html = projects.length ? projects.map(p => `
+        <div class="card">
+          <div class="card-header">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              ${p.thumbnailFilename ? `<img src="https://portfolio-api.flo62616.workers.dev/api/images/${p.thumbnailFilename.replace(/\.[^.]+$/, '')}" style="width: 80px; height: 50px; object-fit: cover; border: 1px solid #000;">` : ''}
+              <div>
+                <span class="card-title">${p.title}</span>
+                ${p.featured ? '<span class="tag featured">Featured</span>' : ''}
+                <span class="tag">${p.category}</span>
+              </div>
+            </div>
+            <div class="actions">
+              <button class="btn btn-sm" onclick="openAddScreen('${p.slug}')">+ Screen</button>
+              <button class="btn btn-sm" onclick="editProject('${p.slug}')">Edit</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteProject('${p.slug}')">Delete</button>
+            </div>
+          </div>
+          <p class="card-meta">${p.shortDescription}</p>
+          <div style="margin-top: 0.5rem;">
+            ${p.technologies.map(t => `<span class="tag">${t}</span>`).join('')}
+          </div>
+          ${p.screens.length ? `
+            <div class="screens-list">
+              <strong>Screens (${p.screens.length}):</strong>
+              ${p.screens.map(s => `
+                <div class="screen-item">
+                  <img src="https://portfolio-api.flo62616.workers.dev${s.imageUrl}" alt="${s.title}">
+                  <div class="screen-info">
+                    <div class="screen-title">${s.title}</div>
+                    <div class="card-meta">${s.description.substring(0, 100)}...</div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          ` : ''}
+        </div>
+      `).join('') : '<div class="empty">No projects yet</div>';
+      
+      document.getElementById('projects-list').innerHTML = html;
+    }
+    
+    // Load Images
+    async function loadImages() {
+      const res = await fetch(`${API}/api/images`);
+      const images = await res.json();
+      
+      const html = images.length ? `
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem;">
+          ${images.map(img => `
+            <div class="card" style="padding: 0.5rem;">
+              <img src="https://portfolio-api.flo62616.workers.dev/api/images/${img.slug}" 
+                   alt="${img.name}" 
+                   style="width: 100%; height: 120px; object-fit: cover; border: 1px solid #000;">
+              <div style="padding: 0.5rem;">
+                <strong>${img.name}</strong>
+                <div class="card-meta">${img.slug}</div>
+                <span class="tag">${img.category}</span>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      ` : '<div class="empty">No images yet</div>';
+      
+      document.getElementById('images-list').innerHTML = html;
+    }
+    
+    // Add/Edit Project
+    function openAddProject() {
+      document.getElementById('project-modal-title').textContent = 'Add Project';
+      document.getElementById('project-form').reset();
+      document.getElementById('project-edit-slug').value = '';
+      document.getElementById('project-mockup-preview').innerHTML = '';
+      openModal('project-modal');
+    }
+    
+    async function editProject(slug) {
+      const res = await fetch(`${API}/api/projects/${slug}`);
+      const p = await res.json();
+      
+      document.getElementById('project-modal-title').textContent = 'Edit Project';
+      document.getElementById('project-edit-slug').value = slug;
+      document.getElementById('project-title').value = p.title;
+      document.getElementById('project-slug').value = p.slug;
+      document.getElementById('project-short-desc').value = p.shortDescription;
+      document.getElementById('project-description').value = p.description;
+      document.getElementById('project-category').value = p.category;
+      document.getElementById('project-order').value = p.order;
+      document.getElementById('project-technologies').value = p.technologies.join(', ');
+      document.getElementById('project-live-url').value = p.liveUrl || '';
+      document.getElementById('project-github-url').value = p.githubUrl || '';
+      document.getElementById('project-featured').checked = p.featured;
+      
+      // Show current mockup if exists
+      const mockupPreview = document.getElementById('project-mockup-preview');
+      if (p.thumbnailFilename) {
+        mockupPreview.innerHTML = `<img src="https://portfolio-api.flo62616.workers.dev/api/images/${p.thumbnailFilename.replace(/\.[^.]+$/, '')}" style="max-width: 200px; border: 1px solid #000;">`;
+      } else {
+        mockupPreview.innerHTML = '<span class="card-meta">No mockup set</span>';
+      }
+      
+      openModal('project-modal');
+    }
+    
+    async function saveProject(e) {
+      e.preventDefault();
+      const editSlug = document.getElementById('project-edit-slug').value;
+      const slug = document.getElementById('project-slug').value;
+      const mockupFile = document.getElementById('project-mockup').files[0];
+      
+      const data = {
+        title: document.getElementById('project-title').value,
+        slug: slug,
+        shortDescription: document.getElementById('project-short-desc').value,
+        description: document.getElementById('project-description').value,
+        category: document.getElementById('project-category').value,
+        order: parseInt(document.getElementById('project-order').value) || 0,
+        technologies: document.getElementById('project-technologies').value.split(',').map(t => t.trim()).filter(t => t),
+        liveUrl: document.getElementById('project-live-url').value || null,
+        githubUrl: document.getElementById('project-github-url').value || null,
+        featured: document.getElementById('project-featured').checked
+      };
+      
+      if (editSlug) {
+        await fetch(`${API}/api/projects/${editSlug}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        showToast('Project updated!');
+      } else {
+        await fetch(`${API}/api/projects`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        showToast('Project added!');
+      }
+      
+      // Upload mockup if selected
+      const mockupSource = document.querySelector('input[name="mockup-source"]:checked').value;
+      if (mockupSource === 'upload' && mockupFile) {
+        const formData = new FormData();
+        formData.append('file', mockupFile);
+        await fetch(`${API}/api/projects/${slug}/mockup`, {
+          method: 'POST',
+          body: formData
+        });
+        showToast('Mockup uploaded!');
+      } else if (mockupSource === 'existing') {
+        const existingSlug = document.getElementById('project-mockup-existing').value;
+        if (existingSlug) {
+          await fetch(`${API}/api/projects/${slug}/mockup-existing`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ imageSlug: existingSlug })
+          });
+          showToast('Mockup set!');
+        }
+      }
+      
+      closeModal('project-modal');
+      loadProjects();
+    }
+    
+    async function deleteProject(slug) {
+      if (!confirm(`Delete project "${slug}"?`)) return;
+      await fetch(`${API}/api/projects/${slug}`, { method: 'DELETE' });
+      showToast('Project deleted!');
+      loadProjects();
+    }
+    
+    // Screens
+    function openAddScreen(slug) {
+      document.getElementById('screen-project-slug').value = slug;
+      document.getElementById('screen-form').reset();
+      document.querySelector('input[name="screen-source"][value="upload"]').checked = true;
+      toggleScreenSource();
+      document.getElementById('screen-existing-preview').style.display = 'none';
+      openModal('screen-modal');
+    }
+    
+    async function saveScreen(e) {
+      e.preventDefault();
+      const slug = document.getElementById('screen-project-slug').value;
+      const title = document.getElementById('screen-title').value;
+      const description = document.getElementById('screen-description').value;
+      const screenSource = document.querySelector('input[name="screen-source"]:checked').value;
+      
+      if (screenSource === 'upload') {
+        const file = document.getElementById('screen-file').files[0];
+        if (!file) {
+          showToast('Please select a file');
+          return;
+        }
+        const formData = new FormData();
+        formData.append('title', title);
+        formData.append('description', description);
+        formData.append('file', file);
+        
+        await fetch(`${API}/api/projects/${slug}/screens`, {
+          method: 'POST',
+          body: formData
+        });
+      } else {
+        const existingSlug = document.getElementById('screen-existing').value;
+        if (!existingSlug) {
+          showToast('Please select an image');
+          return;
+        }
+        await fetch(`${API}/api/projects/${slug}/screens-existing`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, description, imageSlug: existingSlug })
+        });
+      }
+      
+      showToast('Screen added!');
+      closeModal('screen-modal');
+      loadProjects();
+    }
+    
+    // Images
+    function openAddImage() {
+      document.getElementById('image-form').reset();
+      openModal('image-modal');
+    }
+    
+    async function saveImage(e) {
+      e.preventDefault();
+      const formData = new FormData();
+      formData.append('name', document.getElementById('image-name').value);
+      formData.append('slug', document.getElementById('image-slug').value);
+      formData.append('category', document.getElementById('image-category').value);
+      formData.append('file', document.getElementById('image-file').files[0]);
+      
+      await fetch(`${API}/api/images`, {
+        method: 'POST',
+        body: formData
+      });
+      
+      showToast('Image uploaded!');
+      closeModal('image-modal');
+      loadImages();
+      populateImageSelects(); // Refresh selects
+    }
+    
+    // Image selection helpers
+    let allImages = [];
+    
+    async function populateImageSelects() {
+      const res = await fetch(`${API}/api/images`);
+      allImages = await res.json();
+      
+      const mockupSelect = document.getElementById('project-mockup-existing');
+      const screenSelect = document.getElementById('screen-existing');
+      
+      const options = allImages.map(img => 
+        `<option value="${img.slug}" data-filename="${img.filename}">${img.name} (${img.category})</option>`
+      ).join('');
+      
+      mockupSelect.innerHTML = '<option value="">-- Select image --</option>' + options;
+      screenSelect.innerHTML = '<option value="">-- Select image --</option>' + options;
+    }
+    
+    function toggleMockupSource() {
+      const source = document.querySelector('input[name="mockup-source"]:checked').value;
+      document.getElementById('mockup-upload-section').style.display = source === 'upload' ? 'block' : 'none';
+      document.getElementById('mockup-existing-section').style.display = source === 'existing' ? 'block' : 'none';
+    }
+    
+    function toggleScreenSource() {
+      const source = document.querySelector('input[name="screen-source"]:checked').value;
+      document.getElementById('screen-upload-section').style.display = source === 'upload' ? 'block' : 'none';
+      document.getElementById('screen-existing-section').style.display = source === 'existing' ? 'block' : 'none';
+    }
+    
+    function previewMockupSelection() {
+      const select = document.getElementById('project-mockup-existing');
+      const preview = document.getElementById('mockup-existing-preview');
+      const slug = select.value;
+      
+      if (slug) {
+        preview.src = `https://portfolio-api.flo62616.workers.dev/api/images/${slug}`;
+        preview.style.display = 'block';
+      } else {
+        preview.style.display = 'none';
+      }
+    }
+    
+    function previewScreenSelection() {
+      const select = document.getElementById('screen-existing');
+      const preview = document.getElementById('screen-existing-preview');
+      const slug = select.value;
+      
+      if (slug) {
+        preview.src = `https://portfolio-api.flo62616.workers.dev/api/images/${slug}`;
+        preview.style.display = 'block';
+      } else {
+        preview.style.display = 'none';
+      }
+    }
+    
+    // Init
+    loadProjects();
+    loadImages();
+    populateImageSelects();
+  </script>
+</body>
+</html>

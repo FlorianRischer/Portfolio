@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import ProjectCard from './ProjectCard';
 import './ProjectGrid.css';
 import { projectsAPI, imagesAPI, type Project as APIProject } from '../../services/api';
+import { getTechnologyIcons } from '../../services/technologyIcons';
 
 export interface Project {
   id: string;
@@ -11,6 +12,7 @@ export interface Project {
   image: string;
   category: 'ux-ui-design' | 'visual-design' | 'personal-art';
   projectUrl?: string;
+  technologies: string[];
 }
 
 // All images now from API
@@ -34,6 +36,7 @@ const convertAPIProject = (apiProject: APIProject): Project => ({
   image: getProjectImage(apiProject.slug),
   category: categoryMap[apiProject.category] || 'ux-ui-design',
   projectUrl: `/works/${apiProject.slug}`,
+  technologies: apiProject.technologies || [],
 });
 
 // Fallback project data (used when API is unavailable)
@@ -44,7 +47,8 @@ const fallbackProjects: Project[] = [
     description: 'This redesign of an older version of the SoundCloud website was created as part of a UX and UI Design course.',
     image: imagesAPI.getUrl('project-soundcloud-mockup'),
     category: 'ux-ui-design',
-    projectUrl: '/works/soundcloud'
+    projectUrl: '/works/soundcloud',
+    technologies: ['Figma', 'Adobe Photoshop', 'User Research']
   },
   {
     id: 'muenchen-budget',
@@ -52,7 +56,8 @@ const fallbackProjects: Project[] = [
     description: '"München Budget" was developed as part of a Service Design module, focusing on creating a concept for a potential service offered by the City of Munich.',
     image: imagesAPI.getUrl('project-muenchen-budget-mockup'),
     category: 'ux-ui-design',
-    projectUrl: '#'
+    projectUrl: '#',
+    technologies: ['Figma', 'Service Design', 'User Research']
   },
   {
     id: 'slice-of-paradise',
@@ -60,7 +65,8 @@ const fallbackProjects: Project[] = [
     description: '"Slice of Paradise" is a corporate design project focused on developing a fresh visual identity for a catamaran called "Slice."',
     image: imagesAPI.getUrl('project-slice-of-paradise-mockup'),
     category: 'visual-design',
-    projectUrl: '/works/slice-of-paradise'
+    projectUrl: '/works/slice-of-paradise',
+    technologies: ['Adobe Illustrator', 'Adobe Photoshop', 'Brand Strategy']
   }
 ];
 
@@ -123,6 +129,7 @@ export default function ProjectGrid({ filter, isVisible, isExiting, animationDel
           description={project.description}
           image={project.image}
           projectUrl={project.projectUrl}
+          technologies={project.technologies}
           index={index}
           totalItems={totalProjects}
           baseDelay={baseDelay}

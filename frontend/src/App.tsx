@@ -5,8 +5,7 @@ import Header from './components/Header';
 import { TransitionProvider } from './components/PageTransition/TransitionContext';
 import HomePage from './pages/HomePage';
 import WorksPage from './pages/WorksPage';
-import SoundcloudDetailPage from './pages/SoundcloudDetailPage';
-import SliceOfParadiseDetailPage from './pages/SliceOfParadiseDetailPage';
+import ProjectDetailPage from './pages/ProjectDetailPage';
 import ContactPage from './pages/ContactPage';
 import AboutPage from './pages/AboutPage';
 import { imagesAPI } from './services/api';
@@ -49,8 +48,7 @@ function AppContent() {
           {/* Public routes */}
           <Route path="/home" element={<HomePage />} />
           <Route path="/works" element={<WorksPage />} />
-          <Route path="/works/soundcloud" element={<SoundcloudDetailPage />} />
-          <Route path="/works/slice-of-paradise" element={<SliceOfParadiseDetailPage />} />
+          <Route path="/works/:slug" element={<ProjectDetailPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
         </Routes>

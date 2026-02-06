@@ -2,8 +2,9 @@
 import { useTransition } from '../PageTransition/TransitionContext';
 import './ProjectCard.css';
 import { imagesAPI } from '../../services/api';
+import { getTechnologyIcons } from '../../services/technologyIcons';
 
-// Website icon
+// Fallback icon
 const flowerIcon = imagesAPI.getUrl('flower');
 
 interface ProjectCardProps {
@@ -11,6 +12,7 @@ interface ProjectCardProps {
   description: string;
   image: string;
   projectUrl?: string;
+  technologies?: string[];
   index: number;
   totalItems: number;
   baseDelay: number;
@@ -21,12 +23,16 @@ export default function ProjectCard({
   description, 
   image, 
   projectUrl = '#',
+  technologies = [],
   index,
   totalItems,
   baseDelay
 }: ProjectCardProps) {
   const isInternalLink = projectUrl.startsWith('/');
   const { navigateWithTransition } = useTransition();
+  
+  // Get technology icons (max 3)
+  const techIcons = getTechnologyIcons(technologies).slice(0, 3);
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (isInternalLink) {
@@ -56,7 +62,21 @@ export default function ProjectCard({
               view project
             </a>
           )}
-          <img src={flowerIcon} alt="" className="project-card__icon" />
+          <div className="project-card__icons">
+            {techIcons.length > 0 ? (
+              techIcons.map((tech, i) => (
+                <img 
+                  key={i} 
+                  src={tech.icon} 
+                  alt={tech.name} 
+                  className="project-card__tech-icon" 
+                  title={tech.name}
+                />
+              ))
+            ) : (
+              <img src={flowerIcon} alt="" className="project-card__icon" />
+            )}
+          </div>
         </div>
       </div>
       <div className="project-card__image-wrapper">

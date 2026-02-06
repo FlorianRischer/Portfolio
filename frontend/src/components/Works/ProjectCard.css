@@ -77,10 +77,27 @@
   gap: 10vw;
 }
 
+.project-card__icons {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.5rem, 1vw, 1rem);
+}
+
 .project-card__icon {
   width: 5vw;
   height: auto;
   object-fit: contain;
+}
+
+.project-card__tech-icon {
+  width: clamp(1.75rem, 3vw, 2.5rem);
+  height: clamp(1.75rem, 3vw, 2.5rem);
+  object-fit: contain;
+  transition: transform 0.2s ease;
+}
+
+.project-card__tech-icon:hover {
+  transform: scale(1.1);
 }
 
 .project-card__image-wrapper {
