@@ -173,8 +173,8 @@ export default function Contact() {
           filters={filterOptions}
           activeFilter={activeView}
           onFilterChange={setActiveView}
-          className={`contact__filters ${delayedButtonPosition === 'socials' ? 'contact__filters--socials-active' : ''} ${delayedButtonPosition === 'contact-form' ? 'contact__filters--form-active' : ''}`}
-          baseClassName="contact__filters"
+          className={`contact__filters filter-buttons ${delayedButtonPosition === 'socials' ? 'contact__filters--socials-active' : ''} ${delayedButtonPosition === 'contact-form' ? 'contact__filters--form-active' : ''}`}
+          baseClassName="filter-buttons"
           isFiltered={delayedButtonPosition !== null}
         />
       </div>

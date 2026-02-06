@@ -2,7 +2,7 @@
 .filter-buttons {
   display: flex;
   flex-direction: column;
-  gap: clamp(0.375rem, 0.7vw, 0.625rem);
+  gap: 1.5vh;
   transition: var(--transition-slow);
 }
 

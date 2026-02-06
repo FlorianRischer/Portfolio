@@ -69,9 +69,6 @@
   position: absolute;
   left: 0vw;
   bottom: 8vh;
-  display: flex;
-  flex-direction: column;
-  gap: 0.7vh;
   transition: var(--transition-slow);
 }
 
@@ -81,37 +78,6 @@
 
 .contact__filters--form-active {
   bottom: 68vh;
-}
-
-.contact__filters__btn {
-  font-family: 'Helvetica', sans-serif;
-  font-weight: 700;
-  line-height: normal;
-  color: #000000;
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  text-align: left;
-  white-space: nowrap;
-  transition: font-size var(--transition-fast);
-  margin: 0;
-}
-
-.contact__filters__btn--small {
-  font-size: var(--font-xl);
-}
-
-.contact__filters__btn--large {
-  font-size: var(--font-3xl);
-}
-
-.contact__filters__btn--active {
-  font-weight: 700;
-}
-
-.contact__filters__btn:hover {
-  opacity: 0.6;
 }
 
 /* Socials Section */

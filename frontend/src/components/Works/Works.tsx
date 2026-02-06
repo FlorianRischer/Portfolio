@@ -100,7 +100,8 @@ export default function Works() {
           filters={filterOptions}
           activeFilter={activeFilter}
           onFilterChange={setActiveFilter}
-          className="works__filters"
+          className="works__filters filter-buttons"
+          baseClassName="filter-buttons"
           isFiltered={delayedButtonPosition !== null}
         />
 
