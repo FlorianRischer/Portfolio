@@ -412,6 +412,29 @@ app.delete('/api/projects/:slug/screens/:screenIndex', (req, res) => {
   res.json({ success: true });
 });
 
+// Reorder screens in a project
+app.put('/api/projects/:slug/screens-reorder', (req, res) => {
+  const { fromIndex, toIndex } = req.body;
+  const projectSlug = req.params.slug;
+  
+  // Get current project
+  const projects = executeD1(`SELECT screens FROM projects WHERE slug='${projectSlug}'`);
+  const currentScreens = JSON.parse(projects[0]?.screens || '[]');
+  
+  if (fromIndex < 0 || fromIndex >= currentScreens.length || toIndex < 0 || toIndex >= currentScreens.length) {
+    return res.status(400).json({ error: 'Invalid index' });
+  }
+  
+  // Move screen from fromIndex to toIndex
+  const [movedScreen] = currentScreens.splice(fromIndex, 1);
+  currentScreens.splice(toIndex, 0, movedScreen);
+  
+  // Update project
+  executeD1(`UPDATE projects SET screens='${JSON.stringify(currentScreens).replace(/'/g, "''")}', updatedAt='${new Date().toISOString()}' WHERE slug='${projectSlug}'`);
+  
+  res.json({ success: true });
+});
+
 app.listen(PORT, () => {
   console.log(`\n🎨 Portfolio Admin running at http://localhost:${PORT}\n`);
 });

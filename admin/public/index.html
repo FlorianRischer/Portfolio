@@ -41,10 +41,14 @@
     .modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; }
     
     .screens-list { display: grid; gap: 1rem; margin-top: 1rem; }
-    .screen-item { display: flex; gap: 1rem; padding: 1rem; border: 1px solid #ddd; }
-    .screen-item img { width: 100px; height: 60px; object-fit: cover; border: 1px solid #000; }
-    .screen-info { flex: 1; }
+    .screen-item { display: flex; gap: 1rem; padding: 1rem; border: 1px solid #ddd; cursor: grab; transition: all 0.2s; background: #fff; }
+    .screen-item:active { cursor: grabbing; }
+    .screen-item.dragging { opacity: 0.5; border-style: dashed; }
+    .screen-item.drag-over { border-color: #000; border-width: 2px; background: #f0f0f0; }
+    .screen-item img { width: 100px; height: 60px; object-fit: cover; border: 1px solid #000; pointer-events: none; }
+    .screen-info { flex: 1; pointer-events: none; }
     .screen-title { font-weight: 700; }
+    .drag-handle { display: flex; align-items: center; padding-right: 0.5rem; color: #999; cursor: grab; font-size: 1.2rem; }
     
     .tag { display: inline-block; padding: 0.25rem 0.5rem; background: #eee; border: 1px solid #000; font-size: 0.75rem; margin: 0.25rem 0.25rem 0.25rem 0; }
     .featured { background: #000; color: #fff; }
@@ -122,10 +126,9 @@
           <div class="form-group">
             <label>Category</label>
             <select id="project-category" required>
-              <option value="ux-design">UX Design</option>
-              <option value="ui-design">UI Design</option>
-              <option value="branding">Branding</option>
-              <option value="web-development">Web Development</option>
+              <option value="UX/UI Design">UX/UI Design</option>
+              <option value="Visual Design">Visual Design</option>
+              <option value="Personal Art">Personal Art</option>
             </select>
           </div>
           <div class="form-group">
@@ -313,10 +316,14 @@
     function openModal(id) { document.getElementById(id).classList.add('open'); }
     function closeModal(id) { document.getElementById(id).classList.remove('open'); }
     
+    // Store projects data globally for screen editing
+    let projectsData = [];
+    
     // Load Projects
     async function loadProjects() {
       const res = await fetch(`${API}/api/projects`);
       const projects = await res.json();
+      projectsData = projects; // Store for later use
       
       const html = projects.length ? projects.map(p => `
         <div class="card">
@@ -340,17 +347,18 @@
             ${p.technologies.map(t => `<span class="tag">${t}</span>`).join('')}
           </div>
           ${p.screens.length ? `
-            <div class="screens-list">
+            <div class="screens-list" data-project="${p.slug}">
               <strong>Screens (${p.screens.length}):</strong>
               ${p.screens.map((s, i) => `
-                <div class="screen-item">
+                <div class="screen-item" draggable="true" data-index="${i}" data-project="${p.slug}">
+                  <span class="drag-handle">⋮⋮</span>
                   <img src="https://portfolio-api.flo62616.workers.dev${s.imageUrl}" alt="${s.title}">
                   <div class="screen-info">
                     <div class="screen-title">${s.title}</div>
                     <div class="card-meta">${s.description.substring(0, 100)}...</div>
                   </div>
-                  <div class="actions" style="flex-shrink: 0;">
-                    <button class="btn btn-sm" onclick="editScreen('${p.slug}', ${i}, '${s.title.replace(/'/g, "\\'")}', \`${s.description.replace(/`/g, "\\`")}\`, '${s.imageUrl}')">Edit</button>
+                  <div class="actions" style="flex-shrink: 0; pointer-events: auto;">
+                    <button class="btn btn-sm" data-project="${p.slug}" data-index="${i}" onclick="editScreenFromData(this)">Edit</button>
                     <button class="btn btn-sm btn-danger" onclick="deleteScreen('${p.slug}', ${i}, '${s.title.replace(/'/g, "\\'")}')">×</button>
                   </div>
                 </div>
@@ -361,6 +369,80 @@
       `).join('') : '<div class="empty">No projects yet</div>';
       
       document.getElementById('projects-list').innerHTML = html;
+      
+      // Setup drag and drop for screens
+      setupScreenDragDrop();
+    }
+    
+    // Drag and Drop for Screens
+    let draggedScreen = null;
+    let draggedFromIndex = null;
+    let draggedProjectSlug = null;
+    
+    function setupScreenDragDrop() {
+      document.querySelectorAll('.screen-item').forEach(item => {
+        item.addEventListener('dragstart', handleDragStart);
+        item.addEventListener('dragend', handleDragEnd);
+        item.addEventListener('dragover', handleDragOver);
+        item.addEventListener('dragenter', handleDragEnter);
+        item.addEventListener('dragleave', handleDragLeave);
+        item.addEventListener('drop', handleDrop);
+      });
+    }
+    
+    function handleDragStart(e) {
+      draggedScreen = this;
+      draggedFromIndex = parseInt(this.dataset.index);
+      draggedProjectSlug = this.dataset.project;
+      this.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    }
+    
+    function handleDragEnd(e) {
+      this.classList.remove('dragging');
+      document.querySelectorAll('.screen-item').forEach(item => {
+        item.classList.remove('drag-over');
+      });
+      draggedScreen = null;
+      draggedFromIndex = null;
+      draggedProjectSlug = null;
+    }
+    
+    function handleDragOver(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+    }
+    
+    function handleDragEnter(e) {
+      e.preventDefault();
+      // Only allow dropping on screens from the same project
+      if (this.dataset.project === draggedProjectSlug && this !== draggedScreen) {
+        this.classList.add('drag-over');
+      }
+    }
+    
+    function handleDragLeave(e) {
+      this.classList.remove('drag-over');
+    }
+    
+    async function handleDrop(e) {
+      e.preventDefault();
+      this.classList.remove('drag-over');
+      
+      const toIndex = parseInt(this.dataset.index);
+      const projectSlug = this.dataset.project;
+      
+      // Only reorder if same project and different position
+      if (projectSlug === draggedProjectSlug && draggedFromIndex !== toIndex) {
+        await fetch(`${API}/api/projects/${projectSlug}/screens-reorder`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ fromIndex: draggedFromIndex, toIndex })
+        });
+        
+        showToast('Screen order updated!');
+        loadProjects();
+      }
     }
     
     // Load Images
@@ -547,6 +629,18 @@
     }
     
     // Edit Screen
+    function editScreenFromData(btn) {
+      const projectSlug = btn.dataset.project;
+      const index = parseInt(btn.dataset.index);
+      const project = projectsData.find(p => p.slug === projectSlug);
+      if (!project || !project.screens[index]) {
+        showToast('Screen not found');
+        return;
+      }
+      const screen = project.screens[index];
+      editScreen(projectSlug, index, screen.title, screen.description, screen.imageUrl);
+    }
+    
     function editScreen(projectSlug, index, title, description, imageUrl) {
       document.getElementById('edit-screen-project-slug').value = projectSlug;
       document.getElementById('edit-screen-index').value = index;

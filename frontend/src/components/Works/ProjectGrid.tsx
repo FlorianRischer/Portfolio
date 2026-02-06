@@ -21,6 +21,11 @@ const getProjectImage = (slug: string): string => {
 
 // Category mapping from API to frontend
 const categoryMap: Record<string, 'ux-ui-design' | 'visual-design' | 'personal-art'> = {
+  // New categories from admin
+  'UX/UI Design': 'ux-ui-design',
+  'Visual Design': 'visual-design',
+  'Personal Art': 'personal-art',
+  // Legacy categories (for backwards compatibility)
   'ux-design': 'ux-ui-design',
   'ui-design': 'ux-ui-design',
   'branding': 'visual-design',
