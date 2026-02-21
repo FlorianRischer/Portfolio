@@ -1,6 +1,5 @@
 // Author: Florian Rischer
 import { useState, useEffect } from 'react';
-import { useTransition } from '../../PageTransition/TransitionContext';
 import { imagesAPI } from '../../../services/api';
 import './MockupCarousel.css';
 
@@ -36,9 +35,6 @@ interface MockupCarouselProps {
  */
 export default function MockupCarousel({
   screens,
-  title,
-  subtitle,
-  backRoute = '/works',
   enableZoom = true,
   className = 'mockup-carousel'
 }: MockupCarouselProps) {
@@ -49,7 +45,6 @@ export default function MockupCarousel({
   const [isTextTransitioning, setIsTextTransitioning] = useState(false);
   const [displayedScreen, setDisplayedScreen] = useState(0);
   const [isZoomed, setIsZoomed] = useState(false);
-  const { navigateWithTransition } = useTransition();
 
   const goToPrevious = () => {
     if (isAnimating) return;
@@ -142,24 +137,7 @@ export default function MockupCarousel({
 
       {/* Content overlay */}
       <div className={`${className}__content ${isZoomed ? `${className}__content--hidden` : ''}`}>
-        {/* Title section */}
-        <div className={`${className}__header`}>
-          <button 
-            className={`${className}__title-button`}
-            onClick={() => navigateWithTransition(backRoute)}
-            aria-label="Back to works"
-          >
-            <h1 className={`${className}__title`}>
-              {subtitle ? (
-                <>
-                  {title}<br />{subtitle}
-                </>
-              ) : (
-                title
-              )}
-            </h1>
-          </button>
-        </div>
+        
 
         {/* Navigation arrows */}
         <button

@@ -17,7 +17,7 @@ const Header = () => {
           <a href="/home" className="header__logo" onClick={(e) => handleNavigation(e, '/home')}>
             Florian Rischer
           </a>
-          <span className="header__subtitle">ux ui design | frontend development | user research</span>
+          <span className="header__subtitle">ux ui design | frontend development | user research | service design</span>
         </div>
 
         <nav className="header__nav">

@@ -203,7 +203,6 @@
   gap: clamp(2rem, 4vw, 3.5rem);
   max-height: 60vh;
   overflow-y: auto;
-  overflow-x: visible;
   padding-top: clamp(2rem, 3vw, 3rem);
   padding-bottom: clamp(2rem, 3vw, 3rem);
   scrollbar-width: none;

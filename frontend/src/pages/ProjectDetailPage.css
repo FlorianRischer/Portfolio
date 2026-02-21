@@ -1,0 +1,366 @@
+/* Project Detail Page */
+.project-detail {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background-color: #ffffff;
+  overflow: hidden;
+}
+
+/* ── Title ── */
+.project-detail__title {
+  position: absolute;
+  font-family: 'Helvetica', sans-serif;
+  font-size: var(--font-3xl);
+  font-weight: 300;
+  line-height: normal;
+  color: #000000;
+  left: 0;
+  right: auto;
+  top: clamp(4rem, 6.3vw, 5.6875rem);
+  z-index: 10;
+  transition: transform var(--transition-slow), opacity var(--transition-slow);
+  transform: translateX(0);
+}
+
+.project-detail__title--right {
+  /* Slide to right-aligned position: full width minus the title's own width */
+  transform: translateX(calc(85vw - 100%));
+}
+
+/* ── Category (default / My Role state) ── */
+.project-detail__category {
+  position: absolute;
+  right: 0;
+  top: clamp(4rem, 6.3vw, 5.6875rem);
+  font-family: 'Helvetica', sans-serif;
+  font-size: var(--font-works-title);
+  font-weight: 700;
+  line-height: 0.95;
+  color: #000000;
+  max-width: 50%;
+  white-space: normal;
+  word-break: break-word;
+  text-align: right;
+  transition: transform var(--transition-slow), opacity var(--transition-slow);
+  transform: translateX(0);
+}
+
+.project-detail__category p {
+  margin: 0;
+  padding: 0;
+}
+
+.project-detail__category--hidden {
+  transform: translateX(100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── Section Navigation (Filter Buttons) ── */
+.pd-filters {
+  position: absolute;
+  left: 0;
+  bottom: 8vh;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7vh;
+  transition: var(--transition-slow);
+  z-index: 10;
+}
+
+/* Per-section position states (animate bottom like About page) */
+.pd-filters--my-role-active {
+  bottom: 73.5vh;
+}
+
+.pd-filters--prototype-screens-active {
+  bottom: 78.5vh;
+}
+
+.pd-filters--used-technologies-active {
+  bottom: 83.5vh;
+}
+
+/* Button base */
+.pd-filters__btn {
+  font-family: 'Helvetica', sans-serif;
+  font-weight: 700;
+  line-height: normal;
+  color: #000000;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  transition: font-size var(--transition-fast), opacity var(--transition-slow), pointer-events var(--transition-slow);
+  margin: 0;
+}
+
+.pd-filters__btn--small {
+  font-size: var(--font-xl);
+}
+
+.pd-filters__btn--large {
+  font-size: var(--font-3xl);
+}
+
+.pd-filters__btn--active {
+  font-weight: 700;
+}
+
+.pd-filters__btn:hover {
+  opacity: 0.6;
+}
+
+/* Hide inactive buttons when a filter is active */
+.project-detail--filtered .pd-filters__btn:not(.pd-filters__btn--active) {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── Page Description (default state) ── */
+.project-detail__description.page-description {
+  bottom: 8vh;
+  text-align: justify;
+  width: clamp(18rem, 38vw, 35rem);
+}
+
+/* ── Sections (generic) ── */
+.project-detail__section {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-slow);
+}
+
+.project-detail__section--visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.project-detail__section--exiting {
+  opacity: 0;
+}
+
+/* ── My Role section ── */
+.project-detail__role-section {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding-bottom: 8vh;
+}
+
+.project-detail__role-text {
+  font-family: 'Helvetica', sans-serif;
+  font-size: var(--font-base);
+  font-weight: 400;
+  line-height: 1.2;
+  color: #000000;
+  text-align: justify;
+  width: clamp(18rem, 38vw, 35rem);
+  margin: 0;
+}
+
+/* ── Prototype Screens (MockupCarousel) section ── */
+.project-detail__screens-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.project-detail__screens-section .mockup-carousel {
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  transform: translateY(100vh);
+  transition: transform var(--transition-slow);
+}
+
+.project-detail__section--visible.project-detail__screens-section .mockup-carousel {
+  transform: translateY(0);
+}
+
+.project-detail__section--exiting.project-detail__screens-section .mockup-carousel {
+  transform: translateY(100vh);
+}
+
+/* ── Used Technologies section ── */
+.project-detail__tech-section {
+  display: flex;
+  align-items: flex-end;
+  padding-bottom: 8vh;
+}
+
+.project-detail__tech-list {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2rem, 4vw, 3.5rem);
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-top: clamp(2rem, 3vw, 3rem);
+  padding-bottom: clamp(2rem, 3vw, 3rem);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.project-detail__tech-list::-webkit-scrollbar {
+  display: none;
+}
+
+.project-detail__tech-item {
+  display: flex;
+  align-items: center;
+  gap: clamp(1rem, 2vw, 2rem);
+  opacity: 0;
+  transform: translateY(clamp(2rem, 3vw, 3rem));
+}
+
+.project-detail__section--visible .project-detail__tech-item {
+  animation: pdStaggerFadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+  animation-delay: var(--stagger-delay, 0s);
+}
+
+.project-detail__section--exiting .project-detail__tech-item {
+  animation: pdStaggerFadeOutDown 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+  animation-delay: var(--stagger-delay-exit, 0s);
+}
+
+.project-detail__tech-icon {
+  width: clamp(3rem, 5vw, 4.5rem);
+  height: clamp(3rem, 5vw, 4.5rem);
+  flex-shrink: 0;
+  border-radius: 15px;
+  overflow: hidden;
+  transition: transform var(--transition-fast);
+}
+
+.project-detail__tech-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.project-detail__tech-name {
+  font-family: 'Helvetica', sans-serif;
+  font-size: var(--font-base);
+  font-weight: 400;
+  color: #000000;
+}
+
+/* ── Stagger animations ── */
+@keyframes pdStaggerFadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(clamp(2rem, 3vw, 3rem));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pdStaggerFadeOutDown {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(clamp(2rem, 3vw, 3rem));
+  }
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .project-detail {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+    padding-bottom: 4rem;
+  }
+
+  .project-detail__title {
+    position: relative;
+    top: auto;
+    left: auto;
+    margin-top: 2rem;
+  }
+
+  .project-detail__title--right {
+    right: auto;
+    text-align: left;
+  }
+
+  .project-detail__category {
+    position: relative;
+    right: auto;
+    top: auto;
+    text-align: left;
+    margin-top: 1rem;
+    font-size: var(--font-3xl);
+  }
+
+  .pd-filters {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    margin-top: 2rem;
+  }
+
+  .pd-filters--filtered {
+    top: auto;
+  }
+
+  .project-detail__section {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    margin-top: 2rem;
+  }
+
+  .project-detail__carousel-viewport {
+    width: 100%;
+    height: 50vw;
+  }
+
+  .project-detail__carousel-arrow--left {
+    left: 0.5rem;
+  }
+
+  .project-detail__carousel-arrow--right {
+    right: 0.5rem;
+  }
+
+  .project-detail__role-section {
+    justify-content: flex-start;
+    padding-bottom: 0;
+  }
+
+  .project-detail__role-text {
+    width: 100%;
+  }
+
+  .project-detail__tech-section {
+    padding-bottom: 0;
+  }
+
+  .project-detail__description.page-description {
+    position: relative;
+    bottom: auto;
+    right: auto;
+    width: 100%;
+  }
+
+  .project-detail--filtered .pd-filters__btn:not(.pd-filters__btn--active) {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
