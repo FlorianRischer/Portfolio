@@ -105,6 +105,13 @@ export default function MockupCarousel({
 
   return (
     <section className={`${className} ${isZoomed ? `${className}--zoomed` : ''}`}>
+      {/* Preload all screen images */}
+      <div style={{ display: 'none' }} aria-hidden="true">
+        {screens.map((s, i) => (
+          <img key={i} src={s.screenImage} alt="" />
+        ))}
+      </div>
+
       {/* Clickable area above mockup (only if zoom enabled) */}
       {enableZoom && (
         <button
