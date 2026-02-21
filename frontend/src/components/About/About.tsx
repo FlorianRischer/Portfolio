@@ -5,7 +5,7 @@ import { imagesAPI } from '../../services/api';
 import { PageDescription } from '../common/PageDescription';
 
 // All images from API
-const aboutImage = imagesAPI.getUrl('aboutimage');
+const aboutImage = imagesAPI.getUrl('about-image');
 
 type AboutView = 'resume' | 'tech-skills' | 'design-skills' | 'education' | 'mini-job' | null;
 
