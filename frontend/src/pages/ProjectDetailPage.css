@@ -71,7 +71,7 @@
 
 /* Per-section position states (animate bottom like About page) */
 .pd-filters--my-role-active {
-  bottom: 73.5vh;
+  bottom: 74vh;
 }
 
 .pd-filters--prototype-screens-active {
@@ -79,7 +79,7 @@
 }
 
 .pd-filters--used-technologies-active {
-  bottom: 83.5vh;
+  bottom: 82.5vh;
 }
 
 /* Button base */
