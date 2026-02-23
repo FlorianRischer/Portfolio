@@ -5,6 +5,7 @@ node_modules/
 dist/
 frontend/dist/
 workers/dist/
+admin/
 
 # Environment files
 .env

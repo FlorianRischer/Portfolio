@@ -8,6 +8,9 @@ const arrowImg = imagesAPI.getUrl('arrow');
 const profileImg = imagesAPI.getUrl('profile-svg');
 const vectorImg = imagesAPI.getUrl('vector');
 
+// Check if browser is Chrome (has height:auto SVG bug)
+const isChrome = /Chrome/.test(navigator.userAgent) && !/Edg/.test(navigator.userAgent);
+
 const Hero = () => {
   const { navigateWithTransition } = useTransition();
 
@@ -24,12 +27,14 @@ const Hero = () => {
               className="hero__arrow"
             />
             
-            {/* Yellow Vector Background */}
-            <img 
-              src={vectorImg} 
-              alt="" 
-              className="hero__vector"
-            />
+            {/* Yellow Vector Background - hidden in Chrome due to SVG height:auto bug */}
+            {!isChrome && (
+              <img 
+                src={vectorImg} 
+                alt="" 
+                className="hero__vector"
+              />
+            )}
             
             {/* Profile Image */}
             <img 
