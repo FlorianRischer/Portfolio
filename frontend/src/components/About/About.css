@@ -181,7 +181,7 @@
   left: 0vw;
   bottom: 12vh;
   opacity: 0;
-  width: 20vw;
+  width: 40vw;
   pointer-events: none;
   transition: opacity var(--transition-slow);
   overflow: visible;
@@ -247,6 +247,7 @@
   align-items: flex-start;
   gap: clamp(1rem, 3vw, 3rem);
   opacity: 0;
+  width: 20vw;
   transform: translateY(clamp(2rem, 3vw, 3rem));
   background: none;
   border: none;
