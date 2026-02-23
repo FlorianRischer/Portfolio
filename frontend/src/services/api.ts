@@ -75,11 +75,12 @@ export interface Project {
 }
 
 export interface Skill {
-  _id: string;
+  id: string;
   name: string;
   icon: string;
-  category: 'design' | 'development' | 'tools';
+  category: 'tech' | 'design';
   proficiency: number;
+  description?: string;
   order: number;
 }
 

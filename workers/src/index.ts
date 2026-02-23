@@ -10,7 +10,7 @@ export interface Env {
 // CORS headers
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
 };
 
@@ -55,9 +55,20 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
       return await getProjectBySlug(env, slug);
     }
 
-    // Skills routes
+    // Skills routes (R2-based)
     if (path === '/api/skills' && request.method === 'GET') {
       return await getSkills(env, url);
+    }
+    if (path === '/api/skills' && request.method === 'POST') {
+      return await createSkill(env, request);
+    }
+    if (path.match(/^\/api\/skills\/[^/]+$/) && request.method === 'PUT') {
+      const id = path.split('/').pop()!;
+      return await updateSkill(env, id, request);
+    }
+    if (path.match(/^\/api\/skills\/[^/]+$/) && request.method === 'DELETE') {
+      const id = path.split('/').pop()!;
+      return await deleteSkill(env, id);
     }
 
     // Images routes (serve from R2)
@@ -135,22 +146,97 @@ function parseProject(row: Record<string, unknown>) {
   };
 }
 
-// Skills handlers
+// Skills handlers (R2-based - stored as JSON file)
+interface Skill {
+  id: string;
+  name: string;
+  category: 'tech' | 'design';
+  proficiency: number;
+  icon: string;
+  description?: string;
+  order: number;
+}
+
+async function getSkillsFromR2(env: Env): Promise<Skill[]> {
+  const object = await env.IMAGES.get('skills.json');
+  if (!object) {
+    return [];
+  }
+  const text = await object.text();
+  return JSON.parse(text);
+}
+
+async function saveSkillsToR2(env: Env, skills: Skill[]): Promise<void> {
+  await env.IMAGES.put('skills.json', JSON.stringify(skills, null, 2), {
+    httpMetadata: { contentType: 'application/json' }
+  });
+}
+
 async function getSkills(env: Env, url: URL): Promise<Response> {
   const category = url.searchParams.get('category');
-
-  let query = 'SELECT * FROM skills';
-  const params: unknown[] = [];
-
-  if (category) {
-    query += ' WHERE category = ?';
-    params.push(category);
-  }
-  query += ' ORDER BY "order" ASC';
-
-  const result = await env.DB.prepare(query).bind(...params).all();
+  let skills = await getSkillsFromR2(env);
   
-  return jsonResponse(result.results);
+  if (category) {
+    skills = skills.filter(s => s.category === category);
+  }
+  
+  skills.sort((a, b) => a.order - b.order);
+  return jsonResponse(skills);
+}
+
+async function createSkill(env: Env, request: Request): Promise<Response> {
+  const body = await request.json() as Partial<Skill>;
+  
+  if (!body.name || !body.category || !body.icon) {
+    return errorResponse('Name, category and icon are required', 400);
+  }
+  
+  const skills = await getSkillsFromR2(env);
+  const newSkill: Skill = {
+    id: crypto.randomUUID(),
+    name: body.name,
+    category: body.category,
+    proficiency: body.proficiency || 3,
+    icon: body.icon,
+    description: body.description || '',
+    order: body.order || skills.length
+  };
+  
+  skills.push(newSkill);
+  await saveSkillsToR2(env, skills);
+  
+  return jsonResponse(newSkill, 201);
+}
+
+async function updateSkill(env: Env, id: string, request: Request): Promise<Response> {
+  const body = await request.json() as Partial<Skill>;
+  const skills = await getSkillsFromR2(env);
+  
+  const index = skills.findIndex(s => s.id === id);
+  if (index === -1) {
+    return errorResponse('Skill not found', 404);
+  }
+  
+  skills[index] = {
+    ...skills[index],
+    ...body,
+    id // Ensure ID cannot be changed
+  };
+  
+  await saveSkillsToR2(env, skills);
+  return jsonResponse(skills[index]);
+}
+
+async function deleteSkill(env: Env, id: string): Promise<Response> {
+  const skills = await getSkillsFromR2(env);
+  const filtered = skills.filter(s => s.id !== id);
+  
+  if (filtered.length === skills.length) {
+    return errorResponse('Skill not found', 404);
+  }
+  
+  await saveSkillsToR2(env, filtered);
+  return jsonResponse({ message: 'Skill deleted' });
 }
 
 // Images handler (serve from R2)
