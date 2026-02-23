@@ -26,8 +26,11 @@
   cursor: pointer;
   text-align: left;
   white-space: nowrap;
-  transition: font-size var(--transition-fast);
+  transition: font-size 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity var(--transition-slow),
+              transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   margin: 0;
+  transform-origin: left center;
 }
 
 .filter-buttons__btn--small {
@@ -43,5 +46,16 @@
 }
 
 .filter-buttons__btn:hover {
-  opacity: 0.6;
+  opacity: 1;
+  font-size: calc(var(--font-xl) * 1.3);
+  transform: translateX(0.5vw);
+}
+
+.filter-buttons__btn--large:hover {
+  font-size: calc(var(--font-3xl) * 1.15);
+}
+
+.filter-buttons__btn--active:hover {
+  font-size: var(--font-3xl);
+  transform: none;
 }
