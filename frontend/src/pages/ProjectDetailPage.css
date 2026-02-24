@@ -167,6 +167,7 @@
 .project-detail__description.page-description {
   bottom: 8vh;
   text-align: justify;
+  white-space: pre-line;
   width: clamp(18rem, 38vw, 35rem);
 }
 

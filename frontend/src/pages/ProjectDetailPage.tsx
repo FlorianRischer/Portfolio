@@ -220,20 +220,12 @@ export default function ProjectDetailPage() {
           {/* Section Navigation */}
           <div className={`pd-filters ${getButtonPositionClass()}`}>
             <button
-              className={`pd-filters__btn pd-filters__btn--${getViewSize('my-role')} ${
-                isViewActive('my-role') ? 'pd-filters__btn--active' : ''
-              }`}
-              onClick={() => setActiveSection(isViewActive('my-role') ? null : 'my-role')}
-            >
-              About this project
-            </button>
-            <button
               className={`pd-filters__btn pd-filters__btn--${getViewSize('prototype-screens')} ${
                 isViewActive('prototype-screens') ? 'pd-filters__btn--active' : ''
               }`}
               onClick={() => setActiveSection(isViewActive('prototype-screens') ? null : 'prototype-screens')}
             >
-              Project Screens
+              Project Assets
             </button>
             <button
               className={`pd-filters__btn pd-filters__btn--${getViewSize('used-technologies')} ${

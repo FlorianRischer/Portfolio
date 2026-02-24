@@ -55,6 +55,7 @@
   bottom: 8vh;
   width: clamp(18rem, 38vw, 35rem);
   text-align: justify;
+  white-space: pre-line;
   opacity: 0;
   transform: translateY(2rem);
 }
