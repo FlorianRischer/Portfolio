@@ -14,6 +14,11 @@ database_id = "4b5e5b8f-eabb-43aa-93fd-96824c66274e"
 binding = "IMAGES"
 bucket_name = "portfolio-images"
 
+# KV Namespace for rate limiting
+[[kv_namespaces]]
+binding = "RATE_LIMIT"
+id = "2b5b23c314214265ac798a7d82d6a73e"
+
 [vars]
 ENVIRONMENT = "production"
 

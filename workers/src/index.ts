@@ -4,9 +4,14 @@
 export interface Env {
   DB: D1Database;
   IMAGES: R2Bucket;
+  RATE_LIMIT: KVNamespace;
   ENVIRONMENT: string;
   SENDGRID_API_KEY: string;
 }
+
+// Rate limit config
+const RATE_LIMIT_MAX = 5; // Max requests
+const RATE_LIMIT_WINDOW = 3600; // 1 hour in seconds
 
 // CORS headers
 const corsHeaders = {
@@ -92,6 +97,14 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
     // Messages routes
     if (path === '/api/messages' && request.method === 'POST') {
       return await createMessage(env, request);
+    }
+
+    // Rate limit status (for debugging)
+    if (path === '/api/rate-limit-status' && request.method === 'GET') {
+      const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+      const key = `rate_limit:${ip}`;
+      const current = await env.RATE_LIMIT.get(key);
+      return jsonResponse({ ip, requests: current ? parseInt(current) : 0, max: RATE_LIMIT_MAX });
     }
 
     // Health check
@@ -363,6 +376,17 @@ async function getImage(env: Env, slug: string): Promise<Response> {
 
 // Messages handler
 async function createMessage(env: Env, request: Request): Promise<Response> {
+  // Rate limiting by IP
+  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+  const rateLimitKey = `rate_limit:${ip}`;
+  
+  const currentCount = await env.RATE_LIMIT.get(rateLimitKey);
+  const count = currentCount ? parseInt(currentCount) : 0;
+  
+  if (count >= RATE_LIMIT_MAX) {
+    return errorResponse('Too many requests. Please try again later.', 429);
+  }
+
   const body = await request.json() as {
     name?: string;
     email?: string;
@@ -380,6 +404,9 @@ async function createMessage(env: Env, request: Request): Promise<Response> {
   if (!emailRegex.test(body.email)) {
     return errorResponse('Invalid email address', 400);
   }
+
+  // Increment rate limit counter
+  await env.RATE_LIMIT.put(rateLimitKey, String(count + 1), { expirationTtl: RATE_LIMIT_WINDOW });
 
   // Insert message into database
   const result = await env.DB.prepare(
