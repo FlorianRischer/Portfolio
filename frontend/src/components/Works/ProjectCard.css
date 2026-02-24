@@ -54,7 +54,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: clamp(10rem, 14.4vw, 13rem);
+  min-width: clamp(10rem, 14.4vw, 13rem);
   height: clamp(2.75rem, 3.8vw, 3.4375rem);
   border: 2px solid var(--color-blue);
   border-radius: 1.875rem;
@@ -74,7 +74,7 @@
 .project-card__btn-wrapper {
   display: flex;
   align-items: center;
-  gap: 10vw;
+  gap: 6vw;
 }
 
 .project-card__icons {
