@@ -28,6 +28,25 @@
   transform: translateX(calc(85vw - 100%));
 }
 
+.project-detail__title-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: inherit;
+  text-decoration: none;
+  transition: opacity var(--transition-fast);
+}
+
+.project-detail__title-link:hover {
+  opacity: 0.6;
+}
+
+.project-detail__title-icon {
+  width: 0.8em;
+  height: 0.8em;
+  flex-shrink: 0;
+}
+
 /* ── Category (default / My Role state) ── */
 .project-detail__category {
   position: absolute;
@@ -44,6 +63,15 @@
   text-align: right;
   transition: transform var(--transition-slow), opacity var(--transition-slow);
   transform: translateX(0);
+}
+
+.project-detail__category--clickable {
+  cursor: pointer;
+  transition: transform var(--transition-slow), opacity var(--transition-slow);
+}
+
+.project-detail__category--clickable:hover {
+  opacity: 0.6;
 }
 
 .project-detail__category p {
@@ -64,7 +92,7 @@
   bottom: 8vh;
   display: flex;
   flex-direction: column;
-  gap: 0.7vh;
+  gap: 1vh;
   transition: var(--transition-slow);
   z-index: 10;
 }
@@ -258,7 +286,6 @@
 .project-detail__tech-section {
   display: flex;
   align-items: flex-end;
-  padding-bottom: 8vh;
 }
 
 .project-detail__tech-list {
@@ -268,7 +295,7 @@
   max-height: 60vh;
   overflow-y: auto;
   padding-top: clamp(2rem, 3vw, 3rem);
-  padding-bottom: clamp(2rem, 3vw, 3rem);
+  padding-bottom: 8vh;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }

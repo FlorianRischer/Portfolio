@@ -1,8 +1,9 @@
 // Author: Florian Rischer
+import { useEffect, useState } from 'react';
 import { useTransition } from '../PageTransition/TransitionContext';
 import './ProjectCard.css';
 import { imagesAPI } from '../../services/api';
-import { getTechnologyIcons } from '../../services/technologyIcons';
+import { getTechnologyIconsAsync } from '../../services/technologyIcons';
 
 // Fallback icon
 const flowerIcon = imagesAPI.getUrl('flower');
@@ -30,9 +31,14 @@ export default function ProjectCard({
 }: ProjectCardProps) {
   const isInternalLink = projectUrl.startsWith('/');
   const { navigateWithTransition } = useTransition();
+  const [techIcons, setTechIcons] = useState<{ name: string; icon: string }[]>([]);
   
-  // Get technology icons (max 3)
-  const techIcons = getTechnologyIcons(technologies).slice(0, 3);
+  // Load technology icons
+  useEffect(() => {
+    if (technologies.length > 0) {
+      getTechnologyIconsAsync(technologies).then(icons => setTechIcons(icons.slice(0, 3)));
+    }
+  }, [technologies]);
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (isInternalLink) {

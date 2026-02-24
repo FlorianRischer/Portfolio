@@ -9,6 +9,12 @@ import ProjectDetailPage from './pages/ProjectDetailPage';
 import ContactPage from './pages/ContactPage';
 import AboutPage from './pages/AboutPage';
 import { imagesAPI } from './services/api';
+import { preloadSkills } from './services/technologyIcons';
+import './styles/global.css';
+import './components/PageTransition/PageTransition.css';
+
+// Preload skills data for technology icons
+preloadSkills();
 import './styles/global.css';
 import './components/PageTransition/PageTransition.css';
 

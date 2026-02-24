@@ -2,7 +2,7 @@
 .filter-buttons {
   display: flex;
   flex-direction: column;
-  gap: 1.5vh;
+  gap: 1vh;
   transition: var(--transition-slow);
   /* Default positioning - can be overridden by page-specific styles */
   position: absolute;

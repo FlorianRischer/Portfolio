@@ -5,6 +5,7 @@ export interface Env {
   DB: D1Database;
   IMAGES: R2Bucket;
   ENVIRONMENT: string;
+  SENDGRID_API_KEY: string;
 }
 
 // CORS headers
@@ -50,9 +51,20 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
     if (path === '/api/projects' && request.method === 'GET') {
       return await getProjects(env, url);
     }
+    if (path === '/api/projects' && request.method === 'POST') {
+      return await createProject(env, request);
+    }
     if (path.match(/^\/api\/projects\/[^/]+$/) && request.method === 'GET') {
       const slug = path.split('/').pop()!;
       return await getProjectBySlug(env, slug);
+    }
+    if (path.match(/^\/api\/projects\/[^/]+$/) && request.method === 'PUT') {
+      const slug = path.split('/').pop()!;
+      return await updateProject(env, slug, request);
+    }
+    if (path.match(/^\/api\/projects\/[^/]+$/) && request.method === 'DELETE') {
+      const slug = path.split('/').pop()!;
+      return await deleteProject(env, slug);
     }
 
     // Skills routes (R2-based)
@@ -144,6 +156,90 @@ function parseProject(row: Record<string, unknown>) {
     screens: JSON.parse(row.screens as string || '[]'),
     featured: Boolean(row.featured),
   };
+}
+
+interface ProjectInput {
+  title?: string;
+  slug?: string;
+  description?: string;
+  shortDescription?: string;
+  category?: string;
+  technologies?: string[];
+  techDescription?: string | null;
+  liveUrl?: string | null;
+  githubUrl?: string | null;
+  featured?: boolean;
+  order?: number;
+}
+
+async function createProject(env: Env, request: Request): Promise<Response> {
+  const body = await request.json() as ProjectInput;
+  
+  if (!body.title || !body.slug) {
+    return errorResponse('Title and slug are required', 400);
+  }
+  
+  const result = await env.DB.prepare(
+    `INSERT INTO projects (title, slug, description, shortDescription, category, technologies, techDescription, liveUrl, githubUrl, featured, "order", images, screens)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '[]', '[]')`
+  ).bind(
+    body.title,
+    body.slug,
+    body.description || '',
+    body.shortDescription || '',
+    body.category || 'ux-design',
+    JSON.stringify(body.technologies || []),
+    body.techDescription || null,
+    body.liveUrl || null,
+    body.githubUrl || null,
+    body.featured ? 1 : 0,
+    body.order || 0
+  ).run();
+
+  return jsonResponse({ slug: body.slug, message: 'Project created' }, 201);
+}
+
+async function updateProject(env: Env, slug: string, request: Request): Promise<Response> {
+  const body = await request.json() as ProjectInput;
+  
+  console.log('updateProject called with slug:', slug);
+  console.log('updateProject body:', JSON.stringify(body));
+  
+  // Build dynamic update query
+  const updates: string[] = [];
+  const values: unknown[] = [];
+  
+  if (body.title !== undefined) { updates.push('title = ?'); values.push(body.title); }
+  if (body.description !== undefined) { updates.push('description = ?'); values.push(body.description); }
+  if (body.shortDescription !== undefined) { updates.push('shortDescription = ?'); values.push(body.shortDescription); }
+  if (body.category !== undefined) { updates.push('category = ?'); values.push(body.category); }
+  if (body.technologies !== undefined) { updates.push('technologies = ?'); values.push(JSON.stringify(body.technologies)); }
+  if (body.techDescription !== undefined) { updates.push('techDescription = ?'); values.push(body.techDescription); }
+  if (body.liveUrl !== undefined) { updates.push('liveUrl = ?'); values.push(body.liveUrl); }
+  if (body.githubUrl !== undefined) { updates.push('githubUrl = ?'); values.push(body.githubUrl); }
+  if (body.featured !== undefined) { updates.push('featured = ?'); values.push(body.featured ? 1 : 0); }
+  if (body.order !== undefined) { updates.push('"order" = ?'); values.push(body.order); }
+  if (body.slug !== undefined && body.slug !== slug) { updates.push('slug = ?'); values.push(body.slug); }
+  
+  if (updates.length === 0) {
+    return errorResponse('No fields to update', 400);
+  }
+  
+  values.push(slug);
+  
+  const query = `UPDATE projects SET ${updates.join(', ')} WHERE slug = ?`;
+  console.log('Executing query:', query);
+  console.log('With values:', JSON.stringify(values));
+  
+  const result = await env.DB.prepare(query).bind(...values).run();
+  console.log('DB result:', JSON.stringify(result));
+
+  return jsonResponse({ message: 'Project updated' });
+}
+
+async function deleteProject(env: Env, slug: string): Promise<Response> {
+  await env.DB.prepare('DELETE FROM projects WHERE slug = ?').bind(slug).run();
+  return jsonResponse({ message: 'Project deleted' });
 }
 
 // Skills handlers (R2-based - stored as JSON file)
@@ -285,11 +381,62 @@ async function createMessage(env: Env, request: Request): Promise<Response> {
     return errorResponse('Invalid email address', 400);
   }
 
-  // Insert message
+  // Insert message into database
   const result = await env.DB.prepare(
     `INSERT INTO messages (name, email, subject, message, createdAt) 
      VALUES (?, ?, ?, ?, datetime('now'))`
   ).bind(body.name, body.email, body.subject, body.message).run();
+
+  // Send email via SendGrid
+  try {
+    const emailResponse = await fetch('https://api.sendgrid.com/v3/mail/send', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${env.SENDGRID_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        personalizations: [{
+          to: [{ email: 'uxdesign@flo-rischer.de' }],
+        }],
+        from: { 
+          email: 'florian.rischer@icloud.com',
+          name: 'Portfolio Contact Form'
+        },
+        reply_to: {
+          email: body.email,
+          name: body.name
+        },
+        subject: `Portfolio Kontakt: ${body.subject}`,
+        content: [{
+          type: 'text/plain',
+          value: `Neue Nachricht von deinem Portfolio Kontaktformular:\n\n` +
+                 `Name: ${body.name}\n` +
+                 `E-Mail: ${body.email}\n` +
+                 `Betreff: ${body.subject}\n\n` +
+                 `Nachricht:\n${body.message}`
+        }, {
+          type: 'text/html',
+          value: `<h2>Neue Nachricht von deinem Portfolio Kontaktformular</h2>` +
+                 `<p><strong>Name:</strong> ${body.name}</p>` +
+                 `<p><strong>E-Mail:</strong> <a href="mailto:${body.email}">${body.email}</a></p>` +
+                 `<p><strong>Betreff:</strong> ${body.subject}</p>` +
+                 `<hr>` +
+                 `<p><strong>Nachricht:</strong></p>` +
+                 `<p>${body.message.replace(/\n/g, '<br>')}</p>`
+        }]
+      })
+    });
+
+    if (!emailResponse.ok) {
+      const errorText = await emailResponse.text();
+      console.error('SendGrid error:', errorText);
+      // Still return success since message was saved to DB
+    }
+  } catch (emailError) {
+    console.error('Failed to send email:', emailError);
+    // Still return success since message was saved to DB
+  }
 
   return jsonResponse({ 
     id: result.meta.last_row_id,

@@ -61,6 +61,7 @@ export interface Project {
   shortDescription: string;
   category: 'ux-design' | 'ui-design' | 'branding' | 'web-development';
   technologies: string[];
+  techDescription?: string;
   thumbnailUrl: string;
   images: string[];
   screens: {

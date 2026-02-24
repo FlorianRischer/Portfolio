@@ -1,5 +1,6 @@
 // Author: Florian Rischer
 import { useState, useRef, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import './Works.css';
 import ProjectGrid from './ProjectGrid';
 import { PageDescription } from '../common/PageDescription';
@@ -13,9 +14,10 @@ const filterOptions: FilterOption<NonNullable<FilterCategory>>[] = [
   { id: 'personal-art', label: 'Personal Art' }
 ];
 
-
+const validFilters: FilterCategory[] = ['ux-ui-design', 'visual-design', 'personal-art'];
 
 export default function Works() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [activeFilter, setActiveFilter] = useState<FilterCategory>(null);
   const [delayedButtonPosition, setDelayedButtonPosition] = useState<FilterCategory>(null);
   const [displayedFilter, setDisplayedFilter] = useState<FilterCategory>(null);
@@ -23,6 +25,16 @@ export default function Works() {
   const hasBeenActiveRef = useRef<boolean>(false);
   const prevFilterRef = useRef<FilterCategory>(null);
   const [animationDelay, setAnimationDelay] = useState<number>(0);
+
+  // Read filter from URL on mount
+  useEffect(() => {
+    const filterParam = searchParams.get('filter') as FilterCategory;
+    if (filterParam && validFilters.includes(filterParam)) {
+      setActiveFilter(filterParam);
+      // Clear the URL param after reading
+      setSearchParams({}, { replace: true });
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Track if filter has ever been active (update ref without setState)
   useEffect(() => {

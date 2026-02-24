@@ -17,6 +17,9 @@ bucket_name = "portfolio-images"
 [vars]
 ENVIRONMENT = "production"
 
+# Required secrets (add via: wrangler secret put SENDGRID_API_KEY)
+# - SENDGRID_API_KEY: SendGrid API key for sending contact form emails
+
 # For local development
 [dev]
 port = 8787

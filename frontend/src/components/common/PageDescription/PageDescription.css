@@ -50,6 +50,29 @@
   text-align: justify;
 }
 
+/* Project detail page specific styles */
+.project-detail__tech-description.page-description {
+  bottom: 8vh;
+  width: clamp(18rem, 38vw, 35rem);
+  text-align: justify;
+  opacity: 0;
+  transform: translateY(2rem);
+}
+
+.project-detail__section--visible .project-detail__tech-description.page-description {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transition-delay: 0.6s;
+}
+
+.project-detail__section--exiting .project-detail__tech-description.page-description {
+  opacity: 0;
+  transform: translateY(2rem);
+  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition-delay: 0s;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .page-description {

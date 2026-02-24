@@ -5,28 +5,52 @@ import PageContainer from '../components/PageContainer';
 import { MockupCarousel, type Screen } from '../components/common/MockupCarousel';
 import { PageDescription } from '../components/common/PageDescription';
 import { projectsAPI, imagesAPI, type Project } from '../services/api';
-import { getTechnologyIcons } from '../services/technologyIcons';
+import { getTechnologyIconsAsync } from '../services/technologyIcons';
+import { useTransition } from '../components/PageTransition/TransitionContext';
 import './ProjectDetailPage.css';
 
 type DetailSection = 'my-role' | 'prototype-screens' | 'used-technologies';
 
 function getCategoryDisplay(category: string): string[] {
-  switch (category) {
-    case 'ux-design': return ['UX / UI', 'DESIGN'];
+  const normalized = category.toLowerCase().replace(/\s+/g, '-');
+  switch (normalized) {
+    case 'ux-design': 
+    case 'ux/ui-design': return ['UX / UI', 'DESIGN'];
     case 'ui-design': return ['UI', 'DESIGN'];
     case 'branding': return ['BRAND', 'DESIGN'];
+    case 'visual-design': return ['VISUAL', 'DESIGN'];
     case 'web-development': return ['WEB', 'DEV'];
     default: return [category.toUpperCase()];
   }
 }
 
+function getCategoryFilter(category: string): string | null {
+  const normalized = category.toLowerCase().replace(/\s+/g, '-');
+  switch (normalized) {
+    case 'ux-design':
+    case 'ui-design':
+    case 'ux/ui-design':
+    case 'web-development':
+      return 'ux-ui-design';
+    case 'branding':
+    case 'visual-design':
+      return 'visual-design';
+    case 'personal-art':
+      return 'personal-art';
+    default:
+      return null;
+  }
+}
+
 export default function ProjectDetailPage() {
   const { slug } = useParams<{ slug: string }>();
+  const { navigateWithTransition } = useTransition();
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState<DetailSection | null>(null);
   const [delayedButtonPosition, setDelayedButtonPosition] = useState<DetailSection | null>(null);
+  const [techIcons, setTechIcons] = useState<{ name: string; icon: string }[]>([]);
 
   // Section visibility tracking for exit animations
   const [hasBeenActive, setHasBeenActive] = useState<Record<string, boolean>>({});
@@ -71,6 +95,13 @@ export default function ProjectDetailPage() {
       return () => clearTimeout(timer);
     }
   }, [activeSection]);
+
+  // Load technology icons
+  useEffect(() => {
+    if (project?.technologies) {
+      getTechnologyIconsAsync(project.technologies).then(setTechIcons);
+    }
+  }, [project?.technologies]);
 
   if (loading) {
     return (
@@ -121,8 +152,6 @@ export default function ProjectDetailPage() {
 
   // Determine if zoom should be enabled based on category
   const enableZoom = project.category === 'ui-design' || project.category === 'ux-design';
-
-  const techIcons = getTechnologyIcons(project.technologies);
   const hasActiveSection = activeSection !== null;
   const categoryLines = getCategoryDisplay(project.category);
 
@@ -145,11 +174,44 @@ export default function ProjectDetailPage() {
         <section className={`project-detail ${hasActiveSection ? 'project-detail--filtered' : ''}`}>
           {/* Project Title */}
           <h1 className={`project-detail__title ${hasActiveSection ? 'project-detail__title--right' : ''}`}>
-            {project.title}
+            {project.liveUrl ? (
+              <a 
+                href={project.liveUrl} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="project-detail__title-link"
+              >
+                {project.title}
+                <svg 
+                  className="project-detail__title-icon" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path 
+                    d="M7 17L17 7M17 7H7M17 7V17" 
+                    stroke="currentColor" 
+                    strokeWidth="2" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </a>
+            ) : (
+              project.title
+            )}
           </h1>
 
           {/* Category Display (default / landing state) */}
-          <div className={`project-detail__category ${hasActiveSection ? 'project-detail__category--hidden' : ''}`}>
+          <div 
+            className={`project-detail__category ${hasActiveSection ? 'project-detail__category--hidden' : ''} ${getCategoryFilter(project.category) ? 'project-detail__category--clickable' : ''}`}
+            onClick={() => {
+              const filter = getCategoryFilter(project.category);
+              if (filter) {
+                navigateWithTransition(`/works?filter=${filter}`);
+              }
+            }}
+          >
             {categoryLines.map((line, i) => (
               <p key={i}>{line}</p>
             ))}
@@ -163,7 +225,7 @@ export default function ProjectDetailPage() {
               }`}
               onClick={() => setActiveSection(isViewActive('my-role') ? null : 'my-role')}
             >
-              My Role
+              About this project
             </button>
             <button
               className={`pd-filters__btn pd-filters__btn--${getViewSize('prototype-screens')} ${
@@ -171,7 +233,7 @@ export default function ProjectDetailPage() {
               }`}
               onClick={() => setActiveSection(isViewActive('prototype-screens') ? null : 'prototype-screens')}
             >
-              Prototype Screens
+              Project Screens
             </button>
             <button
               className={`pd-filters__btn pd-filters__btn--${getViewSize('used-technologies')} ${
@@ -228,6 +290,24 @@ export default function ProjectDetailPage() {
                 </div>
               ))}
             </div>
+            <PageDescription 
+              className="project-detail__tech-description"
+              isFiltered={activeSection === 'used-technologies'}
+            >
+              {project.techDescription || (
+                `This project was built using ${
+                  techIcons.length === 1 
+                    ? techIcons[0].name
+                    : techIcons.length === 2
+                      ? `${techIcons[0].name} and ${techIcons[1].name}`
+                      : techIcons.map((t, i) => 
+                          i === techIcons.length - 1 
+                            ? `and ${t.name}` 
+                            : `${t.name}, `
+                        ).join('')
+                }.`
+              )}
+            </PageDescription>
           </div>
         </section>
       </PageContainer>
