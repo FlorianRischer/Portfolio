@@ -225,7 +225,7 @@ export default function ProjectDetailPage() {
               }`}
               onClick={() => setActiveSection(isViewActive('prototype-screens') ? null : 'prototype-screens')}
             >
-              Project Assets
+              Project Preview
             </button>
             <button
               className={`pd-filters__btn pd-filters__btn--${getViewSize('used-technologies')} ${
