@@ -6,15 +6,15 @@ import ProjectGrid from './ProjectGrid';
 import { PageDescription } from '../common/PageDescription';
 import { FilterButtons, type FilterOption } from '../common/FilterButtons';
 
-type FilterCategory = 'ux-ui-design' | 'visual-design' | 'personal-art' | null;
+type FilterCategory = 'ux-ui-design' | 'corporate-design' | 'web-development' | null;
 
 const filterOptions: FilterOption<NonNullable<FilterCategory>>[] = [
   { id: 'ux-ui-design', label: 'UX/UI Design' },
-  { id: 'visual-design', label: 'Visual Design' },
-  { id: 'personal-art', label: 'Personal Art' }
+  { id: 'corporate-design', label: 'Corporate Design' },
+  { id: 'web-development', label: 'Web Development' }
 ];
 
-const validFilters: FilterCategory[] = ['ux-ui-design', 'visual-design', 'personal-art'];
+const validFilters: FilterCategory[] = ['ux-ui-design', 'corporate-design', 'web-development'];
 
 export default function Works() {
   const [searchParams, setSearchParams] = useSearchParams();

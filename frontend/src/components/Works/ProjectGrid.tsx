@@ -9,7 +9,7 @@ export interface Project {
   title: string;
   description: string;
   image: string;
-  category: 'ux-ui-design' | 'visual-design' | 'personal-art';
+  category: 'ux-ui-design' | 'corporate-design' | 'web-development';
   projectUrl?: string;
   technologies: string[];
 }
@@ -20,16 +20,17 @@ const getProjectImage = (slug: string): string => {
 };
 
 // Category mapping from API to frontend
-const categoryMap: Record<string, 'ux-ui-design' | 'visual-design' | 'personal-art'> = {
+const categoryMap: Record<string, 'ux-ui-design' | 'corporate-design' | 'web-development'> = {
   // New categories from admin
   'UX/UI Design': 'ux-ui-design',
-  'Visual Design': 'visual-design',
-  'Personal Art': 'personal-art',
+  'Corporate Design': 'corporate-design',
+  'Web Development': 'web-development',
   // Legacy categories (for backwards compatibility)
   'ux-design': 'ux-ui-design',
   'ui-design': 'ux-ui-design',
-  'branding': 'visual-design',
-  'web-development': 'ux-ui-design',
+  'branding': 'corporate-design',
+  'visual-design': 'corporate-design',
+  'Personal Art': 'web-development',
 };
 
 // Convert API project to frontend format
@@ -68,14 +69,14 @@ const fallbackProjects: Project[] = [
     title: 'Slice of Paradise',
     description: '"Slice of Paradise" is a corporate design project focused on developing a fresh visual identity for a catamaran called "Slice."',
     image: imagesAPI.getUrl('project-slice-of-paradise-mockup'),
-    category: 'visual-design',
+    category: 'corporate-design',
     projectUrl: '/works/slice-of-paradise',
     technologies: ['Adobe Illustrator', 'Adobe Photoshop', 'Brand Strategy']
   }
 ];
 
 interface ProjectGridProps {
-  filter: 'ux-ui-design' | 'visual-design' | 'personal-art' | null;
+  filter: 'ux-ui-design' | 'corporate-design' | 'web-development' | null;
   isVisible: boolean;
   isExiting: boolean;
   animationDelay: number;

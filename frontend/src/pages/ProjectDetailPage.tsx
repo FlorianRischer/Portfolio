@@ -17,8 +17,9 @@ function getCategoryDisplay(category: string): string[] {
     case 'ux-design': 
     case 'ux/ui-design': return ['UX / UI', 'DESIGN'];
     case 'ui-design': return ['UI', 'DESIGN'];
-    case 'branding': return ['BRAND', 'DESIGN'];
-    case 'visual-design': return ['VISUAL', 'DESIGN'];
+    case 'branding': 
+    case 'corporate-design': 
+    case 'visual-design': return ['CD'];
     case 'web-development': return ['WEB', 'DEV'];
     default: return [category.toUpperCase()];
   }
@@ -30,13 +31,13 @@ function getCategoryFilter(category: string): string | null {
     case 'ux-design':
     case 'ui-design':
     case 'ux/ui-design':
-    case 'web-development':
       return 'ux-ui-design';
     case 'branding':
     case 'visual-design':
-      return 'visual-design';
-    case 'personal-art':
-      return 'personal-art';
+    case 'corporate-design':
+      return 'corporate-design';
+    case 'web-development':
+      return 'web-development';
     default:
       return null;
   }
