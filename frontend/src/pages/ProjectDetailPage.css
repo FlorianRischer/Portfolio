@@ -13,6 +13,7 @@
   font-family: 'Helvetica', sans-serif;
   font-size: var(--font-3xl);
   font-weight: 300;
+  max-width: 45vw;
   line-height: normal;
   color: #000000;
   left: 0;
@@ -47,7 +48,7 @@
   flex-shrink: 0;
 }
 
-/* ── Category (default / My Role state) ── */
+/* ── Category (default state) ── */
 .project-detail__category {
   position: absolute;
   right: 0;
@@ -190,25 +191,6 @@
 
 .project-detail__section--exiting {
   opacity: 0;
-}
-
-/* ── My Role section ── */
-.project-detail__role-section {
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-end;
-  padding-bottom: 8vh;
-}
-
-.project-detail__role-text {
-  font-family: 'Helvetica', sans-serif;
-  font-size: var(--font-base);
-  font-weight: 400;
-  line-height: 1.2;
-  color: #000000;
-  text-align: justify;
-  width: clamp(18rem, 38vw, 35rem);
-  margin: 0;
 }
 
 /* ── Prototype Screens (MockupCarousel) section ── */
