@@ -252,7 +252,7 @@ export default function Contact() {
 
           <div className="contact__form-footer" style={{ '--stagger-delay': '0.5s', '--stagger-delay-exit': '0s' } as React.CSSProperties}>
             <p className="contact__form-notice">
-              All messages submitted through this, will be sent directly to florian.rischer@icloud.com
+              All messages submitted through this, will be sent directly to uxdesign@flo-rischer.de
             </p>
             <button 
               type="submit" 
