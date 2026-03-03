@@ -5,16 +5,20 @@ import './Works.css';
 import ProjectGrid from './ProjectGrid';
 import { PageDescription } from '../common/PageDescription';
 import { FilterButtons, type FilterOption } from '../common/FilterButtons';
+import { useScrollFilter } from '../../hooks/useScrollFilter';
 
 type FilterCategory = 'ux-ui-design' | 'corporate-design' | 'web-development' | null;
 
 const filterOptions: FilterOption<NonNullable<FilterCategory>>[] = [
+  { id: 'web-development', label: 'Web Development' },
   { id: 'ux-ui-design', label: 'UX/UI Design' },
-  { id: 'corporate-design', label: 'Corporate Design' },
-  { id: 'web-development', label: 'Web Development' }
+  { id: 'corporate-design', label: 'Corporate Design' }
 ];
 
 const validFilters: FilterCategory[] = ['ux-ui-design', 'corporate-design', 'web-development'];
+
+// Filter order for scroll activation
+const scrollFilterOrder: NonNullable<FilterCategory>[] = filterOptions.map(f => f.id);
 
 export default function Works() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -25,6 +29,13 @@ export default function Works() {
   const hasBeenActiveRef = useRef<boolean>(false);
   const prevFilterRef = useRef<FilterCategory>(null);
   const [animationDelay, setAnimationDelay] = useState<number>(0);
+
+  // Enable scroll-based filter activation
+  useScrollFilter({
+    filterOrder: scrollFilterOrder,
+    activeFilter,
+    setActiveFilter
+  });
 
   // Read filter from URL on mount
   useEffect(() => {

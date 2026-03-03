@@ -72,6 +72,16 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
       return await deleteProject(env, slug);
     }
 
+    // Project mockup upload routes
+    if (path.match(/^\/api\/projects\/[^/]+\/mockup$/) && request.method === 'POST') {
+      const slug = path.split('/')[3];
+      return await uploadProjectMockup(env, slug, request);
+    }
+    if (path.match(/^\/api\/projects\/[^/]+\/mockup-existing$/) && request.method === 'POST') {
+      const slug = path.split('/')[3];
+      return await setProjectMockupExisting(env, slug, request);
+    }
+
     // Skills routes (R2-based)
     if (path === '/api/skills' && request.method === 'GET') {
       return await getSkills(env, url);
@@ -255,6 +265,101 @@ async function deleteProject(env: Env, slug: string): Promise<Response> {
   return jsonResponse({ message: 'Project deleted' });
 }
 
+// Project mockup handlers
+async function uploadProjectMockup(env: Env, slug: string, request: Request): Promise<Response> {
+  try {
+    const formData = await request.formData();
+    const file = formData.get('file') as File | null;
+    
+    if (!file) {
+      return errorResponse('No file provided', 400);
+    }
+    
+    // Get file extension
+    const ext = file.name.split('.').pop()?.toLowerCase() || 'png';
+    const r2Key = `project-${slug}-mockup.${ext}`;
+    
+    // Upload to R2
+    const arrayBuffer = await file.arrayBuffer();
+    await env.IMAGES.put(r2Key, arrayBuffer, {
+      httpMetadata: { contentType: file.type || 'image/png' }
+    });
+    
+    // Update project in database with thumbnail filename
+    await env.DB.prepare(
+      'UPDATE projects SET thumbnailFilename = ? WHERE slug = ?'
+    ).bind(r2Key, slug).run();
+    
+    return jsonResponse({ message: 'Mockup uploaded', filename: r2Key });
+  } catch (error) {
+    console.error('Mockup upload error:', error);
+    return errorResponse('Failed to upload mockup', 500);
+  }
+}
+
+async function setProjectMockupExisting(env: Env, slug: string, request: Request): Promise<Response> {
+  try {
+    const body = await request.json() as { imageSlug: string };
+    
+    if (!body.imageSlug) {
+      return errorResponse('Image slug is required', 400);
+    }
+    
+    // Find the existing image in R2
+    const imageSlug = body.imageSlug;
+    
+    // Look for the image with common extensions
+    const extensions = ['png', 'jpg', 'jpeg', 'webp', 'gif'];
+    let foundKey: string | null = null;
+    
+    for (const ext of extensions) {
+      const key = `${imageSlug}.${ext}`;
+      const object = await env.IMAGES.head(key);
+      if (object) {
+        foundKey = key;
+        break;
+      }
+    }
+    
+    // Also check without extension (the slug might be the full key)
+    if (!foundKey) {
+      const object = await env.IMAGES.head(imageSlug);
+      if (object) {
+        foundKey = imageSlug;
+      }
+    }
+    
+    if (!foundKey) {
+      return errorResponse('Image not found', 404);
+    }
+    
+    // Copy the image to the project's mockup key
+    const existingObject = await env.IMAGES.get(foundKey);
+    if (!existingObject) {
+      return errorResponse('Image not found', 404);
+    }
+    
+    const ext = foundKey.split('.').pop() || 'png';
+    const newKey = `project-${slug}-mockup.${ext}`;
+    
+    // Copy the image data
+    const imageData = await existingObject.arrayBuffer();
+    await env.IMAGES.put(newKey, imageData, {
+      httpMetadata: existingObject.httpMetadata
+    });
+    
+    // Update project in database
+    await env.DB.prepare(
+      'UPDATE projects SET thumbnailFilename = ? WHERE slug = ?'
+    ).bind(newKey, slug).run();
+    
+    return jsonResponse({ message: 'Mockup set', filename: newKey });
+  } catch (error) {
+    console.error('Set mockup existing error:', error);
+    return errorResponse('Failed to set mockup', 500);
+  }
+}
+
 // Skills handlers (R2-based - stored as JSON file)
 interface Skill {
   id: string;
@@ -355,23 +460,42 @@ async function getImage(env: Env, slug: string): Promise<Response> {
     'SELECT filename, mimeType FROM images WHERE slug = ?'
   ).bind(slug).first();
 
-  if (!metadata) {
-    return errorResponse('Image not found', 404);
+  if (metadata) {
+    // Get image from R2 using database metadata
+    const object = await env.IMAGES.get(metadata.filename as string);
+    
+    if (object) {
+      const headers = new Headers();
+      headers.set('Content-Type', metadata.mimeType as string);
+      headers.set('Cache-Control', 'public, max-age=31536000'); // 1 year cache
+      headers.set('Access-Control-Allow-Origin', '*');
+      return new Response(object.body, { headers });
+    }
   }
 
-  // Get image from R2
-  const object = await env.IMAGES.get(metadata.filename as string);
-  
-  if (!object) {
-    return errorResponse('Image file not found', 404);
+  // Fallback: Try to find image directly in R2 by slug with various extensions
+  const extensions = ['png', 'jpg', 'jpeg', 'webp', 'gif'];
+  const mimeTypes: Record<string, string> = {
+    'png': 'image/png',
+    'jpg': 'image/jpeg',
+    'jpeg': 'image/jpeg',
+    'webp': 'image/webp',
+    'gif': 'image/gif'
+  };
+
+  for (const ext of extensions) {
+    const key = `${slug}.${ext}`;
+    const object = await env.IMAGES.get(key);
+    if (object) {
+      const headers = new Headers();
+      headers.set('Content-Type', mimeTypes[ext] || 'image/png');
+      headers.set('Cache-Control', 'public, max-age=31536000');
+      headers.set('Access-Control-Allow-Origin', '*');
+      return new Response(object.body, { headers });
+    }
   }
 
-  const headers = new Headers();
-  headers.set('Content-Type', metadata.mimeType as string);
-  headers.set('Cache-Control', 'public, max-age=31536000'); // 1 year cache
-  headers.set('Access-Control-Allow-Origin', '*');
-
-  return new Response(object.body, { headers });
+  return errorResponse('Image not found', 404);
 }
 
 // Messages handler

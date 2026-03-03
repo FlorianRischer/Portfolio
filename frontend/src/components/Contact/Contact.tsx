@@ -4,6 +4,7 @@ import './Contact.css';
 import { messagesAPI, imagesAPI } from '../../services/api';
 import { PageDescription } from '../common/PageDescription';
 import { FilterButtons, type FilterOption } from '../common/FilterButtons';
+import { useScrollFilter } from '../../hooks/useScrollFilter';
 
 // Contact image from API
 const contactImage = imagesAPI.getUrl('contactimage');
@@ -14,6 +15,9 @@ const filterOptions: FilterOption<NonNullable<ContactView>>[] = [
   { id: 'socials', label: 'Socials' },
   { id: 'contact-form', label: 'Contact form' }
 ];
+
+// Filter order for scroll activation
+const scrollFilterOrder: NonNullable<ContactView>[] = filterOptions.map(f => f.id);
 
 interface FormData {
   name: string;
@@ -42,6 +46,13 @@ export default function Contact() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+
+  // Enable scroll-based filter activation
+  useScrollFilter({
+    filterOrder: scrollFilterOrder,
+    activeFilter: activeView,
+    setActiveFilter: setActiveView
+  });
 
   // Track if views have been active
   if (activeView === 'socials') hasBeenActiveRef.current.socials = true;

@@ -4,11 +4,19 @@ import './About.css';
 import { imagesAPI, skillsAPI } from '../../services/api';
 import type { Skill as APISkill } from '../../services/api';
 import { PageDescription } from '../common/PageDescription';
+import { useScrollFilter } from '../../hooks/useScrollFilter';
 
 // All images from API
 const aboutImage = imagesAPI.getUrl('about-image');
 
 type AboutView = 'resume' | 'tech-skills' | 'design-skills' | 'education' | 'mini-job' | null;
+
+// Filter order for scroll activation with subfilters
+const scrollFilterOrder = [
+  { id: 'resume' as const, subfilters: ['education' as const, 'mini-job' as const] },
+  { id: 'tech-skills' as const },
+  { id: 'design-skills' as const }
+];
 
 interface Skill {
   name: string;
@@ -77,6 +85,13 @@ export default function About() {
     'design-skills': false,
     'education': false,
     'mini-job': false,
+  });
+
+  // Enable scroll-based filter activation
+  useScrollFilter({
+    filterOrder: scrollFilterOrder,
+    activeFilter: activeView,
+    setActiveFilter: setActiveView
   });
 
   // Load skills from API
