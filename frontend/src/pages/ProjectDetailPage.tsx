@@ -50,13 +50,14 @@ export default function ProjectDetailPage() {
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  // Start with prototype-screens active for immediate project preview
-  const [activeSection, setActiveSection] = useState<DetailSection | null>('prototype-screens');
-  const [delayedButtonPosition, setDelayedButtonPosition] = useState<DetailSection | null>('prototype-screens');
+  // Start with null, will be set based on whether project has liveUrl
+  const [activeSection, setActiveSection] = useState<DetailSection | null>(null);
+  const [delayedButtonPosition, setDelayedButtonPosition] = useState<DetailSection | null>(null);
   const [techIcons, setTechIcons] = useState<{ name: string; icon: string }[]>([]);
+  const [initialSectionSet, setInitialSectionSet] = useState(false);
 
   // Section visibility tracking for exit animations
-  const [hasBeenActive, setHasBeenActive] = useState<Record<string, boolean>>({ 'prototype-screens': true });
+  const [hasBeenActive, setHasBeenActive] = useState<Record<string, boolean>>({});
 
   // Scroll filter refs
   const accumulatedDeltaDown = useRef(0);
@@ -65,7 +66,7 @@ export default function ProjectDetailPage() {
   const isAnimating = useRef(false);
   const lastWheelTime = useRef(0);
   const debounceTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const activeSectionRef = useRef<DetailSection | null>('prototype-screens');
+  const activeSectionRef = useRef<DetailSection | null>(null);
   
   // Keep ref in sync
   activeSectionRef.current = activeSection;
@@ -202,13 +203,23 @@ export default function ProjectDetailPage() {
       if (result.success && result.data) {
         setProject(result.data);
         setError(null);
+        // Set initial section based on whether project has liveUrl
+        if (!initialSectionSet) {
+          if (!result.data.liveUrl) {
+            // No external link - show prototype screens immediately
+            setActiveSection('prototype-screens');
+            setDelayedButtonPosition('prototype-screens');
+            setHasBeenActive({ 'prototype-screens': true });
+          }
+          setInitialSectionSet(true);
+        }
       } else {
         setError(result.error || 'Project not found');
       }
       setLoading(false);
     }
     loadProject();
-  }, [slug]);
+  }, [slug, initialSectionSet]);
 
   // Track which sections have been active (for exit animations)
   useEffect(() => {
