@@ -1,11 +1,9 @@
 // Author: Florian Rischer
-import { useState, useRef, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
 import './Works.css';
 import ProjectGrid from './ProjectGrid';
 import { PageDescription } from '../common/PageDescription';
 import { FilterButtons, type FilterOption } from '../common/FilterButtons';
-import { useScrollFilter } from '../../hooks/useScrollFilter';
 
 type FilterCategory = 'ux-ui-design' | 'corporate-design' | 'web-development' | null;
 
@@ -15,44 +13,37 @@ const filterOptions: FilterOption<NonNullable<FilterCategory>>[] = [
   { id: 'ux-ui-design', label: 'UX/UI Design' }
 ];
 
-const validFilters: FilterCategory[] = ['ux-ui-design', 'corporate-design', 'web-development'];
-
-// Filter order for scroll activation
-const scrollFilterOrder: NonNullable<FilterCategory>[] = filterOptions.map(f => f.id);
-
 export default function Works() {
-  const [searchParams, setSearchParams] = useSearchParams();
   const [activeFilter, setActiveFilter] = useState<FilterCategory>(null);
+  const [showProjects, setShowProjects] = useState(false);
   const [delayedButtonPosition, setDelayedButtonPosition] = useState<FilterCategory>(null);
   const [displayedFilter, setDisplayedFilter] = useState<FilterCategory>(null);
   const [isExiting, setIsExiting] = useState(false);
-  const hasBeenActiveRef = useRef<boolean>(false);
-  const prevFilterRef = useRef<FilterCategory>(null);
   const [animationDelay, setAnimationDelay] = useState<number>(0);
+  const prevFilterRef = useRef<FilterCategory>(null);
 
-  // Enable scroll-based filter activation
-  useScrollFilter({
-    filterOrder: scrollFilterOrder,
-    activeFilter,
-    setActiveFilter
-  });
-
-  // Read filter from URL on mount
+  // Show projects when user scrolls (without activating any filter)
   useEffect(() => {
-    const filterParam = searchParams.get('filter') as FilterCategory;
-    if (filterParam && validFilters.includes(filterParam)) {
-      setActiveFilter(filterParam);
-      // Clear the URL param after reading
-      setSearchParams({}, { replace: true });
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    const handleScroll = () => {
+      if (window.scrollY > 50 && !showProjects) {
+        setShowProjects(true);
+      }
+    };
 
-  // Track if filter has ever been active (update ref without setState)
-  useEffect(() => {
-    if (activeFilter !== null) {
-      hasBeenActiveRef.current = true;
-    }
-  }, [activeFilter]);
+    const handleWheel = (e: WheelEvent) => {
+      if (e.deltaY > 0 && !showProjects && activeFilter === null) {
+        setShowProjects(true);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('wheel', handleWheel);
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('wheel', handleWheel);
+    };
+  }, [showProjects, activeFilter]);
 
   // Handle filter changes with exit animation
   useEffect(() => {
@@ -61,43 +52,39 @@ export default function Works() {
     
     Promise.resolve().then(() => {
       if (activeFilter !== null) {
-        // Opening or switching filters
+        // Filter clicked - show projects and set filter
+        setShowProjects(true);
         setDelayedButtonPosition(activeFilter);
         
-        // Check if we're switching from one filter to another
         if (prevFilterRef.current !== null && prevFilterRef.current !== activeFilter) {
-          // Switching filters: play exit animation first
+          // Switching filters
           setIsExiting(true);
           exitTimer = setTimeout(() => {
             setIsExiting(false);
             setDisplayedFilter(activeFilter);
-            setAnimationDelay(0); // No delay when switching
-          }, 400); // Wait for exit animation
-          
+            setAnimationDelay(0);
+          }, 400);
           prevFilterRef.current = activeFilter;
         } else if (prevFilterRef.current === null) {
-          // First time opening: delay for buttons to move up
+          // First time clicking filter
           setAnimationDelay(300);
           setDisplayedFilter(activeFilter);
+          prevFilterRef.current = activeFilter;
         } else {
-          // Same filter, no animation needed
           setDisplayedFilter(activeFilter);
           setAnimationDelay(0);
         }
       } else {
-        // Closing: play exit animation first, then hide
+        // Filter deactivated - show all projects
         if (displayedFilter !== null) {
           setIsExiting(true);
-          // Wait for exit animation to complete (0.4s animation + stagger delays)
           exitTimer = setTimeout(() => {
             setIsExiting(false);
             setDisplayedFilter(null);
-          }, 500);
-          // Delay buttons moving down until after exit animation
+          }, 400);
           buttonTimer = setTimeout(() => {
             setDelayedButtonPosition(null);
           }, 100);
-          
           prevFilterRef.current = null;
         }
       }
@@ -109,35 +96,33 @@ export default function Works() {
     };
   }, [activeFilter, displayedFilter]);
 
-  const hasActiveFilter = activeFilter !== null;
-
   return (
-    <section className={`works ${hasActiveFilter ? 'works--filtered' : ''}`}>
+    <section className={`works ${showProjects ? 'works--filtered' : ''}`}>
       {/* Page title */}
       <h1 className="works__title">WORKS</h1>
 
       {/* Main content */}
-      <div className={`works__container ${hasActiveFilter ? 'works__container--filtered' : ''}`}>
-        {/* Filter buttons - left side */}
+      <div className={`works__container ${showProjects ? 'works__container--filtered' : ''}`}>
+        {/* Filter buttons - left side (clickable) */}
         <FilterButtons
           filters={filterOptions}
           activeFilter={activeFilter}
           onFilterChange={setActiveFilter}
           className="works__filters filter-buttons"
           baseClassName="filter-buttons"
-          isFiltered={delayedButtonPosition !== null}
+          isFiltered={delayedButtonPosition !== null || showProjects}
         />
 
         {/* Description - right side */}
-        <PageDescription isFiltered={hasActiveFilter} className="works__description">
-          Under the three filters you can find some selected projects I worked on privately, or during my studies — from design concepts to fully developed digital solutions. Each project reflects my growing skills in visual design, ux/ui design, web development.
+        <PageDescription isFiltered={showProjects} className="works__description">
+          On this page, I'm giving you an overview of the projects I worked on during my studies — from design concepts to fully developed digital solutions. Each project reflects my growing skills in visual design, UX/UI, and web development.
         </PageDescription>
       </div>
 
-      {/* Project Grid - shows when filter is active */}
+      {/* Project Grid - shows when scrolling or filter active */}
       <ProjectGrid 
-        filter={displayedFilter} 
-        isVisible={displayedFilter !== null} 
+        filter={displayedFilter}
+        isVisible={showProjects} 
         isExiting={isExiting} 
         animationDelay={animationDelay} 
       />
