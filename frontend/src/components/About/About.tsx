@@ -293,6 +293,14 @@ export default function About() {
         I'm a UX/UI designer currently studying Web Design & Development. In my work, I combine visual design with a structured, user-focused approach. My goal is to create clear and functional designs that are both aesthetically pleasing and easy to understand.
       </PageDescription>
 
+      {/* CV Description */}
+      <PageDescription 
+        isFiltered={activeView === 'resume'} 
+        className="about__cv-description"
+      >
+        Here you can find an overview of my educational background and mini-job experiences. 
+      </PageDescription>
+
       {displayedSkill && getSelectedSkillData() && (
         <div className={`about__skill-description ${isExiting ? 'about__skill-description--exiting' : ''}`} key={`skill-${displayedSkill}`}>
           <p>

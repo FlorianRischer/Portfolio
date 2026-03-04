@@ -48,6 +48,21 @@
   animation: none !important;
 }
 
+/* About CV description - shows when CV filter is active */
+.about__cv-description.page-description {
+  bottom: 8vh;
+  width: 36vw;
+  text-align: justify;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.about__cv-description.page-description--filtered {
+  opacity: 1;
+  pointer-events: auto;
+  animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 /* Contact page specific styles */
 .contact__description.page-description {
   bottom: 8vh;
