@@ -170,7 +170,7 @@ export function useScrollFilter<T>({
     if (!enabled) return;
 
     // Check if an element or its parents are scrollable
-    const isInsideScrollableElement = (target: EventTarget | null, direction: 'down' | 'up'): boolean => {
+    const isInsideScrollableElement = (target: EventTarget | null, _direction: 'down' | 'up'): boolean => {
       let element = target as HTMLElement | null;
       
       while (element && element !== document.body && element !== document.documentElement) {
