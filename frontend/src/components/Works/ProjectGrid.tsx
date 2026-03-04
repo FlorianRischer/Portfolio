@@ -11,6 +11,7 @@ export interface Project {
   image: string;
   category: 'ux-ui-design' | 'corporate-design' | 'web-development';
   projectUrl?: string;
+  liveUrl?: string;
   technologies: string[];
 }
 
@@ -41,6 +42,7 @@ const convertAPIProject = (apiProject: APIProject): Project => ({
   image: getProjectImage(apiProject.slug),
   category: categoryMap[apiProject.category] || 'ux-ui-design',
   projectUrl: `/works/${apiProject.slug}`,
+  liveUrl: apiProject.liveUrl,
   technologies: apiProject.technologies || [],
 });
 
@@ -134,6 +136,7 @@ export default function ProjectGrid({ filter, isVisible, isExiting, animationDel
           description={project.description}
           image={project.image}
           projectUrl={project.projectUrl}
+          liveUrl={project.liveUrl}
           technologies={project.technologies}
           index={index}
           totalItems={totalProjects}

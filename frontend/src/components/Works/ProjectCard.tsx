@@ -13,6 +13,7 @@ interface ProjectCardProps {
   description: string;
   image: string;
   projectUrl?: string;
+  liveUrl?: string;
   technologies?: string[];
   index: number;
   totalItems: number;
@@ -24,12 +25,12 @@ export default function ProjectCard({
   description, 
   image, 
   projectUrl = '#',
+  liveUrl,
   technologies = [],
   index,
   totalItems,
   baseDelay
 }: ProjectCardProps) {
-  const isInternalLink = projectUrl.startsWith('/');
   const { navigateWithTransition } = useTransition();
   const [techIcons, setTechIcons] = useState<{ name: string; icon: string }[]>([]);
   
@@ -40,11 +41,9 @@ export default function ProjectCard({
     }
   }, [technologies]);
 
-  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    if (isInternalLink) {
-      e.preventDefault();
-      navigateWithTransition(projectUrl);
-    }
+  const handleDetailClick = (e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => {
+    e.preventDefault();
+    navigateWithTransition(projectUrl);
   };
 
   return (
@@ -57,17 +56,26 @@ export default function ProjectCard({
     >
       <div className="project-card__content">
         <h2 className="project-card__title">{title}</h2>
-        <p className="project-card__description">{description}</p>
-        <div className="project-card__btn-wrapper">
-          {isInternalLink ? (
-            <a href={projectUrl} onClick={handleClick} className="project-card__btn">
-              view project
-            </a>
-          ) : (
-            <a href={projectUrl} className="project-card__btn">
-              view project
-            </a>
+        <p className="project-card__description">
+          {description}
+          {liveUrl && (
+            <button onClick={handleDetailClick} className="project-card__btn-text">
+              More about this project
+            </button>
           )}
+        </p>
+        <div className="project-card__btn-wrapper">
+          <div className="project-card__btn-group">
+            {liveUrl ? (
+              <a href={liveUrl} target="_blank" rel="noopener noreferrer" className="project-card__btn">
+                view project
+              </a>
+            ) : (
+              <a href={projectUrl} onClick={handleDetailClick} className="project-card__btn">
+                view project
+              </a>
+            )}
+          </div>
           <div className="project-card__icons">
             {techIcons.length > 0 ? (
               techIcons.map((tech, i) => (
