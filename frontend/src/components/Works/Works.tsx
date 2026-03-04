@@ -11,8 +11,8 @@ type FilterCategory = 'ux-ui-design' | 'corporate-design' | 'web-development' | 
 
 const filterOptions: FilterOption<NonNullable<FilterCategory>>[] = [
   { id: 'web-development', label: 'Web Development' },
-  { id: 'ux-ui-design', label: 'UX/UI Design' },
-  { id: 'corporate-design', label: 'Corporate Design' }
+  { id: 'corporate-design', label: 'Corporate Design' },
+  { id: 'ux-ui-design', label: 'UX/UI Design' }
 ];
 
 const validFilters: FilterCategory[] = ['ux-ui-design', 'corporate-design', 'web-development'];

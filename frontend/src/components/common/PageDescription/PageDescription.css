@@ -16,6 +16,7 @@
 .page-description--filtered {
   opacity: 0;
   pointer-events: none;
+  animation: none;
 }
 
 .page-description p {
@@ -34,6 +35,10 @@
   bottom: 8vh;
   width: 36vw;
   text-align: justify;
+}
+
+/* Only animate fadeInUp when NOT filtered */
+.about__description.page-description:not(.page-description--filtered) {
   animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 

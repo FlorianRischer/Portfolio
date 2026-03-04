@@ -1,6 +1,7 @@
 // Author: Florian Rischer
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
+import gsap from 'gsap';
 import PageContainer from '../components/PageContainer';
 import { MockupCarousel, type Screen } from '../components/common/MockupCarousel';
 import { PageDescription } from '../components/common/PageDescription';
@@ -49,15 +50,148 @@ export default function ProjectDetailPage() {
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeSection, setActiveSection] = useState<DetailSection | null>(null);
-  const [delayedButtonPosition, setDelayedButtonPosition] = useState<DetailSection | null>(null);
+  // Start with prototype-screens active for immediate project preview
+  const [activeSection, setActiveSection] = useState<DetailSection | null>('prototype-screens');
+  const [delayedButtonPosition, setDelayedButtonPosition] = useState<DetailSection | null>('prototype-screens');
   const [techIcons, setTechIcons] = useState<{ name: string; icon: string }[]>([]);
 
   // Section visibility tracking for exit animations
-  const [hasBeenActive, setHasBeenActive] = useState<Record<string, boolean>>({});
+  const [hasBeenActive, setHasBeenActive] = useState<Record<string, boolean>>({ 'prototype-screens': true });
+
+  // Scroll filter refs
+  const accumulatedDeltaDown = useRef(0);
+  const accumulatedDeltaUp = useRef(0);
+  const isDebouncing = useRef(false);
+  const isAnimating = useRef(false);
+  const lastWheelTime = useRef(0);
+  const debounceTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const activeSectionRef = useRef<DetailSection | null>('prototype-screens');
+  
+  // Keep ref in sync
+  activeSectionRef.current = activeSection;
+
+  // Scroll sequence: prototype-screens → null → used-technologies
+  const sectionSequence: (DetailSection | null)[] = ['prototype-screens', null, 'used-technologies'];
+
+  const getCurrentIndex = useCallback(() => {
+    return sectionSequence.indexOf(activeSectionRef.current);
+  }, []);
+
+  const startDebounce = useCallback(() => {
+    isDebouncing.current = true;
+    accumulatedDeltaDown.current = 0;
+    accumulatedDeltaUp.current = 0;
+    
+    if (debounceTimeout.current) {
+      clearTimeout(debounceTimeout.current);
+    }
+    debounceTimeout.current = setTimeout(() => {
+      isDebouncing.current = false;
+      accumulatedDeltaDown.current = 0;
+      accumulatedDeltaUp.current = 0;
+    }, 600);
+  }, []);
+
+  const smoothScrollToTop = useCallback(() => {
+    isAnimating.current = true;
+    const start = window.scrollY;
+    const obj = { y: start };
+    gsap.to(obj, {
+      y: 0,
+      duration: 0.8,
+      ease: 'power2.inOut',
+      onUpdate: () => window.scrollTo(0, obj.y),
+      onComplete: () => { isAnimating.current = false; }
+    });
+  }, []);
+
+  const smoothScrollToBottom = useCallback(() => {
+    isAnimating.current = true;
+    const documentHeight = document.documentElement.scrollHeight;
+    const windowHeight = window.innerHeight;
+    const target = documentHeight - windowHeight;
+    const start = window.scrollY;
+    const obj = { y: start };
+    gsap.to(obj, {
+      y: target,
+      duration: 0.8,
+      ease: 'power2.inOut',
+      onUpdate: () => window.scrollTo(0, obj.y),
+      onComplete: () => { isAnimating.current = false; }
+    });
+  }, []);
+
+  // Scroll-based section navigation
+  useEffect(() => {
+    const wheelRateLimit = 25;
+    const wheelThreshold = 150;
+    const scrollIncrement = 10;
+
+    const handleWheel = (e: WheelEvent) => {
+      if (isDebouncing.current || isAnimating.current) return;
+
+      const now = Date.now();
+      if (now - lastWheelTime.current < wheelRateLimit) return;
+      lastWheelTime.current = now;
+
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      const currentScrollY = window.scrollY;
+      const canScrollDown = currentScrollY + windowHeight < documentHeight - 20;
+      const canScrollUp = currentScrollY > 20;
+      const currentIndex = getCurrentIndex();
+
+      // Scrolling DOWN
+      if (e.deltaY > 0) {
+        accumulatedDeltaUp.current = 0;
+
+        if (canScrollDown) {
+          accumulatedDeltaDown.current = 0;
+          return;
+        }
+
+        accumulatedDeltaDown.current += scrollIncrement;
+        
+        if (accumulatedDeltaDown.current >= wheelThreshold) {
+          const nextIndex = currentIndex + 1;
+          if (nextIndex < sectionSequence.length) {
+            setActiveSection(sectionSequence[nextIndex]);
+            startDebounce();
+            smoothScrollToTop();
+          }
+        }
+      }
+      // Scrolling UP
+      else if (e.deltaY < 0) {
+        accumulatedDeltaDown.current = 0;
+
+        if (canScrollUp) {
+          accumulatedDeltaUp.current = 0;
+          return;
+        }
+
+        accumulatedDeltaUp.current += scrollIncrement;
+        
+        if (accumulatedDeltaUp.current >= wheelThreshold) {
+          const prevIndex = currentIndex - 1;
+          if (prevIndex >= 0) {
+            setActiveSection(sectionSequence[prevIndex]);
+            startDebounce();
+            setTimeout(() => smoothScrollToBottom(), 100);
+          }
+        }
+      }
+    };
+
+    window.addEventListener('wheel', handleWheel, { passive: true });
+    return () => {
+      window.removeEventListener('wheel', handleWheel);
+      if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+    };
+  }, [getCurrentIndex, startDebounce, smoothScrollToTop, smoothScrollToBottom]);
 
   useEffect(() => {
-    window.scrollTo(0, -1000);
+    window.scrollTo(0, 0);
   }, []);
 
   useEffect(() => {

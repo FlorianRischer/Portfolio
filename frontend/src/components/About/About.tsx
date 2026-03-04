@@ -268,7 +268,7 @@ export default function About() {
             }`}
             onClick={() => setActiveView(isViewActive('resume') ? null : 'resume')}
           >
-            Resume
+            CV
           </button>
           
           <button
@@ -289,7 +289,7 @@ export default function About() {
           </button>
       </div>
 
-      <PageDescription isFiltered={hasActiveView} className="about__description" data-skill-selected={selectedSkill ? 'true' : 'false'}>
+      <PageDescription isFiltered={hasActiveView} className="about__description" data-skill-selected={displayedSkill ? 'true' : 'false'}>
         I'm a UX/UI designer currently studying Web Design & Development. In my work, I combine visual design with a structured, user-focused approach. My goal is to create clear and functional designs that are both aesthetically pleasing and easy to understand.
       </PageDescription>
 
