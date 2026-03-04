@@ -13,9 +13,9 @@ type AboutView = 'resume' | 'tech-skills' | 'design-skills' | 'education' | 'min
 
 // Filter order for scroll activation with subfilters
 const scrollFilterOrder = [
-  { id: 'resume' as const, subfilters: ['education' as const, 'mini-job' as const] },
   { id: 'tech-skills' as const },
-  { id: 'design-skills' as const }
+  { id: 'design-skills' as const },
+  { id: 'resume' as const, subfilters: ['education' as const, 'mini-job' as const] }
 ];
 
 interface Skill {
@@ -263,15 +263,6 @@ export default function About() {
 
         <div className={`about__filters ${getButtonPositionClass()}`}>
           <button
-            className={`about__filter-btn about__filter-btn--${getViewSize('resume')} ${
-              isViewActive('resume') ? 'about__filter-btn--active' : ''
-            }`}
-            onClick={() => setActiveView(isViewActive('resume') ? null : 'resume')}
-          >
-            CV
-          </button>
-          
-          <button
             className={`about__filter-btn about__filter-btn--${getViewSize('tech-skills')} ${
               isViewActive('tech-skills') ? 'about__filter-btn--active' : ''
             }`}
@@ -287,6 +278,14 @@ export default function About() {
           >
             Design - skills
           </button>
+          <button
+            className={`about__filter-btn about__filter-btn--${getViewSize('resume')} ${
+              isViewActive('resume') ? 'about__filter-btn--active' : ''
+            }`}
+            onClick={() => setActiveView(isViewActive('resume') ? null : 'resume')}
+          >
+            Curriculum Vitae
+          </button>
       </div>
 
       <PageDescription isFiltered={hasActiveView} className="about__description" data-skill-selected={displayedSkill ? 'true' : 'false'}>
@@ -298,7 +297,7 @@ export default function About() {
         isFiltered={activeView === 'resume'} 
         className="about__cv-description"
       >
-        Here you can find an overview of my educational background and mini-job experiences. 
+        Here you can find out more about my educational background and mini-job experiences. 
       </PageDescription>
 
       {displayedSkill && getSelectedSkillData() && (

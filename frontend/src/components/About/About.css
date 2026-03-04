@@ -84,16 +84,15 @@
 }
 
 /* Filter position states for each view */
-.about__filters--resume-active {
+.about__filters--tech-skills-active {
   bottom: 70vh;
 }
 
-
-.about__filters--tech-skills-active {
+.about__filters--design-skills-active {
   bottom: 75vh;
 }
 
-.about__filters--design-skills-active {
+.about__filters--resume-active {
   bottom: 80vh;
 }
 
