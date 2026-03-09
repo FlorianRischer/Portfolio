@@ -23,6 +23,7 @@ export default function Works() {
   const [animationDelay, setAnimationDelay] = useState<number>(0);
   const prevFilterRef = useRef<FilterCategory>(null);
   const accumulatedDelta = useRef<number>(0);
+  const activationCooldown = useRef<number>(0);
   const { detectDevice, getThreshold } = useWheelDetection();
 
   // Show projects when user scrolls (without activating any filter)
@@ -34,6 +35,33 @@ export default function Works() {
     };
 
     const handleWheel = (e: WheelEvent) => {
+      const now = performance.now();
+      
+      // Check if we're in cooldown period (after activation)
+      if (activationCooldown.current > 0) {
+        const timeSinceActivation = now - activationCooldown.current;
+        
+        // During first 500ms after activation: block all scroll
+        if (timeSinceActivation < 500) {
+          e.preventDefault();
+          return;
+        }
+        
+        // Between 500ms-1000ms: reduced sensitivity (ignore small deltas)
+        if (timeSinceActivation < 1000) {
+          const absDelta = Math.abs(e.deltaY);
+          if (absDelta < 30) {
+            e.preventDefault();
+            return;
+          }
+        }
+        
+        // After 1000ms: clear cooldown
+        if (timeSinceActivation >= 1000) {
+          activationCooldown.current = 0;
+        }
+      }
+      
       if (showProjects || activeFilter !== null) return;
       
       // Detect device and get normalized delta
@@ -47,8 +75,17 @@ export default function Works() {
         const threshold = getThreshold(100);
         
         if (accumulatedDelta.current >= threshold) {
+          // Activate projects
           setShowProjects(true);
+          
+          // Reset accumulated delta to eat up remaining scroll momentum
           accumulatedDelta.current = 0;
+          
+          // Start cooldown period to prevent over-scrolling
+          activationCooldown.current = now;
+          
+          // Prevent default scroll for this event
+          e.preventDefault();
         }
       } else {
         // Reset accumulator if scrolling up
@@ -57,7 +94,7 @@ export default function Works() {
     };
 
     window.addEventListener('scroll', handleScroll);
-    window.addEventListener('wheel', handleWheel);
+    window.addEventListener('wheel', handleWheel, { passive: false });
     
     return () => {
       window.removeEventListener('scroll', handleScroll);
