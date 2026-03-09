@@ -71,8 +71,8 @@ export default function Works() {
         // Accumulate scroll delta
         accumulatedDelta.current += normalizedDelta;
         
-        // Threshold adjusts based on device (lower for touchpad, higher for mouse)
-        const threshold = getThreshold(100);
+        // Low threshold - single scroll tick should activate
+        const threshold = getThreshold(30);
         
         if (accumulatedDelta.current >= threshold) {
           // Activate projects
