@@ -4,6 +4,7 @@ import './Works.css';
 import ProjectGrid from './ProjectGrid';
 import { PageDescription } from '../common/PageDescription';
 import { FilterButtons, type FilterOption } from '../common/FilterButtons';
+import { useWheelDetection } from '../../hooks/useWheelDetection';
 
 type FilterCategory = 'ux-ui-design' | 'corporate-design' | 'web-development' | null;
 
@@ -21,6 +22,8 @@ export default function Works() {
   const [isExiting, setIsExiting] = useState(false);
   const [animationDelay, setAnimationDelay] = useState<number>(0);
   const prevFilterRef = useRef<FilterCategory>(null);
+  const accumulatedDelta = useRef<number>(0);
+  const { detectDevice, getThreshold } = useWheelDetection();
 
   // Show projects when user scrolls (without activating any filter)
   useEffect(() => {
@@ -31,8 +34,25 @@ export default function Works() {
     };
 
     const handleWheel = (e: WheelEvent) => {
-      if (e.deltaY > 0 && !showProjects && activeFilter === null) {
-        setShowProjects(true);
+      if (showProjects || activeFilter !== null) return;
+      
+      // Detect device and get normalized delta
+      const { normalizedDelta } = detectDevice(e);
+      
+      if (normalizedDelta > 0) {
+        // Accumulate scroll delta
+        accumulatedDelta.current += normalizedDelta;
+        
+        // Threshold adjusts based on device (lower for touchpad, higher for mouse)
+        const threshold = getThreshold(100);
+        
+        if (accumulatedDelta.current >= threshold) {
+          setShowProjects(true);
+          accumulatedDelta.current = 0;
+        }
+      } else {
+        // Reset accumulator if scrolling up
+        accumulatedDelta.current = 0;
       }
     };
 
@@ -43,7 +63,7 @@ export default function Works() {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('wheel', handleWheel);
     };
-  }, [showProjects, activeFilter]);
+  }, [showProjects, activeFilter, detectDevice, getThreshold]);
 
   // Handle filter changes with exit animation
   useEffect(() => {
