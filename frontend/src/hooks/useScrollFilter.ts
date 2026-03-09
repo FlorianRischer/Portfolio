@@ -35,8 +35,8 @@ export function useScrollFilter<T>({
   activeFilter,
   setActiveFilter,
   enabled = true,
-  wheelThreshold = 50,
-  wheelThresholdActive = 150,
+  wheelThreshold = 20,
+  wheelThresholdActive = 40,
   debounceTime = 600
 }: UseScrollFilterOptions<T>) {
   const accumulatedDeltaDown = useRef(0);
