@@ -9,13 +9,12 @@ import { useScrollFilter } from '../../hooks/useScrollFilter';
 // All images from API
 const aboutImage = imagesAPI.getUrl('about-image');
 
-type AboutView = 'resume' | 'tech-skills' | 'design-skills' | 'education' | 'mini-job' | null;
+type AboutView = 'tech-skills' | 'design-skills' | null;
 
-// Filter order for scroll activation with subfilters
+// Filter order for scroll activation
 const scrollFilterOrder = [
   { id: 'tech-skills' as const },
-  { id: 'design-skills' as const },
-  { id: 'resume' as const, subfilters: ['education' as const, 'mini-job' as const] }
+  { id: 'design-skills' as const }
 ];
 
 interface Skill {
@@ -24,44 +23,6 @@ interface Skill {
   icon: string;
   description?: string;
 }
-
-interface Education {
-  title: string;
-  year: string;
-  description: string;
-}
-
-interface MiniJob {
-  company: string;
-  year: string;
-  description: string;
-}
-
-const education: Education[] = [
-  {
-    title: 'Abitur',
-    year: '2017 - 2024',
-    description: 'I completed my general university entrance qualification (Abitur) at Max-Born-Gymnasium in Germering, where I also took the advanced art course (Kunst Additum) and successfully graduated with an average grade of 2.7.'
-  },
-  {
-    title: 'Munich University of applied sciences',
-    year: '2024 - now',
-    description: 'I\'m currently studying Computer Science and Design at the Munich University of Applied Sciences, where I\'m in my third semester with a current average grade of 1.7.'
-  }
-];
-
-const miniJobs: MiniJob[] = [
-  {
-    company: 'REBIKE Mobility GMBH',
-    year: '2021-2023',
-    description: 'Between 2021 and 2023, I occasionally supported the sales and marketing team at REBIKE Mobility, assisting with various tasks, such as promoting products and preparing team events.'
-  },
-  {
-    company: 'Netto Marken-Discount',
-    year: '2023 - 2024',
-    description: 'From December 2023 to March 2024, I worked as a store assistant at a local Netto supermarket, assisting with day-to-day store operations and customer service.'
-  }
-];
 
 // Convert API skill to local Skill interface
 const convertAPISkill = (apiSkill: APISkill): Skill => ({
@@ -80,11 +41,8 @@ export default function About() {
   const [techSkills, setTechSkills] = useState<Skill[]>([]);
   const [designSkills, setDesignSkills] = useState<Skill[]>([]);
   const [hasBeenActive, setHasBeenActive] = useState<{ [key: string]: boolean }>({
-    resume: false,
     'tech-skills': false,
     'design-skills': false,
-    'education': false,
-    'mini-job': false,
   });
 
   // Enable scroll-based filter activation
@@ -256,7 +214,7 @@ export default function About() {
         <img 
           src={aboutImage} 
           alt="About" 
-          className={`about__image-img ${activeView === 'design-skills' ? 'about__image-img--faded' : ''} ${(activeView === 'resume' || activeView === 'education' || activeView === 'mini-job') ? 'about__image-img--very-faded' : ''}`} 
+          className={`about__image-img ${activeView === 'design-skills' ? 'about__image-img--faded' : ''}`} 
         />
       </div>
       <h1 className="about__title">ABOUT</h1>
@@ -278,26 +236,10 @@ export default function About() {
           >
             Design - skills
           </button>
-          <button
-            className={`about__filter-btn about__filter-btn--${getViewSize('resume')} ${
-              isViewActive('resume') ? 'about__filter-btn--active' : ''
-            }`}
-            onClick={() => setActiveView(isViewActive('resume') ? null : 'resume')}
-          >
-            Curriculum Vitae
-          </button>
       </div>
 
       <PageDescription isFiltered={hasActiveView} className="about__description" data-skill-selected={displayedSkill ? 'true' : 'false'}>
-        I'm a UX/UI designer currently studying Web Design & Development. In my work, I combine visual design with a structured, user-focused approach. My goal is to create clear and functional designs that are both aesthetically pleasing and easy to understand.
-      </PageDescription>
-
-      {/* CV Description */}
-      <PageDescription 
-        isFiltered={activeView === 'resume'} 
-        className="about__cv-description"
-      >
-        Here you can find out more about my educational background and mini-job experiences. 
+        I'm a UX/UI designer currently studying Web Design & Development at University of applied sciences in Munich, Germany. In my work, I combine visual design with a structured, user-focused approach. My goal is to create clear and functional designs that are both aesthetically pleasing and easy to understand.
       </PageDescription>
 
       {displayedSkill && getSelectedSkillData() && (
@@ -307,72 +249,6 @@ export default function About() {
           </p>
         </div>
       )}
-
-      {/* Resume Section */}
-      <div className={`about__section about__resume-section ${activeView === 'resume' || activeView === 'education' || activeView === 'mini-job' ? 'about__section--visible' : ''} ${(hasBeenActive.resume || hasBeenActive.education || hasBeenActive['mini-job']) && activeView !== 'resume' && activeView !== 'education' && activeView !== 'mini-job' ? 'about__section--exiting' : ''}`}>
-        {/* Resume Sub-filters */}
-        {activeView === 'resume' || activeView === 'education' || activeView === 'mini-job' ? (
-          <div className={`about__resume-filters ${activeView === 'education' || activeView === 'mini-job' ? 'about__resume-filters--active' : ''}`}>
-            <button
-              className={`about__resume-filter-btn ${activeView === 'education' ? 'about__resume-filter-btn--active' : ''}`}
-              onClick={() => setActiveView(activeView === 'education' ? 'resume' : 'education')}
-            >
-              Education
-            </button>
-            <button
-              className={`about__resume-filter-btn ${activeView === 'mini-job' ? 'about__resume-filter-btn--active' : ''}`}
-              onClick={() => setActiveView(activeView === 'mini-job' ? 'resume' : 'mini-job')}
-            >
-              Mini-job Experiences
-            </button>
-          </div>
-        ) : null}
-        
-      </div>
-
-      {/* Education Section */}
-      <div className={`about__section about__education-section ${activeView === 'education' ? 'about__section--visible' : ''} ${hasBeenActive.education && activeView !== 'education' ? 'about__section--exiting' : ''}`}>
-        <div className="about__resume-items">
-          {education.map((item, index) => (
-            <div 
-              key={item.title}
-              className="about__resume-item"
-              style={{ 
-                '--stagger-delay': `${0.1 + index * 0.15}s`,
-                '--stagger-delay-exit': `${(education.length - index) * 0.05}s`
-              } as React.CSSProperties}
-            >
-              <div className="about__resume-header">
-                <h3 className="about__resume-title">{item.title}</h3>
-                <span className="about__resume-year">{item.year}</span>
-              </div>
-              <p className="about__resume-description">{item.description}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Mini-job Section */}
-      <div className={`about__section about__mini-job-section ${activeView === 'mini-job' ? 'about__section--visible' : ''} ${hasBeenActive['mini-job'] && activeView !== 'mini-job' ? 'about__section--exiting' : ''}`}>
-        <div className="about__resume-items">
-          {miniJobs.map((item, index) => (
-            <div 
-              key={item.company}
-              className="about__resume-item"
-              style={{ 
-                '--stagger-delay': `${0.1 + index * 0.15}s`,
-                '--stagger-delay-exit': `${(miniJobs.length - index) * 0.05}s`
-              } as React.CSSProperties}
-            >
-              <div className="about__resume-header">
-                <h3 className="about__resume-title">{item.company}</h3>
-                <span className="about__resume-year">{item.year}</span>
-              </div>
-              <p className="about__resume-description">{item.description}</p>
-            </div>
-          ))}
-        </div>
-      </div>
 
       {/* Tech Skills Section */}
       <div className={`about__section about__tech-skills-section ${activeView === 'tech-skills' ? 'about__section--visible' : ''} ${selectedSkill ? 'about__section--skill-selected' : ''} ${hasBeenActive['tech-skills'] && activeView !== 'tech-skills' ? 'about__section--exiting' : ''}`}>

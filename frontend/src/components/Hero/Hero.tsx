@@ -70,7 +70,7 @@ const Hero = () => {
           
           <div className="hero__intro">
             <p className="hero__intro-text">
-              HEY, NICE TO MEET YOU, I'M FLO, A (WEB-) DESIGNER AND FRONTEND DEVELOPER, FROM GERMANY. 
+              HEY, NICE TO MEET YOU, I'M FLORIAN, A WEB- DESIGN AND DEVELOPMENT STUDENT, FROM GERMANY. 
               WELCOME TO MY PORTFOLIO PAGE, DON'T BE SHY LOOK AROUND AND GET TO KNOW MORE ABOUT ME AND MY WORK!   
             </p>
           </div>

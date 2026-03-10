@@ -44,13 +44,6 @@
   opacity: 0.5;
 }
 
-/* Resume filter image opacity */
-.about__resume-section--visible .about__image-img,
-.about__education-section--visible .about__image-img,
-.about__mini-job-section--visible .about__image-img {
-  opacity: 0.3;
-}
-
 /* Title */
 .about__title {
   position: absolute;
@@ -85,14 +78,10 @@
 
 /* Filter position states for each view */
 .about__filters--tech-skills-active {
-  bottom: 70vh;
-}
-
-.about__filters--design-skills-active {
   bottom: 75vh;
 }
 
-.about__filters--resume-active {
+.about__filters--design-skills-active {
   bottom: 80vh;
 }
 
@@ -402,125 +391,11 @@
   opacity: 0.6;
 }
 
-/* Resume Section Content */
-.about__resume-content {
-  font-family: 'Helvetica', sans-serif;
-  font-size: var(--font-base);
-  color: #000000;
-}
-
 /* Design Section Content */
 .about__design-content {
   font-family: 'Helvetica', sans-serif;
   font-size: var(--font-base);
   color: #000000;
-}
-
-/* Resume Sub-filters */
-.about__resume-filters {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(1rem, 2vw, 1.5rem);
-  transition: var(--transition-slow);
-}
-
-.about__resume-filters--active {
-  transform: translateY(-64vh);
-}
-
-.about__resume-filter-btn {
-  font-family: 'Helvetica', sans-serif;
-  font-weight: 700;
-  font-size: var(--font-xl);
-  line-height: normal;
-  color: #000000;
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  text-align: left;
-  white-space: nowrap;
-  transition: font-size 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              opacity var(--transition-slow),
-              transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  margin: 0;
-  transform-origin: left center;
-}
-
-.about__resume-filter-btn:hover {
-  opacity: 1;
-  font-size: calc(var(--font-xl) * 1.3);
-  transform: translateX(0.5vw);
-}
-
-.about__resume-filter-btn--active {
-  font-size: var(--font-3xl);
-  font-weight: 700;
-}
-
-.about__resume-filter-btn--active:hover {
-  font-size: var(--font-3xl);
-  transform: none;
-}
-
-/* Resume Items */
-.about__resume-items {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(3rem, 5vw, 4rem);
-}
-
-.about__resume-item {
-  opacity: 0;
-  transform: translateY(clamp(2rem, 3vw, 3rem));
-}
-
-.about__section--visible .about__resume-item {
-  animation: staggerFadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
-  animation-delay: var(--stagger-delay, 0s);
-}
-
-.about__section--exiting .about__resume-item {
-  animation: staggerFadeOutDown 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
-  animation-delay: var(--stagger-delay-exit, 0s);
-}
-
-.about__resume-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 6vh;
-}
-
-.about__resume-title {
-  font-family: 'Helvetica', sans-serif;
-  font-size: var(--font-lg);
-  font-weight: 700;
-  line-height: normal;
-  color: #000000;
-  margin: 0;
-  padding: 0;
-}
-
-.about__resume-year {
-  font-family: 'Helvetica', sans-serif;
-  font-size: var(--font-lg);
-  font-weight: 700;
-  line-height: normal;
-  color: #000000;
-
-}
-
-.about__resume-description {
-  font-family: 'Helvetica', sans-serif;
-  font-size: var(--font-sm);
-  font-weight: 400;
-  line-height: 1.2;
-  color: #000000;
-  text-align: justify;
-  margin: 0;
-  padding: 0;
-  max-width: 40vw;
 }
 
 /* Stagger Animation Keyframes */

@@ -104,8 +104,8 @@
 }
 
 .hero__intro {
-  max-width: 19vw;
-  text-align: justify;
+  max-width: 20vw;
+  text-align: left;
 }
 
 .hero__intro-text {
