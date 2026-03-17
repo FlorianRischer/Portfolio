@@ -26,7 +26,7 @@ export function useScrollFilter<T>({
   activeFilter,
   setActiveFilter,
   enabled = true,
-  debounceTime = 500
+  debounceTime = 300
 }: UseScrollFilterOptions<T>) {
   // Gesture state
   const gestureDirection = useRef<'down' | 'up' | null>(null);
@@ -37,6 +37,16 @@ export function useScrollFilter<T>({
   
   const activeFilterRef = useRef(activeFilter);
   activeFilterRef.current = activeFilter;
+
+  // Reset cycle state when filter is deactivated
+  useEffect(() => {
+    if (activeFilter === null) {
+      gestureDirection.current = null;
+      isCoolingDown.current = false;
+      if (cooldownTimeout.current) clearTimeout(cooldownTimeout.current);
+      if (gestureTimeout.current) clearTimeout(gestureTimeout.current);
+    }
+  }, [activeFilter]);
 
   const flatFilterSequence = useRef<T[]>([]);
   
@@ -188,20 +198,56 @@ export function useScrollFilter<T>({
     }
   }, [getFirstFilter, setActiveFilter, activateNextFilter, activatePreviousFilter, smoothScrollToTop, smoothScrollToBottom, startCooldown]);
 
+  const isScrollableElement = useCallback((element: Element): boolean => {
+    const style = window.getComputedStyle(element);
+    const overflowY = style.overflowY;
+    const hasScroll = element.scrollHeight > element.clientHeight;
+    return (overflowY === 'auto' || overflowY === 'scroll') && hasScroll;
+  }, []);
+
+  const canScrollImmediately = useCallback((element: Element, direction: 'up' | 'down'): boolean => {
+    if (direction === 'down') {
+      return element.scrollTop + element.clientHeight < element.scrollHeight - 5;
+    } else {
+      return element.scrollTop > 5;
+    }
+  }, []);
+
   useEffect(() => {
     if (!enabled) return;
 
     const handleWheel = (e: WheelEvent) => {
-      // During cooldown, block ALL wheel events and extend cooldown
-      if (isCoolingDown.current) {
-        e.preventDefault();
-        e.stopPropagation();
-        extendCooldown(); // Reset timer on every event - absorbs full gesture
+      const target = e.target as Element;
+      
+      // Check if the event target or any parent is a scrollable container
+      let scrollableParent: Element | null = null;
+      let current: Element | null = target;
+      
+      while (current && current !== document.body) {
+        if (isScrollableElement(current)) {
+          scrollableParent = current;
+          break;
+        }
+        current = current.parentElement;
+      }
+
+      // If scrolling originates from within a scrollable container, never trigger filter changes
+      if (scrollableParent) {
+        // Allow natural scrolling - don't intercept at all
         return;
       }
 
       // Determine direction
       const direction = e.deltaY > 0 ? 'down' : 'up';
+
+      // During cooldown, only block the same direction that triggered the cooldown
+      // This allows bidirectional scrolling
+      if (isCoolingDown.current && gestureDirection.current === direction) {
+        e.preventDefault();
+        e.stopPropagation();
+        extendCooldown(); // Reset timer on every event - absorbs full gesture
+        return;
+      }
       
       // Check if we're at an edge where filter change could happen
       const windowHeight = window.innerHeight;
@@ -244,7 +290,7 @@ export function useScrollFilter<T>({
       if (gestureTimeout.current) clearTimeout(gestureTimeout.current);
       if (cooldownTimeout.current) clearTimeout(cooldownTimeout.current);
     };
-  }, [enabled, executeGesture, extendCooldown]);
+  }, [enabled, executeGesture, extendCooldown, isScrollableElement, canScrollImmediately]);
 
   return {
     resetCycle: useCallback(() => {
