@@ -45,35 +45,35 @@ const Hero = () => {
           </div>
         </div>
 
-        {/* Right Side - Navigation Buttons & Text */}
+        {/* Right Side - Navigation Buttons */}
         <div className="hero__content">
           <div className="hero__nav-buttons">
-            <button 
+            <button
               className="hero__nav-btn"
               onClick={() => navigateWithTransition('/about')}
             >
               ABOUT
             </button>
-            <button 
+            <button
               className="hero__nav-btn"
               onClick={() => navigateWithTransition('/works')}
             >
               WORKS
             </button>
-            <button 
+            <button
               className="hero__nav-btn"
               onClick={() => navigateWithTransition('/contact')}
             >
               CONTACT
             </button>
           </div>
-          
-          <div className="hero__intro">
-            <p className="hero__intro-text">
-              HEY, NICE TO MEET YOU, I'M FLORIAN, A WEB- DESIGN AND DEVELOPMENT STUDENT, FROM GERMANY. 
-              WELCOME TO MY PORTFOLIO PAGE, DON'T BE SHY LOOK AROUND AND GET TO KNOW MORE ABOUT ME AND MY WORK!   
-            </p>
-          </div>
+        </div>
+
+        <div className="hero__intro">
+          <p className="hero__intro-text">
+            HEY, NICE TO MEET YOU, I'M FLORIAN, A WEB- DESIGN AND DEVELOPMENT STUDENT, FROM GERMANY.
+            WELCOME TO MY PORTFOLIO PAGE, DON'T BE SHY LOOK AROUND AND GET TO KNOW MORE ABOUT ME AND MY WORK!
+          </p>
         </div>
       </div>
     </section>
