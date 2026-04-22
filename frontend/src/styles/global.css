@@ -175,7 +175,7 @@ button {
 }
 
 /* Large screens: cap content width to match 16" MacBook reference */
-@media (min-width: 1800px) {
+@media (min-width: 1500px) {
   :root {
     --max-width-content: 1470px;
     --content-max-width: 1470px;

@@ -40,27 +40,27 @@
 
 .hero__arrow {
   position: absolute;
-  width: 57vw;
+  width: min(57vw, 820px);
   height: auto;
   bottom: 3.7vh;
-  left: 3vw;
+  left: min(3vw, 43px);
   transform: rotate(2deg);
   z-index: 4;
 }
 
 .hero__vector {
   position: absolute;
-  width: 21vw;
+  width: min(21vw, 302px);
   height: auto;
-  bottom: 3.5vw;
-  left: 9.1vw;
+  bottom: min(3.5vw, 50px);
+  left: min(9.1vw, 131px);
   z-index: 0;
   object-fit: contain;
 }
 
 .hero__profile {
   position: absolute;
-  width: 45vw;
+  width: min(45vw, 648px);
   height: auto;
   bottom: 0vh;
   z-index: 2;
@@ -105,7 +105,7 @@
 }
 
 .hero__intro {
-  max-width: 20vw;
+  max-width: min(20vw, 288px);
   text-align: left;
 }
 
