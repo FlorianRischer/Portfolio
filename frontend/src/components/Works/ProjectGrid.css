@@ -31,29 +31,8 @@
   animation-delay: var(--stagger-delay-exit, 0s);
 }
 
-.project-grid__vertical-line {
-  display: none;
-}
-
-/* Stagger Animation Keyframes */
-@keyframes staggerFadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(clamp(3rem, 4vw, 4rem));
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes staggerFadeOutDown {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(clamp(3rem, 4vw, 4rem));
+@media (max-width: 768px) {
+  .project-grid {
+    margin-top: 0;
   }
 }

@@ -1,13 +1,11 @@
 // Author: Florian Rischer
+import { BaseLayout } from '../layouts';
 import About from '../components/About';
-import PageContainer from '../components/PageContainer';
 
 export default function AboutPage() {
   return (
-    <main>
-      <PageContainer>
-        <About />
-      </PageContainer>
-    </main>
+    <BaseLayout>
+      <About />
+    </BaseLayout>
   );
 }

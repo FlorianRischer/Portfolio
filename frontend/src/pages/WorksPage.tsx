@@ -1,13 +1,11 @@
 // Author: Florian Rischer
+import { BaseLayout } from '../layouts';
 import Works from '../components/Works/Works';
-import PageContainer from '../components/PageContainer';
 
 export default function WorksPage() {
   return (
-    <main>
-      <PageContainer>
-        <Works />
-      </PageContainer>
-    </main>
+    <BaseLayout scrollable>
+      <Works />
+    </BaseLayout>
   );
 }

@@ -387,7 +387,7 @@
   }
 }
 
-/* Responsive design */
+/* Responsive */
 @media (max-width: 768px) {
   .mockup-carousel {
     padding-top: var(--spacing-lg);
@@ -398,17 +398,39 @@
   }
 
   .mockup-carousel__arrow {
-    font-size: var(--font-xl);
+    position: fixed;
     padding: var(--spacing-xs);
+  }
+
+  .mockup-carousel__arrow--left {
+    left: var(--spacing-sm);
+  }
+
+  .mockup-carousel__arrow--right {
+    right: var(--spacing-sm);
+  }
+
+  .mockup-carousel__click-area {
+    width: 70vw;
+    height: 40vh;
   }
 
   .mockup-carousel__description {
     font-size: var(--font-sm);
     text-align: left;
+    margin-top: 55vh;
+  }
+
+  .mockup-carousel__text-content {
+    max-width: 90vw;
   }
 
   .mockup-carousel__dot {
     width: 12px;
     height: 12px;
+  }
+
+  .mockup-carousel__indicators {
+    gap: 3vw;
   }
 }

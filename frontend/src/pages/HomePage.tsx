@@ -1,10 +1,11 @@
 // Author: Florian Rischer
+import { BaseLayout } from '../layouts';
 import Hero from '../components/Hero';
 
 export default function HomePage() {
   return (
-    <main>
+    <BaseLayout fullBleed>
       <Hero />
-    </main>
+    </BaseLayout>
   );
 }

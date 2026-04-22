@@ -2,7 +2,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import gsap from 'gsap';
-import PageContainer from '../components/PageContainer';
+import { BaseLayout } from '../layouts';
 import { MockupCarousel, type Screen } from '../components/common/MockupCarousel';
 import { PageDescription } from '../components/common/PageDescription';
 import { projectsAPI, imagesAPI, type Project } from '../services/api';
@@ -251,39 +251,35 @@ export default function ProjectDetailPage() {
 
   if (loading) {
     return (
-      <main>
-        <PageContainer>
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            alignItems: 'center', 
-            minHeight: '50vh',
-            fontSize: 'var(--font-xl)'
-          }}>
-            Loading...
-          </div>
-        </PageContainer>
-      </main>
+      <BaseLayout>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '50vh',
+          fontSize: 'var(--font-xl)'
+        }}>
+          Loading...
+        </div>
+      </BaseLayout>
     );
   }
 
   if (error || !project) {
     return (
-      <main>
-        <PageContainer>
-          <div style={{ 
-            display: 'flex', 
-            flexDirection: 'column',
-            justifyContent: 'center', 
-            alignItems: 'center', 
-            minHeight: '50vh',
-            gap: '1rem'
-          }}>
-            <h1 style={{ fontSize: 'var(--font-3xl)' }}>Project Not Found</h1>
-            <p style={{ fontSize: 'var(--font-base)', color: '#666' }}>{error}</p>
-          </div>
-        </PageContainer>
-      </main>
+      <BaseLayout>
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '50vh',
+          gap: '1rem'
+        }}>
+          <h1 style={{ fontSize: 'var(--font-3xl)' }}>Project Not Found</h1>
+          <p style={{ fontSize: 'var(--font-base)', color: '#666' }}>{error}</p>
+        </div>
+      </BaseLayout>
     );
   }
 
@@ -315,9 +311,8 @@ export default function ProjectDetailPage() {
   };
 
   return (
-    <main>
-      <PageContainer>
-        <section className={`project-detail ${hasActiveSection ? 'project-detail--filtered' : ''}`}>
+    <BaseLayout>
+      <section className={`project-detail ${hasActiveSection ? 'project-detail--filtered' : ''}`}>
           {/* Project Title */}
           <h1 className={`project-detail__title ${hasActiveSection ? 'project-detail__title--right' : ''}`}>
             {project.liveUrl ? (
@@ -447,8 +442,7 @@ export default function ProjectDetailPage() {
               )}
             </PageDescription>
           </div>
-        </section>
-      </PageContainer>
-    </main>
+      </section>
+    </BaseLayout>
   );
 }

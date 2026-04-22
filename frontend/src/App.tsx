@@ -1,5 +1,5 @@
 // Author: Florian Rischer
-import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import Header from './components/Header';
 import { TransitionProvider } from './components/PageTransition/TransitionContext';
@@ -13,24 +13,9 @@ import { preloadSkills } from './services/technologyIcons';
 import './styles/global.css';
 import './components/PageTransition/PageTransition.css';
 
-// Preload skills data for technology icons
 preloadSkills();
-import './styles/global.css';
-import './components/PageTransition/PageTransition.css';
 
 function AppContent() {
-  const location = useLocation();
-
-  useEffect(() => {
-    const body = document.body;
-    // Enable scrolling on works page
-    if (location.pathname === '/works') {
-      body.classList.add('app-scroll-enabled');
-    } else {
-      body.classList.remove('app-scroll-enabled');
-    }
-  }, [location]);
-
   useEffect(() => {
     // Set flower icon as favicon dynamically
     const flowerIcon = imagesAPI.getUrl('flower');

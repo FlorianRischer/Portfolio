@@ -6,7 +6,18 @@
   --color-white: #ffffff;
   --color-yellow: #f5a623;
   --color-blue: #3d66e1;
-  
+
+  /* Layout constraints — shared by BaseLayout / PageContainer */
+  --page-max-width: 1440px;
+  --content-max-height: 100vh;
+  --content-max-width: 85vw;
+
+  /* Standard positions within ContentContainer (percentage-based = container-relative) */
+  --filter-resting-bottom: 8%;
+  --title-top: clamp(3.5rem, 5.5vw, 5rem);
+  --filter-active-top: clamp(4rem, 6.3vw, 5.6875rem);
+  --description-resting-bottom: 8%;
+
   /* Responsive spacing system based on viewport */
   --spacing-xs: clamp(0.5rem, 1vw, 1rem);
   --spacing-sm: clamp(1rem, 2vw, 1.5rem);
@@ -14,10 +25,10 @@
   --spacing-lg: clamp(2rem, 4vw, 4rem);
   --spacing-xl: clamp(3rem, 6vw, 6rem);
   --spacing-2xl: clamp(4rem, 8vw, 8rem);
-  
+
   /* Container padding */
   --container-padding: clamp(1.25rem, 3.5vw, 3.125rem);
-  
+
   /* Typography scale */
   --font-xs: clamp(0.75rem, 0.9vw, 0.875rem);
   --font-sm: clamp(0.875rem, 1vw, 1rem);
@@ -30,11 +41,19 @@
   --font-5xl: clamp(4rem, 8vw, 8rem);
   --font-hero: clamp(3.5rem, 9vw, 9rem);
   --font-works-title: clamp(4rem, 10vw, 9.75rem);
-  
-  /* Max widths */
+
+  /* Max widths (legacy alias — prefer --content-max-width) */
   --max-width-content: 85vw;
   --max-width-narrow: min(50rem, 100%);
-  
+
+  /* Z-index layers */
+  --z-base: 0;
+  --z-content: 1;
+  --z-filters: 10;
+  --z-header: 1000;
+  --z-overlay: 5000;
+  --z-transition: 9999;
+
   /* Transition timing */
   --transition-fast: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-medium: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
@@ -61,7 +80,9 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   height: 100%;
-  overflow: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 img {
@@ -74,30 +95,13 @@ a {
   text-decoration: none;
 }
 
-body.app-scroll-enabled {
-  overflow: auto;
-}
-
 button {
   font-family: inherit;
 }
 
-/* Custom Scrollbar */
+/* Hide scrollbar across all browsers */
 ::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--color-white);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--color-black);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #333;
+  display: none;
 }
 
 /* Selection */
@@ -123,7 +127,7 @@ button {
   align-items: center;
   justify-content: center;
   background-color: #7c99ff;
-  z-index: 10000;
+  z-index: calc(var(--z-transition) + 1);
 }
 
 .loading-spinner {
@@ -138,5 +142,42 @@ button {
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+/* Shared stagger animations (used across Works, About, Contact) */
+@keyframes staggerFadeInUp {
+  from { opacity: 0; transform: translateY(clamp(3rem, 4vw, 4rem)); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes staggerFadeOutDown {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(clamp(3rem, 4vw, 4rem)); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(clamp(1rem, 1.5vw, 1.5rem)); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOutDown {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-clamp(1rem, 1.5vw, 1.5rem)); }
+}
+
+/* Mobile: enable scrolling on all pages */
+@media (max-width: 768px) {
+  body {
+    overflow: auto !important;
+    height: auto;
+  }
+}
+
+/* Large screens: cap content width to match 16" MacBook reference */
+@media (min-width: 1800px) {
+  :root {
+    --max-width-content: 1470px;
+    --content-max-width: 1470px;
   }
 }

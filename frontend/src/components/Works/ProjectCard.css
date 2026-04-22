@@ -141,3 +141,26 @@
   object-fit: cover;
   object-position: center;
 }
+
+@media (max-width: 768px) {
+  .project-card {
+    flex-direction: column;
+  }
+
+  .project-card__content {
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .project-card__image-wrapper {
+    width: 100%;
+  }
+
+  .project-card__btn-wrapper {
+    gap: var(--spacing-md);
+  }
+
+  .project-card__icon {
+    width: 10vw;
+  }
+}

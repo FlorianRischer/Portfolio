@@ -4,15 +4,14 @@
   flex-direction: column;
   gap: 1vh;
   transition: var(--transition-slow);
-  /* Default positioning - can be overridden by page-specific styles */
   position: absolute;
   left: 0vw;
-  bottom: 8vh;
+  bottom: var(--filter-resting-bottom);
 }
 
 /* Default filtered state - moves buttons up */
 .filter-buttons--filtered {
-  bottom: 40vh;
+  bottom: 40%;
 }
 
 .filter-buttons__btn {
@@ -58,4 +57,16 @@
 .filter-buttons__btn--active:hover {
   font-size: var(--font-3xl);
   transform: none;
+}
+
+@media (max-width: 768px) {
+  .filter-buttons {
+    position: relative;
+    left: auto;
+    bottom: auto;
+  }
+
+  .filter-buttons--filtered {
+    bottom: auto;
+  }
 }

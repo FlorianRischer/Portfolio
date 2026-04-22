@@ -1,13 +1,13 @@
 .contact {
   position: relative;
   width: 100%;
-  height: 100vh;
+  height: var(--content-max-height);
   background-color: #ffffff;
   overflow: hidden;
 }
 
 .contact--filtered {
-  height: 100vh;
+  height: var(--content-max-height);
   overflow: hidden;
 }
 
@@ -44,7 +44,7 @@
   line-height: normal;
   color: #000000;
   right: 0vw;
-  top: clamp(4rem, 6.3vw, 5.6875rem);
+  top: var(--title-top);
   margin: 0;
   white-space: nowrap;
 }
@@ -52,7 +52,7 @@
 /* Main container with filters and description */
 .contact__container {
   position: relative;
-  height: 100vh;
+  height: var(--content-max-height);
   display: flex;
   justify-content: space-between;
   padding: clamp(12rem, 21vw, 18.75rem) var(--container-padding) clamp(4rem, 7vw, 6.25rem);
@@ -66,18 +66,18 @@
 
 /* Filter buttons - Override positions for different states */
 .contact__filters--socials-active {
-  bottom: 32vh;
+  bottom: 32%;
 }
 
 .contact__filters--form-active {
-  bottom: 68vh;
+  bottom: 68%;
 }
 
 /* Socials Section */
 .contact__socials {
   position: absolute;
   left: 0vw;
-  bottom: 12vh;
+  bottom: 12%;
   display: flex;
   flex-direction: column;
   gap: clamp(1rem, 2vw, 1.75rem);
@@ -145,7 +145,7 @@
 .contact__form-section {
   position: absolute;
   left: 0vw;
-  bottom: clamp(6rem, 12vw, 6rem);
+  bottom: var(--filter-resting-bottom);
   opacity: 0;
   pointer-events: none;
   transition: opacity var(--transition-slow);
@@ -160,7 +160,7 @@
   display: flex;
   flex-direction: column;
   gap: clamp(0.5rem, 1vw, 0.75rem);
-  width: clamp(18rem, 30vw, 27rem);
+  width: clamp(14rem, 28vw, 27rem);
 }
 
 .contact__form-group {
@@ -206,7 +206,7 @@
   background: transparent;
   border: none;
   border-bottom: 2px solid #000000;
-  padding: clamp(0.5rem, 1vw, 0.75rem) clamp(0.5rem, 0.75vw, 0.75rem);
+  padding: clamp(0.35rem, 0.8vw, 0.75rem) clamp(0.35rem, 0.6vw, 0.75rem);
   outline: none !important;
   box-shadow: none !important;
   transition: var(--transition-fast);
@@ -240,11 +240,11 @@
   background: #e2e2e2;
   border: none;
   border-radius: 10px;
-  padding: clamp(0.75rem, 1vw, 1rem);
+  padding: clamp(0.5rem, 0.8vw, 1rem);
   outline: none !important;
   box-shadow: none !important;
   resize: none;
-  min-height: clamp(8rem, 14vw, 12.5rem);
+  min-height: clamp(5rem, 12vw, 12.5rem);
   transition: var(--transition-fast);
   transform-origin: left center;
   transform: scale(1);
@@ -282,36 +282,13 @@
   margin-top: clamp(0.5rem, 0.5vw, 1rem);
 }
 
-/* Stagger Animation Keyframes */
-@keyframes staggerFadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(clamp(3rem, 4vw, 4rem));
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes staggerFadeOutDown {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(clamp(3rem, 4vw, 4rem));
-  }
-}
-
 .contact__form-notice {
   font-family: 'Helvetica', sans-serif;
   font-size: var(--font-xs);
   font-weight: 400;
   color: rgba(0, 0, 0, 0.55);
   text-align: left;
-  max-width: clamp(8rem, 12vw, 12.5rem);
+  max-width: clamp(6rem, 11vw, 12.5rem);
   margin: 0;
   line-height: 1.4;
 }
@@ -328,7 +305,7 @@
   background: transparent;
   border: 2px solid #000000;
   border-radius: 10px;
-  padding: clamp(0.375rem, 0.75vw, 0.625rem) clamp(1.5rem, 2.5vw, 2.25rem);
+  padding: clamp(0.25rem, 0.6vw, 0.625rem) clamp(1rem, 2vw, 2.25rem);
   cursor: pointer;
   transition: var(--transition-fast);
   white-space: nowrap;
@@ -363,30 +340,76 @@
   margin-top: var(--spacing-sm);
 }
 
-/* Responsive adjustments */
+/* Responsive */
 @media (max-width: 768px) {
-  .contact__filters {
-    position: relative;
-    left: var(--container-padding);
-    top: auto;
-    margin-top: clamp(10rem, 20vw, 15rem);
+  .contact {
+    height: auto;
+    min-height: auto;
+    overflow: visible;
+    padding-bottom: var(--spacing-xl);
   }
 
-  .contact__socials {
-    position: relative;
-    left: var(--container-padding);
-    top: auto;
-    margin-top: var(--spacing-xl);
+  .contact--filtered {
+    height: auto;
+    overflow: visible;
   }
 
-  .contact__form-section {
+  .contact__image {
     position: relative;
-    left: var(--container-padding);
+    left: auto;
     top: auto;
+    width: 100%;
+    height: auto;
+    max-height: 40vh;
+    margin-top: clamp(4rem, 12vw, 6rem);
+  }
+
+  .contact__title {
+    position: relative;
+    top: auto;
+    right: auto;
+    text-align: right;
+    margin-top: var(--spacing-md);
+  }
+
+  .contact__container {
+    height: auto;
+    flex-direction: column;
+    padding-top: var(--spacing-lg);
+    padding-bottom: var(--spacing-lg);
+  }
+
+  .contact__container--filtered {
+    padding-top: var(--spacing-lg);
+  }
+
+  .contact__filters--socials-active,
+  .contact__filters--form-active {
+    bottom: auto;
+  }
+
+  .contact__socials--visible {
+    position: relative;
+    left: 0;
+    bottom: auto;
+    margin-top: var(--spacing-lg);
+  }
+
+  .contact__form-section--visible {
+    position: relative;
+    left: 0;
+    bottom: auto;
     margin-top: var(--spacing-lg);
   }
 
   .contact__form {
-    width: calc(100% - var(--container-padding) * 2);
+    width: 100%;
+  }
+
+  .contact__input:hover,
+  .contact__input:focus,
+  .contact__textarea:hover,
+  .contact__textarea:focus {
+    transform: none;
   }
 }

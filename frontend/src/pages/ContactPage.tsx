@@ -1,13 +1,11 @@
 // Author: Florian Rischer
+import { BaseLayout } from '../layouts';
 import Contact from '../components/Contact/Contact';
-import PageContainer from '../components/PageContainer';
 
 export default function ContactPage() {
   return (
-    <main>
-      <PageContainer>
-        <Contact />
-      </PageContainer>
-    </main>
+    <BaseLayout>
+      <Contact />
+    </BaseLayout>
   );
 }

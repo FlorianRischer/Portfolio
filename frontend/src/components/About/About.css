@@ -1,7 +1,7 @@
 .about {
   position: relative;
   width: 100%;
-  min-height: 100vh;
+  height: var(--content-max-height);
   background-color: #ffffff;
   overflow: hidden;
   padding: clamp(4rem, 8vw, 6rem) 0;
@@ -14,9 +14,8 @@
 /* About Image */
 .about__image {
   position: absolute;
-  left: clamp(1rem, 6.4vw, 92px);
   bottom: 0vh;
-  left: 14vw;
+  left: 4vw;
   width: 46vw;
   height: auto;
   overflow: hidden;
@@ -53,7 +52,7 @@
   line-height: normal;
   color: #000000;
   right: 0vw;
-  top: clamp(4rem, 6.3vw, 5.6875rem);
+  top: var(--title-top);
   margin: 0;
   white-space: nowrap;
 }
@@ -67,22 +66,20 @@
 /* Filter buttons - left side */
 .about__filters {
   position: absolute;
-  left: var(--container-padding);
-  bottom: 8vh;
+  left: 0vw;
+  top: calc(100% - var(--filter-resting-bottom));
+  transform: translateY(-100%);
   display: flex;
   flex-direction: column;
-  left: 0vw;
   gap: 0.7vh;
   transition: var(--transition-slow);
 }
 
-/* Filter position states for each view */
-.about__filters--tech-skills-active {
-  bottom: 75vh;
-}
-
+/* Active: top edge aligns with the page heading */
+.about__filters--tech-skills-active,
 .about__filters--design-skills-active {
-  bottom: 80vh;
+  top: var(--filter-active-top);
+  transform: translateY(0);
 }
 
 .about__filter-btn {
@@ -135,14 +132,16 @@
 .about--filtered .about__filter-btn:not(.about__filter-btn--active) {
   opacity: 0;
   pointer-events: none;
+  height: 0;
+  overflow: hidden;
+  margin: 0;
 }
 
 /* Skill Description */
 .about__skill-description {
   position: absolute;
-  right: var(--container-padding);
-  bottom: 8vh;
   right: 0vw;
+  bottom: var(--description-resting-bottom);
   width: 36vw;
   font-family: 'Helvetica', sans-serif;
   font-size: var(--font-base);
@@ -182,7 +181,7 @@
 .about__section {
   position: absolute;
   left: 0vw;
-  bottom: 8vh;
+  bottom: var(--filter-resting-bottom);
   opacity: 0;
   width: 40vw;
   pointer-events: none;
@@ -251,7 +250,7 @@
   gap: clamp(1rem, 3vw, 3rem);
   opacity: 0;
   width: 20vw;
-  transform: translateY(clamp(2rem, 3vw, 3rem));
+  transform: translateY(clamp(3rem, 4vw, 4rem));
   background: none;
   border: none;
   padding: 0;
@@ -398,68 +397,71 @@
   color: #000000;
 }
 
-/* Stagger Animation Keyframes */
-@keyframes staggerFadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(clamp(2rem, 3vw, 3rem));
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes staggerFadeOutDown {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(clamp(2rem, 3vw, 3rem));
-  }
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(clamp(1rem, 1.5vw, 1.5rem));
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeOutDown {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(-clamp(1rem, 1.5vw, 1.5rem));
-  }
-}
-
-/* Responsive adjustments */
+/* Responsive */
 @media (max-width: 768px) {
+  .about {
+    min-height: auto;
+    overflow: visible;
+    padding-bottom: var(--spacing-xl);
+  }
+
+  .about__image {
+    position: relative;
+    left: auto;
+    bottom: auto;
+    width: 100%;
+    margin-top: clamp(4rem, 12vw, 6rem);
+  }
+
+  .about__title {
+    position: relative;
+    top: auto;
+    right: auto;
+    text-align: right;
+    margin-top: var(--spacing-md);
+  }
+
   .about__filters {
     position: relative;
-    left: var(--container-padding);
+    left: 0;
     top: auto;
-    margin-top: clamp(10rem, 20vw, 15rem);
+    transform: none;
+    margin-top: var(--spacing-lg);
   }
 
-  .about__section {
-    position: relative;
-    left: var(--container-padding);
+  .about__filters--tech-skills-active,
+  .about__filters--design-skills-active {
     top: auto;
-    margin-top: var(--spacing-xl);
+    transform: none;
+  }
+
+  .about__section--visible {
+    position: relative;
+    left: 0;
+    bottom: auto;
+    width: 100%;
+    margin-top: var(--spacing-lg);
+  }
+
+  .about__skill {
+    width: 100%;
+  }
+
+  .about__skill-description {
+    position: relative;
+    right: auto;
+    bottom: auto;
+    width: 100%;
+    margin-top: var(--spacing-md);
   }
 
   .about__skill-content {
-    width: calc(100% - var(--container-padding) * 2);
+    width: 100%;
+  }
+
+  .about__skills-list {
+    max-height: none;
+    mask-image: none;
+    -webkit-mask-image: none;
   }
 }

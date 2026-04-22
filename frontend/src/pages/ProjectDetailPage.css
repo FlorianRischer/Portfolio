@@ -2,7 +2,7 @@
 .project-detail {
   position: relative;
   width: 100%;
-  height: 100vh;
+  height: var(--content-max-height);
   background-color: #ffffff;
   overflow: hidden;
 }
@@ -18,8 +18,8 @@
   color: #000000;
   left: 0;
   right: auto;
-  top: clamp(4rem, 6.3vw, 5.6875rem);
-  z-index: 10;
+  top: var(--title-top);
+  z-index: var(--z-filters);
   transition: transform var(--transition-slow), opacity var(--transition-slow);
   transform: translateX(0);
 }
@@ -52,7 +52,7 @@
 .project-detail__category {
   position: absolute;
   right: 0;
-  top: clamp(4rem, 6.3vw, 5.6875rem);
+  top: var(--title-top);
   font-family: 'Helvetica', sans-serif;
   font-size: var(--font-works-title);
   font-weight: 700;
@@ -90,25 +90,21 @@
 .pd-filters {
   position: absolute;
   left: 0;
-  bottom: 8vh;
+  top: calc(100% - var(--filter-resting-bottom));
+  transform: translateY(-100%);
   display: flex;
   flex-direction: column;
   gap: 1vh;
   transition: var(--transition-slow);
-  z-index: 10;
+  z-index: var(--z-filters);
 }
 
-/* Per-section position states (animate bottom like About page) */
-.pd-filters--my-role-active {
-  bottom: 74vh;
-}
-
-.pd-filters--prototype-screens-active {
-  bottom: 78.5vh;
-}
-
+/* Active: top edge aligns with the page heading */
+.pd-filters--my-role-active,
+.pd-filters--prototype-screens-active,
 .pd-filters--used-technologies-active {
-  bottom: 82.5vh;
+  top: var(--filter-active-top);
+  transform: translateY(0);
 }
 
 /* Button base */
@@ -162,11 +158,14 @@
 .project-detail--filtered .pd-filters__btn:not(.pd-filters__btn--active) {
   opacity: 0;
   pointer-events: none;
+  height: 0;
+  overflow: hidden;
+  margin: 0;
 }
 
 /* ── Page Description (default state) ── */
 .project-detail__description.page-description {
-  bottom: 8vh;
+  bottom: var(--description-resting-bottom);
   text-align: justify;
   white-space: pre-line;
   width: clamp(18rem, 38vw, 35rem);
@@ -382,13 +381,10 @@
 
   .pd-filters {
     position: relative;
-    bottom: auto;
-    left: auto;
-    margin-top: 2rem;
-  }
-
-  .pd-filters--filtered {
     top: auto;
+    left: auto;
+    transform: none;
+    margin-top: 2rem;
   }
 
   .project-detail__section {
@@ -433,8 +429,27 @@
     width: 100%;
   }
 
+  .project-detail__tech-section {
+    align-items: flex-start;
+  }
+
+  .project-detail__tech-list {
+    max-height: none;
+    padding-bottom: var(--spacing-lg);
+  }
+
   .project-detail--filtered .pd-filters__btn:not(.pd-filters__btn--active) {
     opacity: 1;
     pointer-events: auto;
+    height: auto;
+    overflow: visible;
+    margin: 0;
+  }
+
+  .pd-filters--my-role-active,
+  .pd-filters--prototype-screens-active,
+  .pd-filters--used-technologies-active {
+    top: auto;
+    transform: none;
   }
 }

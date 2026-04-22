@@ -1,5 +1,5 @@
 .hero {
-  height: 100vh;
+  height: var(--content-max-height);
   display: flex;
   align-items: center;
   padding: clamp(4rem, 5vw, 4.375rem) var(--container-padding);
@@ -11,7 +11,7 @@
 
 .hero__container {
   max-width: var(--max-width-content);
-  height: 100vh;
+  height: var(--content-max-height);
   margin: 0 auto;
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -29,6 +29,7 @@
   height: 100%;
   min-height: clamp(25rem, 55vh, 50rem);
   overflow: visible;
+  margin-top: -3vh;
 }
 
 .hero__composition {
@@ -117,4 +118,54 @@
   line-height: 1.4;
 }
 
+@media (max-width: 768px) {
+  .hero {
+    height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding-top: clamp(5rem, 15vw, 8rem);
+  }
 
+  .hero__container {
+    grid-template-columns: 1fr;
+    height: auto;
+    gap: var(--spacing-lg);
+    padding-bottom: var(--spacing-xl);
+  }
+
+  .hero__image-section {
+    min-height: 40vh;
+    max-height: 55vh;
+  }
+
+  .hero__arrow {
+    width: 85%;
+    left: 5%;
+  }
+
+  .hero__profile {
+    width: 70%;
+  }
+
+  .hero__vector {
+    width: 30%;
+    left: 15%;
+  }
+
+  .hero__content {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .hero__nav-buttons {
+    align-items: flex-start;
+  }
+
+  .hero__nav-btn:hover {
+    transform: translateX(0.5rem);
+  }
+
+  .hero__intro {
+    max-width: 100%;
+  }
+}
