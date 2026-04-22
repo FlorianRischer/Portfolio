@@ -34,27 +34,17 @@
 
 .hero__arrow {
   position: absolute;
-  width: 67%;
+  width: min(57vw, 1000px);
   height: auto;
   bottom: 3.7vh;
-  left: 3.5%;
+  left: min(3vw, 50px);
   transform: rotate(2deg);
   z-index: 4;
 }
 
-.hero__vector {
-  position: absolute;
-  width: 25%;
-  height: auto;
-  bottom: 4%;
-  left: 10.7%;
-  z-index: 0;
-  object-fit: contain;
-}
-
 .hero__profile {
   position: absolute;
-  width: 53%;
+  width: min(45vw, 800px);
   height: auto;
   bottom: 0;
   z-index: 2;
@@ -142,11 +132,6 @@
 
   .hero__profile {
     width: 70%;
-  }
-
-  .hero__vector {
-    width: 30%;
-    left: 15%;
   }
 
   .hero__content {
