@@ -130,11 +130,7 @@
 
 /* Hide inactive buttons when a filter is active */
 .about--filtered .about__filter-btn:not(.about__filter-btn--active) {
-  opacity: 0;
-  pointer-events: none;
-  height: 0;
-  overflow: hidden;
-  margin: 0;
+  display: none;
 }
 
 /* Skill Description */

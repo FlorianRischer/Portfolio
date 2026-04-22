@@ -90,7 +90,7 @@
 .pd-filters {
   position: absolute;
   left: 0;
-  top: calc(100% - var(--filter-resting-bottom));
+  top: calc(100% - var(--filter-resting-bottom) - 3%);
   transform: translateY(-100%);
   display: flex;
   flex-direction: column;
@@ -103,7 +103,7 @@
 .pd-filters--my-role-active,
 .pd-filters--prototype-screens-active,
 .pd-filters--used-technologies-active {
-  top: var(--filter-active-top);
+  top: var(--title-top);
   transform: translateY(0);
 }
 
@@ -156,11 +156,7 @@
 
 /* Hide inactive buttons when a filter is active */
 .project-detail--filtered .pd-filters__btn:not(.pd-filters__btn--active) {
-  opacity: 0;
-  pointer-events: none;
-  height: 0;
-  overflow: hidden;
-  margin: 0;
+  display: none;
 }
 
 /* ── Page Description (default state) ── */
@@ -439,11 +435,7 @@
   }
 
   .project-detail--filtered .pd-filters__btn:not(.pd-filters__btn--active) {
-    opacity: 1;
-    pointer-events: auto;
-    height: auto;
-    overflow: visible;
-    margin: 0;
+    display: flex;
   }
 
   .pd-filters--my-role-active,
