@@ -188,7 +188,10 @@ export default function WorksProjectSection({ project, index, registerRef }: Pro
         </div>
 
         {galleryImages.length > 0 && (
-          <div className="works-project__gallery">
+          <div
+            className="works-project__gallery"
+            style={{ '--gallery-cols': Math.max(galleryImages.length, 3) } as React.CSSProperties}
+          >
             {galleryImages.map((img, i) => (
               <button
                 key={i}
