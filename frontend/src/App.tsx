@@ -8,7 +8,6 @@ import HomePage from './pages/HomePage';
 import WorksPage from './pages/WorksPage';
 // ProjectDetailPage disabled — file kept for potential re-use
 // import ProjectDetailPage from './pages/ProjectDetailPage';
-import ContactPage from './pages/ContactPage';
 import AboutPage from './pages/AboutPage';
 import { imagesAPI } from './services/api';
 import { preloadSkills } from './services/technologyIcons';
@@ -55,7 +54,6 @@ function AppContent() {
           <Route path="/home" element={<HomePage />} />
           <Route path="/works" element={<WorksPage />} />
           <Route path="/about" element={<AboutPage />} />
-          <Route path="/contact" element={<ContactPage />} />
         </Routes>
       </div>
     </TransitionProvider>

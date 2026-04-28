@@ -102,19 +102,12 @@ const Hero = () => {
             >
               WORKS
             </button>
-            <button
-              className="hero__nav-btn"
-              onClick={() => navigateWithTransition('/contact')}
-            >
-              CONTACT
-            </button>
           </div>
         </div>
 
         <div className="hero__intro" data-animate>
           <p className="hero__intro-text">
-            HEY, NICE TO MEET YOU, I'M FLORIAN, A WEB- DESIGN AND DEVELOPMENT STUDENT, FROM GERMANY.
-            WELCOME TO MY PORTFOLIO PAGE, DON'T BE SHY LOOK AROUND AND GET TO KNOW MORE ABOUT ME AND MY WORK!
+            Hey there, nice to meet you! I'm Florian, a computer science and design student form Munich, Germany. Welcome to my portfolio page where you can get to know more about me and my work.
           </p>
         </div>
       </div>

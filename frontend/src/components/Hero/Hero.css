@@ -92,7 +92,7 @@
 .hero__intro {
   position: absolute;
   right: 0;
-  bottom: var(--description-resting-bottom);
+  bottom: 15%;
   max-width: min(20vw, 288px);
   text-align: left;
   z-index: 10;
@@ -101,7 +101,7 @@
 .hero__intro-text {
   font-family: 'Helvetica', Arial, sans-serif;
   font-size: var(--font-base);
-  font-weight: 700;
+  font-weight: 600;
   color: black;
   margin: 0;
   line-height: 1.4;

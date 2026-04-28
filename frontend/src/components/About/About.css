@@ -14,9 +14,9 @@
 .about__image {
   position: absolute;
   bottom: 0vh;
-  left: 4vw;
-  width: 46vw;
-  height: auto;
+  left: 16vw;
+  width: clamp(250px, 25vw, 476px);
+  height: clamp(350px, 40vw, 776px);
   overflow: hidden;
   pointer-events: none;
 }

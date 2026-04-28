@@ -52,24 +52,44 @@
 
 .header__nav-list {
   display: flex;
+  align-items: center;
   gap: clamp(1rem, 2vw, 1.875rem);
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-.header__nav-item a {
+
+.header__nav-item a,
+.header__nav-item .header__nav-btn {
+  display: inline-flex;
+  align-items: center;
   text-decoration: none;
   color: black;
   font-family: 'Helvetica', Arial, sans-serif;
   font-size: clamp(0.75rem, 1vw, 0.875rem);
-  font-weight: 700;
+  font-weight: 600;
+  line-height: 1;
+  text-shadow: 0 0 0 transparent;
+  background: none;
+  border: none;
+  padding: 0.4rem 0.9rem;
+  border-radius: 3rem;
+  cursor: pointer;
   transition: var(--transition-fast);
 }
 
-.header__nav-item a:hover {
-  opacity: 0.6;
+.header__nav-item a:hover,
+.header__nav-item .header__nav-btn:hover {
+  background: #ffc4a0;
+  text-shadow: 0.2px 0 0 currentColor, -0.2px 0 0 currentColor;
 }
+
+.header__nav-item--active a {
+  background: #ffc4a0;
+  text-shadow: 0.2px 0 0 currentColor, -0.2px 0 0 currentColor;
+}
+
 
 .header__line {
   position: absolute;

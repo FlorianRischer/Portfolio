@@ -28,10 +28,10 @@ interface Props {
 const categoryLabels: Record<string, string> = {
   'ux-design': 'UX/UI Design',
   'ui-design': 'UI Design',
-  'branding': 'Corporate Design',
+  'branding': 'Graphic Design',
   'web-development': 'Web Development',
   'UX/UI Design': 'UX/UI Design',
-  'Corporate Design': 'Corporate Design',
+  'Corporate Design': 'Graphic Design',
   'Web Development': 'Web Development',
   'Personal Art': 'Personal Art',
 };
