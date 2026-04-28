@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect, type FormEvent } from 'react';
 import './Contact.css';
 import { messagesAPI, imagesAPI } from '../../services/api';
+import { usePageEntrance } from '../../hooks/usePageEntrance';
 import { PageDescription } from '../common/PageDescription';
 import { FilterButtons, type FilterOption } from '../common/FilterButtons';
 import { useScrollFilter } from '../../hooks/useScrollFilter';
@@ -34,6 +35,7 @@ interface FormErrors {
 }
 
 export default function Contact() {
+  const containerRef = usePageEntrance<HTMLElement>();
   const [activeView, setActiveView] = useState<ContactView>(null);
   const [delayedButtonPosition, setDelayedButtonPosition] = useState<ContactView>(null);
   const hasBeenActiveRef = useRef<{ socials: boolean; form: boolean }>({ socials: false, form: false });
@@ -169,17 +171,17 @@ export default function Contact() {
   ];
 
   return (
-    <section className={`contact ${hasActiveView ? 'contact--filtered' : ''}`}>
-      <div className="contact__image">
+    <section ref={containerRef} className={`contact ${hasActiveView ? 'contact--filtered' : ''}`}>
+      <div className="contact__image" data-animate>
         <img 
           src={contactImage} 
           alt="Contact" 
           className={`contact__image-img ${activeView === 'contact-form' ? 'contact__image-img--faded' : ''}`} 
         />
       </div>
-      <h1 className="contact__title">CONTACT</h1>
+      <h1 className="contact__title" data-animate>CONTACT</h1>
 
-      <div className={`contact__container ${hasActiveView ? 'contact__container--filtered' : ''}`}>
+      <div data-animate className={`contact__container ${hasActiveView ? 'contact__container--filtered' : ''}`}>
         <FilterButtons
           filters={filterOptions}
           activeFilter={activeView}

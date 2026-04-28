@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import './About.css';
 import { imagesAPI, skillsAPI } from '../../services/api';
+import { usePageEntrance } from '../../hooks/usePageEntrance';
 import type { Skill as APISkill } from '../../services/api';
 import { PageDescription } from '../common/PageDescription';
 import { useScrollFilter } from '../../hooks/useScrollFilter';
@@ -33,6 +34,7 @@ const convertAPISkill = (apiSkill: APISkill): Skill => ({
 });
 
 export default function About() {
+  const containerRef = usePageEntrance<HTMLElement>();
   const [activeView, setActiveView] = useState<AboutView>(null);
   const [selectedSkill, setSelectedSkill] = useState<string | null>(null);
   const [displayedSkill, setDisplayedSkill] = useState<string | null>(null);
@@ -209,17 +211,17 @@ export default function About() {
   };
 
   return (
-    <section className={`about ${hasActiveView ? 'about--filtered' : ''}`}>
-      <div className="about__image">
+    <section ref={containerRef} className={`about ${hasActiveView ? 'about--filtered' : ''}`}>
+      <div className="about__image" data-animate>
         <img 
           src={aboutImage} 
           alt="About" 
           className={`about__image-img ${activeView === 'design-skills' ? 'about__image-img--faded' : ''}`} 
         />
       </div>
-      <h1 className="about__title">ABOUT</h1>
+      <h1 className="about__title" data-animate>ABOUT</h1>
 
-        <div className={`about__filters ${getButtonPositionClass()}`}>
+        <div data-animate className={`about__filters ${getButtonPositionClass()}`}>
           <button
             className={`about__filter-btn about__filter-btn--${getViewSize('tech-skills')} ${
               isViewActive('tech-skills') ? 'about__filter-btn--active' : ''

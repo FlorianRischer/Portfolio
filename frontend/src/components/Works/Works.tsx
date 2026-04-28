@@ -4,6 +4,7 @@ import './Works.css';
 import WorksSidebar from './WorksSidebar';
 import WorksProjectSection from './WorksProjectSection';
 import { projectsAPI, imagesAPI, type Project as APIProject } from '../../services/api';
+import { usePageEntrance } from '../../hooks/usePageEntrance';
 
 interface WorksProject {
   id: string;
@@ -13,6 +14,7 @@ interface WorksProject {
   category: string;
   technologies: string[];
   thumbnailUrl: string;
+  isVideoHero: boolean;
   images: string[];
   screens: { title: string; description: string; imageUrl: string }[];
   liveUrl?: string;
@@ -27,6 +29,7 @@ const convertProject = (p: APIProject): WorksProject => ({
   category: p.category,
   technologies: p.technologies || [],
   thumbnailUrl: imagesAPI.getUrl(`project-${p.slug}-mockup`),
+  isVideoHero: p.isVideoHero || false,
   images: p.images || [],
   screens: p.screens || [],
   liveUrl: p.liveUrl,
@@ -37,6 +40,7 @@ export default function Works() {
   const [projects, setProjects] = useState<WorksProject[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const containerRef = usePageEntrance<HTMLDivElement>(!isLoading);
   const sectionRefs = useRef<Map<string, HTMLElement>>(new Map());
 
   useEffect(() => {
@@ -93,14 +97,14 @@ export default function Works() {
   if (isLoading) return null;
 
   return (
-    <div className="works-page">
+    <div className="works-page" ref={containerRef}>
       <WorksSidebar
         projects={projects.map((p) => ({ id: p.id, title: p.title }))}
         activeIndex={activeIndex}
         onProjectClick={scrollToProject}
       />
       <div className="works-page__content">
-        <header className="works-page__header">
+        <header className="works-page__header" data-animate>
           <h1 className="works-page__heading">Selected Works</h1>
           <p className="works-page__intro">
             An overview of my projects — from design concepts to fully developed digital solutions,

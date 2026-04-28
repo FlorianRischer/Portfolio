@@ -66,6 +66,15 @@
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 10vw;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.works-sidebar__link--active .works-sidebar__name,
+.works-sidebar__link:hover .works-sidebar__name {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 @media (max-width: 991px) {

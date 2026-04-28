@@ -1,5 +1,4 @@
 import { useCallback } from 'react';
-import { useTransition } from '../PageTransition/TransitionContext';
 import { imagesAPI } from '../../services/api';
 import './WorksProjectSection.css';
 
@@ -11,6 +10,7 @@ interface ProjectData {
   category: string;
   technologies: string[];
   thumbnailUrl: string;
+  isVideoHero: boolean;
   images: string[];
   screens: { title: string; description: string; imageUrl: string }[];
   liveUrl?: string;
@@ -36,12 +36,25 @@ const categoryLabels: Record<string, string> = {
 
 const resolveImageUrl = (url: string) => {
   if (url.startsWith('http')) return url;
+  if (url.startsWith('/api/images/')) return `https://portfolio-api.flo62616.workers.dev${url}`;
   return imagesAPI.getUrl(url);
 };
 
-export default function WorksProjectSection({ project, index, registerRef }: Props) {
-  const { navigateWithTransition } = useTransition();
+function HeroVideo({ src, className }: { src: string; className?: string }) {
+  return (
+    <video
+      src={src}
+      className={className}
+      preload="auto"
+      autoPlay
+      muted
+      playsInline
+      loop
+    />
+  );
+}
 
+export default function WorksProjectSection({ project, index, registerRef }: Props) {
   const handleRef = useCallback(
     (el: HTMLElement | null) => {
       registerRef(project.id, el);
@@ -49,24 +62,12 @@ export default function WorksProjectSection({ project, index, registerRef }: Pro
     [project.id, registerRef],
   );
 
-  const handleDetailClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    navigateWithTransition(project.projectUrl);
-  };
-
-  const displayImages: string[] = [project.thumbnailUrl];
-  project.screens.forEach((s) => {
-    if (s.imageUrl) displayImages.push(resolveImageUrl(s.imageUrl));
-  });
-  project.images.forEach((img) => {
-    const resolved = resolveImageUrl(img);
-    if (!displayImages.includes(resolved)) displayImages.push(resolved);
-  });
+  const galleryImages: string[] = project.images.map((img) => resolveImageUrl(img));
 
   const num = String(index + 1).padStart(2, '0');
 
   return (
-    <article id={project.id} ref={handleRef} className="works-project">
+    <article id={project.id} ref={handleRef} className="works-project" data-animate>
       <div className="works-project__info">
         <div className="works-project__info-col works-project__info-col--title">
           <span className="works-project__number">{num}</span>
@@ -103,30 +104,35 @@ export default function WorksProjectSection({ project, index, registerRef }: Pro
               View Live ↗
             </a>
           )}
-          <button
-            onClick={handleDetailClick}
-            className="works-project__action works-project__action--detail"
-          >
-            Details →
-          </button>
         </div>
       </div>
 
-      <div className="works-project__media">
-        {displayImages.map((img, i) => (
-          <div
-            key={i}
-            className={`works-project__img-wrap ${i === 0 ? 'works-project__img-wrap--hero' : ''}`}
-          >
-            <img
-              src={img}
-              alt={project.title}
-              className="works-project__img"
-              loading={i > 0 ? 'lazy' : undefined}
-            />
-          </div>
-        ))}
+      <div className="works-project__hero">
+        {project.isVideoHero ? (
+          <HeroVideo src={project.thumbnailUrl} className="works-project__img" />
+        ) : (
+          <img
+            src={project.thumbnailUrl}
+            alt={project.title}
+            className="works-project__img"
+          />
+        )}
       </div>
+
+      {galleryImages.length > 0 && (
+        <div className="works-project__gallery">
+          {galleryImages.map((img, i) => (
+            <div key={i} className="works-project__img-wrap">
+              <img
+                src={img}
+                alt={project.title}
+                className="works-project__img"
+                loading="lazy"
+              />
+            </div>
+          ))}
+        </div>
+      )}
     </article>
   );
 }

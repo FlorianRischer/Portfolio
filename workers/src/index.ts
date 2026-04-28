@@ -82,6 +82,18 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
       return await setProjectMockupExisting(env, slug, request);
     }
 
+    // Project gallery image routes
+    if (path.match(/^\/api\/projects\/[^/]+\/gallery$/) && request.method === 'POST') {
+      const slug = path.split('/')[3];
+      return await addGalleryImage(env, slug, request);
+    }
+    if (path.match(/^\/api\/projects\/[^/]+\/gallery\/\d+$/) && request.method === 'DELETE') {
+      const parts = path.split('/');
+      const slug = parts[3];
+      const index = parseInt(parts[5]);
+      return await removeGalleryImage(env, slug, index);
+    }
+
     // Skills routes (R2-based)
     if (path === '/api/skills' && request.method === 'GET') {
       return await getSkills(env, url);
@@ -99,9 +111,9 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
     }
 
     // Images routes (serve from R2)
-    if (path.match(/^\/api\/images\/[^/]+$/) && request.method === 'GET') {
+    if (path.match(/^\/api\/images\/[^/]+$/) && (request.method === 'GET' || request.method === 'HEAD')) {
       const slug = path.split('/').pop()!;
-      return await getImage(env, slug);
+      return await getImage(env, slug, request);
     }
 
     // Messages routes
@@ -172,12 +184,14 @@ async function getProjectBySlug(env: Env, slug: string): Promise<Response> {
 }
 
 function parseProject(row: Record<string, unknown>) {
+  const filename = (row.thumbnailFilename as string) || '';
   return {
     ...row,
     technologies: JSON.parse(row.technologies as string || '[]'),
     images: JSON.parse(row.images as string || '[]'),
     screens: JSON.parse(row.screens as string || '[]'),
     featured: Boolean(row.featured),
+    isVideoHero: /\.(mp4|webm|mov)$/i.test(filename),
   };
 }
 
@@ -360,6 +374,65 @@ async function setProjectMockupExisting(env: Env, slug: string, request: Request
   }
 }
 
+// Gallery image handlers
+async function addGalleryImage(env: Env, slug: string, request: Request): Promise<Response> {
+  try {
+    const formData = await request.formData();
+    const file = formData.get('file') as File | null;
+
+    if (!file) {
+      return errorResponse('No file provided', 400);
+    }
+
+    const ext = file.name.split('.').pop()?.toLowerCase() || 'png';
+    const timestamp = Date.now().toString(36);
+    const imageSlug = `project-${slug}-gallery-${timestamp}`;
+    const r2Key = `${imageSlug}.${ext}`;
+
+    const arrayBuffer = await file.arrayBuffer();
+    await env.IMAGES.put(r2Key, arrayBuffer, {
+      httpMetadata: { contentType: file.type || 'image/png' }
+    });
+
+    await env.DB.prepare(
+      `INSERT INTO images (id, name, slug, category, mimeType, size, filename) VALUES (?, ?, ?, 'project', ?, ?, ?)`
+    ).bind(crypto.randomUUID(), `${slug} Gallery`, imageSlug, file.type || 'image/png', file.size, r2Key).run();
+
+    const project = await env.DB.prepare('SELECT images FROM projects WHERE slug = ?').bind(slug).first();
+    if (!project) return errorResponse('Project not found', 404);
+
+    const currentImages: string[] = JSON.parse(project.images as string || '[]');
+    currentImages.push(imageSlug);
+
+    await env.DB.prepare(
+      'UPDATE projects SET images = ? WHERE slug = ?'
+    ).bind(JSON.stringify(currentImages), slug).run();
+
+    return jsonResponse({ message: 'Gallery image added', imageSlug });
+  } catch (error) {
+    console.error('Gallery upload error:', error);
+    return errorResponse('Failed to add gallery image', 500);
+  }
+}
+
+async function removeGalleryImage(env: Env, slug: string, index: number): Promise<Response> {
+  const project = await env.DB.prepare('SELECT images FROM projects WHERE slug = ?').bind(slug).first();
+  if (!project) return errorResponse('Project not found', 404);
+
+  const currentImages: string[] = JSON.parse(project.images as string || '[]');
+  if (index < 0 || index >= currentImages.length) {
+    return errorResponse('Image index out of range', 400);
+  }
+
+  currentImages.splice(index, 1);
+
+  await env.DB.prepare(
+    'UPDATE projects SET images = ? WHERE slug = ?'
+  ).bind(JSON.stringify(currentImages), slug).run();
+
+  return jsonResponse({ message: 'Gallery image removed' });
+}
+
 // Skills handlers (R2-based - stored as JSON file)
 interface Skill {
   id: string;
@@ -453,49 +526,81 @@ async function deleteSkill(env: Env, id: string): Promise<Response> {
   return jsonResponse({ message: 'Skill deleted' });
 }
 
-// Images handler (serve from R2)
-async function getImage(env: Env, slug: string): Promise<Response> {
+// Images handler (serve from R2, with Range support for video)
+async function getImage(env: Env, slug: string, request: Request): Promise<Response> {
   // First get image metadata from D1
   const metadata = await env.DB.prepare(
     'SELECT filename, mimeType FROM images WHERE slug = ?'
   ).bind(slug).first();
 
+  let r2Key: string | null = null;
+  let contentType = 'application/octet-stream';
+
   if (metadata) {
-    // Get image from R2 using database metadata
-    const object = await env.IMAGES.get(metadata.filename as string);
-    
-    if (object) {
-      const headers = new Headers();
-      headers.set('Content-Type', metadata.mimeType as string);
-      headers.set('Cache-Control', 'public, max-age=31536000'); // 1 year cache
-      headers.set('Access-Control-Allow-Origin', '*');
-      return new Response(object.body, { headers });
+    r2Key = metadata.filename as string;
+    contentType = metadata.mimeType as string;
+  } else {
+    // Fallback: Try to find directly in R2 by slug with various extensions
+    const extensions = ['png', 'jpg', 'jpeg', 'webp', 'gif', 'mp4', 'webm', 'mov'];
+    const mimeTypes: Record<string, string> = {
+      'png': 'image/png', 'jpg': 'image/jpeg', 'jpeg': 'image/jpeg',
+      'webp': 'image/webp', 'gif': 'image/gif', 'mp4': 'video/mp4',
+      'webm': 'video/webm', 'mov': 'video/quicktime',
+    };
+    for (const ext of extensions) {
+      const key = `${slug}.${ext}`;
+      const head = await env.IMAGES.head(key);
+      if (head) {
+        r2Key = key;
+        contentType = mimeTypes[ext] || 'image/png';
+        break;
+      }
     }
   }
 
-  // Fallback: Try to find image directly in R2 by slug with various extensions
-  const extensions = ['png', 'jpg', 'jpeg', 'webp', 'gif'];
-  const mimeTypes: Record<string, string> = {
-    'png': 'image/png',
-    'jpg': 'image/jpeg',
-    'jpeg': 'image/jpeg',
-    'webp': 'image/webp',
-    'gif': 'image/gif'
-  };
+  if (!r2Key) return errorResponse('Image not found', 404);
 
-  for (const ext of extensions) {
-    const key = `${slug}.${ext}`;
-    const object = await env.IMAGES.get(key);
-    if (object) {
+  const rangeHeader = request.headers.get('Range');
+  const isHead = request.method === 'HEAD';
+
+  if (rangeHeader) {
+    const match = rangeHeader.match(/bytes=(\d+)-(\d*)/);
+    if (match) {
+      const objHead = await env.IMAGES.head(r2Key);
+      if (!objHead) return errorResponse('Image not found', 404);
+
+      const totalSize = objHead.size;
+      const start = parseInt(match[1]);
+      const end = match[2] ? parseInt(match[2]) : totalSize - 1;
+      const length = end - start + 1;
+
       const headers = new Headers();
-      headers.set('Content-Type', mimeTypes[ext] || 'image/png');
+      headers.set('Content-Type', contentType);
       headers.set('Cache-Control', 'public, max-age=31536000');
       headers.set('Access-Control-Allow-Origin', '*');
-      return new Response(object.body, { headers });
+      headers.set('Accept-Ranges', 'bytes');
+      headers.set('Content-Range', `bytes ${start}-${end}/${totalSize}`);
+      headers.set('Content-Length', String(length));
+
+      if (isHead) return new Response(null, { status: 206, headers });
+
+      const object = await env.IMAGES.get(r2Key, { range: { offset: start, length } });
+      if (!object) return errorResponse('Image not found', 404);
+      return new Response(object.body, { status: 206, headers });
     }
   }
 
-  return errorResponse('Image not found', 404);
+  const object = await env.IMAGES.get(r2Key);
+  if (!object) return errorResponse('Image not found', 404);
+
+  const headers = new Headers();
+  headers.set('Content-Type', contentType);
+  headers.set('Cache-Control', 'public, max-age=31536000');
+  headers.set('Access-Control-Allow-Origin', '*');
+  headers.set('Accept-Ranges', 'bytes');
+  headers.set('Content-Length', String(object.size));
+
+  return new Response(isHead ? null : object.body, { headers });
 }
 
 // Messages handler

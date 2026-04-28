@@ -63,6 +63,8 @@ export interface Project {
   technologies: string[];
   techDescription?: string;
   thumbnailUrl: string;
+  thumbnailFilename?: string;
+  isVideoHero?: boolean;
   images: string[];
   screens: {
     title: string;

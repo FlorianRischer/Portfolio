@@ -28,17 +28,21 @@ export function TransitionProvider({ children }: TransitionProviderProps) {
   const transitionRef = useRef<HTMLDivElement>(null);
   const [hasPlayedIntro, setHasPlayedIntro] = useState(false);
 
-  // Initial intro animation - blocks start visible and open up
+  // Intro animation disabled — set to re-enable: change false → true
+  const ENABLE_TRANSITION = false;
+
   useEffect(() => {
+    if (!ENABLE_TRANSITION) {
+      setHasPlayedIntro(true);
+      return;
+    }
     if (hasPlayedIntro) return;
-    
+
     const blocks = transitionRef.current?.querySelectorAll('.block');
     if (!blocks || blocks.length === 0) return;
 
-    // Start with blocks fully visible (covering the screen)
     gsap.set(blocks, { visibility: 'visible', scaleY: 1 });
-    
-    // Small delay before opening animation
+
     const timeout = setTimeout(() => {
       gsap.to(blocks, {
         scaleY: 0,
@@ -58,7 +62,7 @@ export function TransitionProvider({ children }: TransitionProviderProps) {
     }, 300);
 
     return () => clearTimeout(timeout);
-  }, [hasPlayedIntro]);
+  }, [hasPlayedIntro, ENABLE_TRANSITION]);
 
   const animateToTransition = useCallback((): Promise<void> => {
     return new Promise((resolve) => {
@@ -112,22 +116,19 @@ export function TransitionProvider({ children }: TransitionProviderProps) {
   }, []);
 
   const navigateWithTransition = useCallback(async (to: string) => {
-    // Überprüfe ob Nutzer bereits auf der Zielseite ist
-    if (location.pathname === to) {
-      return; // Keine Animation, nichts machen
-    }
+    if (location.pathname === to) return;
 
-    // 1. Blöcke fahren rein (alte Seite noch sichtbar)
-    await animateToTransition();
-    // 2. Seite wechseln (Blöcke bedecken den Bildschirm)
-    navigate(to);
-    // 3. Kurze Verzögerung damit React die neue Seite rendert
-    await new Promise(resolve => setTimeout(resolve, 50));
-    // 4. Scroll-Position resetten
-    window.scrollTo(0, 0);
-    // 5. Blöcke fahren raus (neue Seite wird sichtbar)
-    await animateFromTransition();
-  }, [navigate, location.pathname, animateToTransition, animateFromTransition]);
+    if (ENABLE_TRANSITION) {
+      await animateToTransition();
+      navigate(to);
+      await new Promise(resolve => setTimeout(resolve, 50));
+      window.scrollTo(0, 0);
+      await animateFromTransition();
+    } else {
+      navigate(to);
+      window.scrollTo(0, 0);
+    }
+  }, [navigate, location.pathname, animateToTransition, animateFromTransition, ENABLE_TRANSITION]);
 
   return (
     <TransitionContext.Provider value={{ navigateWithTransition }}>
