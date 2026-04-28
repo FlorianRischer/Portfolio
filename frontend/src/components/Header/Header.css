@@ -90,6 +90,55 @@
   text-shadow: 0.2px 0 0 currentColor, -0.2px 0 0 currentColor;
 }
 
+.header__nav-btn {
+  background: #ffc4a0 !important;
+  text-shadow: 0.2px 0 0 currentColor, -0.2px 0 0 currentColor;
+  white-space: nowrap;
+  overflow: hidden;
+  position: relative;
+  transition: padding 0.3s ease, background 0.3s ease, text-shadow 0.3s ease !important;
+}
+
+.header__nav-btn-label {
+  white-space: nowrap;
+}
+
+.header__nav-btn-label--hover,
+.header__nav-btn-label--copied {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+}
+
+/* Hover: grow button, swap labels instantly */
+.header__nav-btn:hover {
+  padding: 0.4rem 1.7rem;
+}
+
+.header__nav-btn:hover .header__nav-btn-label--default {
+  opacity: 0;
+}
+
+.header__nav-btn:hover .header__nav-btn-label--hover {
+  opacity: 1;
+}
+
+/* Copied state */
+.header__nav-btn--copied {
+  padding: 0.4rem 1.3rem !important;
+}
+
+.header__nav-btn--copied .header__nav-btn-label--default,
+.header__nav-btn--copied .header__nav-btn-label--hover {
+  opacity: 0 !important;
+}
+
+.header__nav-btn--copied .header__nav-btn-label--copied {
+  opacity: 1;
+}
+
 
 .header__line {
   position: absolute;
