@@ -12,17 +12,18 @@ export function usePageEntrance<T extends HTMLElement>(ready = true) {
     const elements = container.querySelectorAll<HTMLElement>('[data-animate]');
     if (!elements.length) return;
 
-    gsap.set(elements, { opacity: 0 });
+    gsap.set(elements, { opacity: 0, y: 40 });
 
     gsap.to(elements, {
       opacity: 1,
-      duration: 0.8,
-      stagger: 0.15,
-      ease: 'power2.out',
+      y: 0,
+      duration: 0.9,
+      stagger: 0.2,
+      ease: 'power3.out',
       delay: 0.1,
       onComplete: () => {
         elements.forEach((el) => {
-          gsap.set(el, { clearProps: 'opacity' });
+          gsap.set(el, { clearProps: 'opacity,transform' });
         });
       },
     });
