@@ -4,7 +4,7 @@
   align-items: center;
   padding: clamp(4rem, 5vw, 4.375rem) var(--container-padding);
   padding-bottom: 0;
-  background: white;
+  background: transparent;
   position: relative;
   overflow: hidden;
 }

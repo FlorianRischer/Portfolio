@@ -6,8 +6,9 @@
   left: 0;
   right: 0;
   z-index: var(--z-header);
-  background: white;
+  background: linear-gradient(to bottom, #f4f4f4 60%, rgba(244, 244, 244, 0));
   padding: var(--spacing-xs) 0;
+  padding-bottom: clamp(1rem, 2vw, 1.5rem);
 }
 
 .header__container {
@@ -137,7 +138,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: white;
+    background: var(--color-bg);
     z-index: var(--z-header);
     display: flex;
     align-items: center;

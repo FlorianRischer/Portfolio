@@ -4,6 +4,7 @@
 :root {
   --color-black: #000000;
   --color-white: #ffffff;
+  --color-bg: #f4f4f4;
   --color-yellow: #f5a623;
   --color-blue: #3d66e1;
 
@@ -68,7 +69,22 @@
 
 html {
   height: 100%;
-  scroll-behavior: smooth;
+}
+
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
 }
 
 body {
@@ -76,7 +92,7 @@ body {
   font-size: 16px;
   line-height: 1.6;
   color: var(--color-black);
-  background: var(--color-white);
+  background: var(--color-bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   height: 100%;

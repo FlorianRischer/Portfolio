@@ -1,6 +1,7 @@
 // Author: Florian Rischer
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect } from 'react';
+import Lenis from 'lenis';
 import Header from './components/Header';
 import { TransitionProvider } from './components/PageTransition/TransitionContext';
 import HomePage from './pages/HomePage';
@@ -17,7 +18,20 @@ preloadSkills();
 
 function AppContent() {
   useEffect(() => {
-    // Set flower icon as favicon dynamically
+    const lenis = new Lenis({ lerp: 0.1, wheelMultiplier: 1 });
+    let rafId: number;
+    function raf(time: number) {
+      lenis.raf(time);
+      rafId = requestAnimationFrame(raf);
+    }
+    rafId = requestAnimationFrame(raf);
+    return () => {
+      cancelAnimationFrame(rafId);
+      lenis.destroy();
+    };
+  }, []);
+
+  useEffect(() => {
     const flowerIcon = imagesAPI.getUrl('flower');
     const link = (document.querySelector("link[rel*='icon']") || document.createElement('link')) as HTMLLinkElement;
     link.type = 'image/png';

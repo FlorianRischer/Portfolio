@@ -1,188 +1,121 @@
 // Author: Florian Rischer
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import './Works.css';
-import ProjectGrid from './ProjectGrid';
-import { PageDescription } from '../common/PageDescription';
-import { FilterButtons, type FilterOption } from '../common/FilterButtons';
-import { useWheelDetection } from '../../hooks/useWheelDetection';
+import WorksSidebar from './WorksSidebar';
+import WorksProjectSection from './WorksProjectSection';
+import { projectsAPI, imagesAPI, type Project as APIProject } from '../../services/api';
 
-type FilterCategory = 'ux-ui-design' | 'corporate-design' | 'web-development' | null;
+interface WorksProject {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  category: string;
+  technologies: string[];
+  thumbnailUrl: string;
+  images: string[];
+  screens: { title: string; description: string; imageUrl: string }[];
+  liveUrl?: string;
+  projectUrl: string;
+}
 
-const filterOptions: FilterOption<NonNullable<FilterCategory>>[] = [
-  { id: 'web-development', label: 'Web Development' },
-  { id: 'corporate-design', label: 'Corporate Design' },
-  { id: 'ux-ui-design', label: 'UX/UI Design' }
-];
+const convertProject = (p: APIProject): WorksProject => ({
+  id: p.slug,
+  slug: p.slug,
+  title: p.title,
+  description: p.shortDescription || p.description,
+  category: p.category,
+  technologies: p.technologies || [],
+  thumbnailUrl: imagesAPI.getUrl(`project-${p.slug}-mockup`),
+  images: p.images || [],
+  screens: p.screens || [],
+  liveUrl: p.liveUrl,
+  projectUrl: `/works/${p.slug}`,
+});
 
 export default function Works() {
-  const [activeFilter, setActiveFilter] = useState<FilterCategory>(null);
-  const [showProjects, setShowProjects] = useState(false);
-  const [delayedButtonPosition, setDelayedButtonPosition] = useState<FilterCategory>(null);
-  const [displayedFilter, setDisplayedFilter] = useState<FilterCategory>(null);
-  const [isExiting, setIsExiting] = useState(false);
-  const [animationDelay, setAnimationDelay] = useState<number>(0);
-  const prevFilterRef = useRef<FilterCategory>(null);
-  const accumulatedDelta = useRef<number>(0);
-  const activationCooldown = useRef<number>(0);
-  const { detectDevice, getThreshold } = useWheelDetection();
+  const [projects, setProjects] = useState<WorksProject[]>([]);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const sectionRefs = useRef<Map<string, HTMLElement>>(new Map());
 
-  // Show projects when user scrolls (without activating any filter)
   useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 50 && !showProjects) {
-        setShowProjects(true);
+    const fetchProjects = async () => {
+      const response = await projectsAPI.getAll();
+      if (response.success && response.data?.length) {
+        setProjects(response.data.map(convertProject));
       }
+      setIsLoading(false);
     };
+    fetchProjects();
+  }, []);
 
-    const handleWheel = (e: WheelEvent) => {
-      const now = performance.now();
-      
-      // Check if we're in cooldown period (after activation)
-      if (activationCooldown.current > 0) {
-        const timeSinceActivation = now - activationCooldown.current;
-        
-        // During first 500ms after activation: block all scroll
-        if (timeSinceActivation < 500) {
-          e.preventDefault();
-          return;
-        }
-        
-        // Between 500ms-1000ms: reduced sensitivity (ignore small deltas)
-        if (timeSinceActivation < 1000) {
-          const absDelta = Math.abs(e.deltaY);
-          if (absDelta < 30) {
-            e.preventDefault();
-            return;
+  useEffect(() => {
+    if (!projects.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        let bestIndex = -1;
+        let bestRatio = 0;
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            const idx = projects.findIndex((p) => p.id === entry.target.id);
+            if (idx !== -1 && entry.intersectionRatio > bestRatio) {
+              bestIndex = idx;
+              bestRatio = entry.intersectionRatio;
+            }
           }
         }
-        
-        // After 1000ms: clear cooldown
-        if (timeSinceActivation >= 1000) {
-          activationCooldown.current = 0;
-        }
-      }
-      
-      if (showProjects || activeFilter !== null) return;
-      
-      // Detect device and get normalized delta
-      const { normalizedDelta } = detectDevice(e);
-      
-      if (normalizedDelta > 0) {
-        // Accumulate scroll delta
-        accumulatedDelta.current += normalizedDelta;
-        
-        // Low threshold - single scroll tick should activate
-        const threshold = getThreshold(30);
-        
-        if (accumulatedDelta.current >= threshold) {
-          // Activate projects
-          setShowProjects(true);
-          
-          // Reset accumulated delta to eat up remaining scroll momentum
-          accumulatedDelta.current = 0;
-          
-          // Start cooldown period to prevent over-scrolling
-          activationCooldown.current = now;
-          
-          // Prevent default scroll for this event
-          e.preventDefault();
-        }
-      } else {
-        // Reset accumulator if scrolling up
-        accumulatedDelta.current = 0;
-      }
-    };
+        if (bestIndex !== -1) setActiveIndex(bestIndex);
+      },
+      { threshold: [0.1, 0.3, 0.5], rootMargin: '-10% 0px -10% 0px' },
+    );
 
-    window.addEventListener('scroll', handleScroll);
-    window.addEventListener('wheel', handleWheel, { passive: false });
-    
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('wheel', handleWheel);
-    };
-  }, [showProjects, activeFilter, detectDevice, getThreshold]);
+    sectionRefs.current.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [projects]);
 
-  // Handle filter changes with exit animation
-  useEffect(() => {
-    let exitTimer: ReturnType<typeof setTimeout>;
-    let buttonTimer: ReturnType<typeof setTimeout>;
-    
-    Promise.resolve().then(() => {
-      if (activeFilter !== null) {
-        // Filter clicked - show projects and set filter
-        setShowProjects(true);
-        setDelayedButtonPosition(activeFilter);
-        
-        if (prevFilterRef.current !== null && prevFilterRef.current !== activeFilter) {
-          // Switching filters
-          setIsExiting(true);
-          exitTimer = setTimeout(() => {
-            setIsExiting(false);
-            setDisplayedFilter(activeFilter);
-            setAnimationDelay(0);
-          }, 400);
-          prevFilterRef.current = activeFilter;
-        } else if (prevFilterRef.current === null) {
-          // First time clicking filter
-          setAnimationDelay(300);
-          setDisplayedFilter(activeFilter);
-          prevFilterRef.current = activeFilter;
-        } else {
-          setDisplayedFilter(activeFilter);
-          setAnimationDelay(0);
-        }
-      } else {
-        // Filter deactivated - show all projects
-        if (displayedFilter !== null) {
-          setIsExiting(true);
-          exitTimer = setTimeout(() => {
-            setIsExiting(false);
-            setDisplayedFilter(null);
-          }, 400);
-          buttonTimer = setTimeout(() => {
-            setDelayedButtonPosition(null);
-          }, 100);
-          prevFilterRef.current = null;
-        }
-      }
-    });
-    
-    return () => {
-      if (exitTimer) clearTimeout(exitTimer);
-      if (buttonTimer) clearTimeout(buttonTimer);
-    };
-  }, [activeFilter, displayedFilter]);
+  const scrollToProject = useCallback(
+    (index: number) => {
+      const project = projects[index];
+      if (!project) return;
+      const el = sectionRefs.current.get(project.id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    },
+    [projects],
+  );
+
+  const registerRef = useCallback((id: string, el: HTMLElement | null) => {
+    if (el) sectionRefs.current.set(id, el);
+    else sectionRefs.current.delete(id);
+  }, []);
+
+  if (isLoading) return null;
 
   return (
-    <section className={`works ${showProjects ? 'works--filtered' : ''}`}>
-      {/* Page title */}
-      <h1 className="works__title">WORKS</h1>
-
-      {/* Main content */}
-      <div className={`works__container ${showProjects ? 'works__container--filtered' : ''}`}>
-        {/* Filter buttons - left side (clickable) */}
-        <FilterButtons
-          filters={filterOptions}
-          activeFilter={activeFilter}
-          onFilterChange={setActiveFilter}
-          className="works__filters filter-buttons"
-          baseClassName="filter-buttons"
-          isFiltered={delayedButtonPosition !== null || showProjects}
-        />
-
-        {/* Description - right side */}
-        <PageDescription isFiltered={showProjects} className="works__description">
-          On this page, I'm giving you an overview of the projects I worked on during my studies — from design concepts to fully developed digital solutions. Each project reflects my growing skills in visual design, UX/UI, and web development.
-        </PageDescription>
-      </div>
-
-      {/* Project Grid - shows when scrolling or filter active */}
-      <ProjectGrid 
-        filter={displayedFilter}
-        isVisible={showProjects} 
-        isExiting={isExiting} 
-        animationDelay={animationDelay} 
+    <div className="works-page">
+      <WorksSidebar
+        projects={projects.map((p) => ({ id: p.id, title: p.title }))}
+        activeIndex={activeIndex}
+        onProjectClick={scrollToProject}
       />
-    </section>
+      <div className="works-page__content">
+        <header className="works-page__header">
+          <h1 className="works-page__heading">Selected Works</h1>
+          <p className="works-page__intro">
+            An overview of my projects — from design concepts to fully developed digital solutions,
+            reflecting my skills in visual design, UX/UI, and web development.
+          </p>
+        </header>
+        {projects.map((project, index) => (
+          <WorksProjectSection
+            key={project.id}
+            project={project}
+            index={index}
+            registerRef={registerRef}
+          />
+        ))}
+      </div>
+    </div>
   );
 }

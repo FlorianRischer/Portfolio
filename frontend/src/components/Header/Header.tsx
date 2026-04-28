@@ -47,7 +47,6 @@ const Header = () => {
           </ul>
         </nav>
       </div>
-      <div className="header__line"></div>
     </header>
   );
 };

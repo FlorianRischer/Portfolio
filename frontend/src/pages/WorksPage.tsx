@@ -4,7 +4,7 @@ import Works from '../components/Works/Works';
 
 export default function WorksPage() {
   return (
-    <BaseLayout scrollable>
+    <BaseLayout scrollable fullBleed className="works-layout">
       <Works />
     </BaseLayout>
   );

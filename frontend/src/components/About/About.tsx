@@ -239,7 +239,7 @@ export default function About() {
       </div>
 
       <PageDescription isFiltered={hasActiveView} className="about__description" data-skill-selected={displayedSkill ? 'true' : 'false'}>
-        I'm a UX/UI designer currently studying Web Design & Development at University of applied sciences in Munich, Germany. In my work, I combine visual design with a structured, user-focused approach. My goal is to create clear and functional designs that are both aesthetically pleasing and easy to understand.
+        I'm a Computer Science and Design Student at University of applied sciences in Munich, Germany. Learning about the combination of both worlds is what makes my design process developement 
       </PageDescription>
 
       {displayedSkill && getSelectedSkillData() && (

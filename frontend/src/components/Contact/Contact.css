@@ -2,7 +2,6 @@
   position: relative;
   width: 100%;
   height: var(--content-max-height);
-  background-color: #ffffff;
   overflow: hidden;
 }
 
