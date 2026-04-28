@@ -6,15 +6,10 @@ import Header from './components/Header';
 import { TransitionProvider } from './components/PageTransition/TransitionContext';
 import HomePage from './pages/HomePage';
 import WorksPage from './pages/WorksPage';
-// ProjectDetailPage disabled — file kept for potential re-use
-// import ProjectDetailPage from './pages/ProjectDetailPage';
 import AboutPage from './pages/AboutPage';
 import { imagesAPI } from './services/api';
-import { preloadSkills } from './services/technologyIcons';
 import './styles/global.css';
 import './components/PageTransition/PageTransition.css';
-
-preloadSkills();
 
 function AppContent() {
   useEffect(() => {

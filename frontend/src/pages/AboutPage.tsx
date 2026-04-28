@@ -4,7 +4,7 @@ import About from '../components/About';
 
 export default function AboutPage() {
   return (
-    <BaseLayout>
+    <BaseLayout scrollable fullBleed className="about-layout">
       <About />
     </BaseLayout>
   );

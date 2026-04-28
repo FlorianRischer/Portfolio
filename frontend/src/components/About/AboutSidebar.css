@@ -1,0 +1,101 @@
+.about-sidebar {
+  position: sticky;
+  top: 0;
+  width: 14vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(1.5rem, 2.5vw, 2.5rem);
+  padding-left: clamp(1.5rem, 3vw, 3rem);
+  padding-top: 5rem;
+  padding-bottom: 3rem;
+  flex-shrink: 0;
+  z-index: 50;
+}
+
+.about-sidebar__group {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.4rem, 0.7vw, 0.7rem);
+}
+
+.about-sidebar__label {
+  font-family: 'Helvetica', sans-serif;
+  font-size: clamp(0.55rem, 0.65vw, 0.65rem);
+  font-weight: 700;
+  color: #000000;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: clamp(0.15rem, 0.3vw, 0.3rem);
+}
+
+.about-sidebar__list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.5rem, 0.8vw, 0.85rem);
+}
+
+.about-sidebar__link {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.5rem, 0.8vw, 0.75rem);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.15rem 0;
+  opacity: 0.25;
+  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.about-sidebar__link--active {
+  opacity: 1;
+}
+
+.about-sidebar__link:hover {
+  opacity: 0.6;
+}
+
+.about-sidebar__link--active:hover {
+  opacity: 1;
+}
+
+.about-sidebar__dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: var(--color-black);
+  flex-shrink: 0;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.about-sidebar__link--active .about-sidebar__dot {
+  transform: scale(1.6);
+}
+
+.about-sidebar__name {
+  font-family: 'Helvetica', sans-serif;
+  font-size: clamp(0.65rem, 0.8vw, 0.8rem);
+  font-weight: 600;
+  color: var(--color-black);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 10vw;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.about-sidebar__link--active .about-sidebar__name,
+.about-sidebar__link:hover .about-sidebar__name {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+@media (max-width: 991px) {
+  .about-sidebar {
+    display: none;
+  }
+}

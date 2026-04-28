@@ -88,23 +88,6 @@ export interface Skill {
   order: number;
 }
 
-export interface Message {
-  _id: string;
-  name: string;
-  email: string;
-  subject: string;
-  message: string;
-  read: boolean;
-  createdAt: string;
-}
-
-export interface ContactFormData {
-  name: string;
-  email: string;
-  subject: string;
-  message: string;
-}
-
 // Projects API
 export const projectsAPI = {
   getAll: (params?: { category?: string; featured?: boolean }) => {
@@ -129,16 +112,6 @@ export const skillsAPI = {
   getAll: (category?: string) => {
     const query = category ? `?category=${category}` : '';
     return fetchAPI<Skill[]>(`/skills${query}`);
-  },
-};
-
-// Messages API (Contact Form)
-export const messagesAPI = {
-  send: (data: ContactFormData) => {
-    return fetchAPI<Message>('/messages', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
   },
 };
 
@@ -175,6 +148,5 @@ export const imagesAPI = {
 export default {
   projects: projectsAPI,
   skills: skillsAPI,
-  messages: messagesAPI,
   images: imagesAPI,
 };

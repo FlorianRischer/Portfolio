@@ -8,7 +8,7 @@ interface WorksSidebarProps {
 
 export default function WorksSidebar({ projects, activeIndex, onProjectClick }: WorksSidebarProps) {
   return (
-    <nav className="works-sidebar" aria-label="Project navigation">
+    <nav className="works-sidebar" aria-label="Project navigation" data-animate>
       <ul className="works-sidebar__list">
         {projects.map((project, index) => (
           <li key={project.id}>

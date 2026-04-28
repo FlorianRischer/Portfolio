@@ -1,1 +1,1 @@
-export { useScrollFilter } from './useScrollFilter';
+export { usePageEntrance } from './usePageEntrance';

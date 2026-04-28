@@ -1,270 +1,181 @@
 // Author: Florian Rischer
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import './About.css';
 import { imagesAPI, skillsAPI } from '../../services/api';
 import { usePageEntrance } from '../../hooks/usePageEntrance';
 import type { Skill as APISkill } from '../../services/api';
 import { PageDescription } from '../common/PageDescription';
-import { useScrollFilter } from '../../hooks/useScrollFilter';
+import AboutSidebar from './AboutSidebar';
 
-// All images from API
 const aboutImage = imagesAPI.getUrl('about-image');
-
-type AboutView = 'tech-skills' | 'design-skills' | null;
-
-// Filter order for scroll activation
-const scrollFilterOrder = [
-  { id: 'tech-skills' as const },
-  { id: 'design-skills' as const }
-];
 
 interface Skill {
   name: string;
-  level: number; // 1-5
+  level: number;
   icon: string;
   description?: string;
+  category: 'tech' | 'design';
 }
 
-// Convert API skill to local Skill interface
 const convertAPISkill = (apiSkill: APISkill): Skill => ({
   name: apiSkill.name,
   level: apiSkill.proficiency,
   icon: imagesAPI.getUrl(apiSkill.icon),
-  description: apiSkill.description
+  description: apiSkill.description,
+  category: apiSkill.category,
 });
 
 export default function About() {
-  const containerRef = usePageEntrance<HTMLElement>();
-  const [activeView, setActiveView] = useState<AboutView>(null);
-  const [selectedSkill, setSelectedSkill] = useState<string | null>(null);
-  const [displayedSkill, setDisplayedSkill] = useState<string | null>(null);
-  const [isExiting, setIsExiting] = useState(false);
-  const [delayedButtonPosition, setDelayedButtonPosition] = useState<AboutView>(null);
-  const [techSkills, setTechSkills] = useState<Skill[]>([]);
-  const [designSkills, setDesignSkills] = useState<Skill[]>([]);
-  const [hasBeenActive, setHasBeenActive] = useState<{ [key: string]: boolean }>({
-    'tech-skills': false,
-    'design-skills': false,
-  });
+  const [skills, setSkills] = useState<Skill[]>([]);
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const [isLoading, setIsLoading] = useState(true);
+  const containerRef = usePageEntrance<HTMLDivElement>(!isLoading);
+  const sectionRefs = useRef<Map<string, HTMLElement>>(new Map());
+  const landingRef = useRef<HTMLElement>(null);
 
-  // Enable scroll-based filter activation
-  useScrollFilter({
-    filterOrder: scrollFilterOrder,
-    activeFilter: activeView,
-    setActiveFilter: setActiveView
-  });
-
-  // Load skills from API
   useEffect(() => {
     const loadSkills = async () => {
       const result = await skillsAPI.getAll();
       if (result.success && result.data) {
-        const tech = result.data
-          .filter(s => s.category === 'tech')
-          .map(convertAPISkill);
-        const design = result.data
-          .filter(s => s.category === 'design')
-          .map(convertAPISkill);
-        setTechSkills(tech);
-        setDesignSkills(design);
+        const allSkills = result.data.map(convertAPISkill);
+        const tech = allSkills.filter((s) => s.category === 'tech');
+        const design = allSkills.filter((s) => s.category === 'design');
+        setSkills([...tech, ...design]);
       }
+      setIsLoading(false);
     };
     loadSkills();
   }, []);
 
-  // Track if views have been active
+  const techSkills = skills.filter((s) => s.category === 'tech');
+  const designSkills = skills.filter((s) => s.category === 'design');
+
   useEffect(() => {
-    if (activeView) {
-      // Use microtask to avoid setState in effect warning
-      Promise.resolve().then(() => {
-        setHasBeenActive(prev => ({
-          ...prev,
-          [activeView]: true
-        }));
-      });
-    } else {
-      // Reset selected skill when leaving skills view
-      Promise.resolve().then(() => {
-        setSelectedSkill(null);
-        setDisplayedSkill(null);
-      });
-    }
-  }, [activeView]);
+    if (!skills.length) return;
 
-  // Handle skill selection and deselection with animation
-  useEffect(() => {
-    if (selectedSkill && selectedSkill !== displayedSkill) {
-      // New skill selected - show immediately
-      Promise.resolve().then(() => {
-        setIsExiting(false);
-        setDisplayedSkill(selectedSkill);
-      });
-    } else if (!selectedSkill && displayedSkill) {
-      // Skill deselected - trigger exit animation
-      Promise.resolve().then(() => {
-        setIsExiting(true);
-      });
-      const timer = setTimeout(() => {
-        setDisplayedSkill(null);
-        setIsExiting(false);
-      }, 500); // Match animation duration
-      return () => clearTimeout(timer);
-    }
-  }, [selectedSkill, displayedSkill]);
-
-  // Delay button position when closing (wait for exit animation)
-  useEffect(() => {
-    if (activeView !== null) {
-      Promise.resolve().then(() => {
-        setDelayedButtonPosition(activeView);
-      });
-    } else {
-      const timer = setTimeout(() => {
-        setDelayedButtonPosition(null);
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [activeView]);
-
-  const getViewSize = (view: AboutView): 'large' | 'small' => {
-    return activeView === view ? 'large' : 'small';
-  };
-
-  const isViewActive = (view: AboutView): boolean => {
-    return activeView === view;
-  };
-
-  const hasActiveView = activeView !== null;
-
-  const getButtonPositionClass = (): string => {
-    if (!delayedButtonPosition) return '';
-    return `about__filters--${delayedButtonPosition}-active`;
-  };
-
-  const handleSkillClick = (skillName: string) => {
-    setSelectedSkill(selectedSkill === skillName ? null : skillName);
-  };
-
-  const getSelectedSkillData = (): Skill | null => {
-    if (!displayedSkill) return null;
-    if (activeView === 'tech-skills') {
-      return techSkills.find(skill => skill.name === displayedSkill) || null;
-    } else if (activeView === 'design-skills') {
-      return designSkills.find(skill => skill.name === displayedSkill) || null;
-    }
-    return null;
-  };
-
-  const renderSkillBar = (skill: Skill, index: number, isDesignSkill: boolean = false) => {
-    const percentage = (skill.level / 5) * 100;
-    const isSelected = selectedSkill === skill.name;
-    
-    // For design skills, render only icon and name without bar and level
-    if (isDesignSkill) {
-      return (
-        <button
-          key={skill.name} 
-          className={`about__skill about__skill--simple ${isSelected ? 'about__skill--selected' : ''}`}
-          onClick={() => handleSkillClick(skill.name)}
-          style={{ 
-            '--stagger-delay': `${0.1 + index * 0.1}s`,
-            '--stagger-delay-exit': `${(4 - index) * 0.05}s`
-          } as React.CSSProperties}
-        >
-          <div className="about__skill-icon">
-            <img src={skill.icon} alt={skill.name} />
-          </div>
-          <div className="about__skill-name-line">
-            <span className="about__skill-name">{skill.name}</span>
-          </div>
-        </button>
-      );
-    }
-    
-    return (
-      <button
-        key={skill.name} 
-        className={`about__skill ${isSelected ? 'about__skill--selected' : ''}`}
-        onClick={() => handleSkillClick(skill.name)}
-        style={{ 
-          '--stagger-delay': `${0.1 + index * 0.1}s`,
-          '--stagger-delay-exit': `${(4 - index) * 0.05}s`
-        } as React.CSSProperties}
-      >
-        <div className="about__skill-icon">
-          <img src={skill.icon} alt={skill.name} />
-        </div>
-        <div className="about__skill-content">
-          <div className="about__skill-bar">
-            <div className="about__skill-bar-bg"></div>
-            <div 
-              className="about__skill-bar-fill" 
-              style={{ width: `${percentage}%` }}
-            ></div>
-          </div>
-          <div className="about__skill-info">
-            <span className="about__skill-name">{skill.name}</span>
-          </div>
-        </div>
-      </button>
+    const landingObserver = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting && entry.intersectionRatio > 0.3) {
+            setActiveIndex(-1);
+          }
+        }
+      },
+      { threshold: [0.3, 0.5, 0.7] },
     );
-  };
+
+    const skillObserver = new IntersectionObserver(
+      (entries) => {
+        let bestId = '';
+        let bestRatio = 0;
+        for (const entry of entries) {
+          if (entry.isIntersecting && entry.intersectionRatio > bestRatio) {
+            bestId = entry.target.id;
+            bestRatio = entry.intersectionRatio;
+          }
+        }
+        if (!bestId) return;
+        const idx = skills.findIndex((s) => s.name === bestId);
+        if (idx !== -1) setActiveIndex(idx);
+      },
+      { threshold: [0.3, 0.5, 0.7, 1], rootMargin: '-40% 0px -40% 0px' },
+    );
+
+    if (landingRef.current) landingObserver.observe(landingRef.current);
+    sectionRefs.current.forEach((el) => skillObserver.observe(el));
+    return () => {
+      landingObserver.disconnect();
+      skillObserver.disconnect();
+    };
+  }, [skills]);
+
+  const scrollToSkill = useCallback(
+    (index: number) => {
+      const skill = skills[index];
+      if (!skill) return;
+      const el = sectionRefs.current.get(skill.name);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    },
+    [skills],
+  );
+
+  const registerRef = useCallback((name: string, el: HTMLElement | null) => {
+    if (el) sectionRefs.current.set(name, el);
+    else sectionRefs.current.delete(name);
+  }, []);
+
+  if (isLoading) return null;
 
   return (
-    <section ref={containerRef} className={`about ${hasActiveView ? 'about--filtered' : ''}`}>
-      <div className="about__image" data-animate>
-        <img 
-          src={aboutImage} 
-          alt="About" 
-          className={`about__image-img ${activeView === 'design-skills' ? 'about__image-img--faded' : ''}`} 
-        />
+    <div className="about-page" ref={containerRef}>
+      <div className="about-page__bg" data-animate>
+        <img src={aboutImage} alt="" className="about-page__bg-img" />
       </div>
-      <h1 className="about__title" data-animate>ABOUT</h1>
 
-        <div data-animate className={`about__filters ${getButtonPositionClass()}`}>
-          <button
-            className={`about__filter-btn about__filter-btn--${getViewSize('tech-skills')} ${
-              isViewActive('tech-skills') ? 'about__filter-btn--active' : ''
-            }`}
-            onClick={() => setActiveView(isViewActive('tech-skills') ? null : 'tech-skills')}
+      <AboutSidebar
+        techSkills={techSkills.map((s) => ({ name: s.name, icon: s.icon }))}
+        designSkills={designSkills.map((s) => ({ name: s.name, icon: s.icon }))}
+        activeSkill={activeIndex >= 0 ? skills[activeIndex]?.name ?? null : null}
+        onSkillClick={(name) => {
+          const idx = skills.findIndex((s) => s.name === name);
+          if (idx !== -1) scrollToSkill(idx);
+        }}
+      />
+
+      <div className="about-page__content">
+        {/* Landing section */}
+        <section id="about-landing" ref={landingRef} className="about-landing" data-animate>
+          <h1 className="about-landing__title">ABOUT</h1>
+          <PageDescription className="about__description">
+            I'm a Computer Science and Design Student at University of applied sciences in Munich,
+            Germany. Learning about the combination of both worlds is what makes my design process
+            developement
+          </PageDescription>
+        </section>
+
+        {/* Skill cards */}
+        {skills.map((skill, index) => (
+          <article
+            key={skill.name}
+            id={skill.name}
+            ref={(el) => registerRef(skill.name, el)}
+            className="about-skill"
+            data-animate
           >
-            Tech - skills
-          </button>
-          <button
-            className={`about__filter-btn about__filter-btn--${getViewSize('design-skills')} ${
-              isViewActive('design-skills') ? 'about__filter-btn--active' : ''
-            }`}
-            onClick={() => setActiveView(isViewActive('design-skills') ? null : 'design-skills')}
-          >
-            Design - skills
-          </button>
+            <div className="about-skill__info">
+              <div className="about-skill__info-col about-skill__info-col--title">
+                <span className="about-skill__number">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+                <h2 className="about-skill__name">{skill.name}</h2>
+                <span className="about-skill__category">
+                  {skill.category === 'tech' ? 'Tech Skill' : 'Design Skill'}
+                </span>
+              </div>
+
+              <div className="about-skill__info-col">
+                <span className="about-skill__label">About</span>
+                <p className="about-skill__description">{skill.description || ''}</p>
+              </div>
+
+              <div className="about-skill__info-col">
+                <span className="about-skill__label">Proficiency</span>
+                <div className="about-skill__bar">
+                  <div className="about-skill__bar-bg" />
+                  <div
+                    className="about-skill__bar-fill"
+                    style={{ width: `${(skill.level / 5) * 100}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="about-skill__hero">
+              <img src={skill.icon} alt={skill.name} className="about-skill__icon" />
+            </div>
+          </article>
+        ))}
       </div>
-
-      <PageDescription isFiltered={hasActiveView} className="about__description" data-skill-selected={displayedSkill ? 'true' : 'false'}>
-        I'm a Computer Science and Design Student at University of applied sciences in Munich, Germany. Learning about the combination of both worlds is what makes my design process developement 
-      </PageDescription>
-
-      {displayedSkill && getSelectedSkillData() && (
-        <div className={`about__skill-description ${isExiting ? 'about__skill-description--exiting' : ''}`} key={`skill-${displayedSkill}`}>
-          <p>
-            {getSelectedSkillData()?.description}
-          </p>
-        </div>
-      )}
-
-      {/* Tech Skills Section */}
-      <div className={`about__section about__tech-skills-section ${activeView === 'tech-skills' ? 'about__section--visible' : ''} ${selectedSkill ? 'about__section--skill-selected' : ''} ${hasBeenActive['tech-skills'] && activeView !== 'tech-skills' ? 'about__section--exiting' : ''}`}>
-        <div className="about__skills-list">
-          {techSkills.map((skill, index) => renderSkillBar(skill, index, true))}
-        </div>
-      </div>
-
-      {/* Design Skills Section */}
-      <div className={`about__section about__design-skills-section ${activeView === 'design-skills' ? 'about__section--visible' : ''} ${selectedSkill ? 'about__section--skill-selected' : ''} ${hasBeenActive['design-skills'] && activeView !== 'design-skills' ? 'about__section--exiting' : ''}`}>
-        <div className="about__skills-list">
-          {designSkills.map((skill, index) => renderSkillBar(skill, index, true))}
-        </div>
-      </div>
-    </section>
+    </div>
   );
 }

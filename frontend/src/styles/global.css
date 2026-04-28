@@ -14,9 +14,7 @@
   --content-max-width: 85vw;
 
   /* Standard positions within ContentContainer (percentage-based = container-relative) */
-  --filter-resting-bottom: 8%;
   --title-top: clamp(3.5rem, 5.5vw, 5rem);
-  --filter-active-top: clamp(4rem, 6.3vw, 5.6875rem);
   --description-resting-bottom: 8%;
 
   /* Responsive spacing system based on viewport */
@@ -159,27 +157,6 @@ button {
   to {
     transform: rotate(360deg);
   }
-}
-
-/* Shared stagger animations (used across Works, About, Contact) */
-@keyframes staggerFadeInUp {
-  from { opacity: 0; transform: translateY(clamp(3rem, 4vw, 4rem)); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes staggerFadeOutDown {
-  from { opacity: 1; transform: translateY(0); }
-  to { opacity: 0; transform: translateY(clamp(3rem, 4vw, 4rem)); }
-}
-
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(clamp(1rem, 1.5vw, 1.5rem)); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fadeOutDown {
-  from { opacity: 1; transform: translateY(0); }
-  to { opacity: 0; transform: translateY(-clamp(1rem, 1.5vw, 1.5rem)); }
 }
 
 /* Mobile: enable scrolling on all pages */
