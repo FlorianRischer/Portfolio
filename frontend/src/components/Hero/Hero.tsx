@@ -8,7 +8,7 @@ import { imagesAPI } from '../../services/api';
 
 const profileImg = imagesAPI.getUrl('profile-svg');
 
-const INTRO_TEXT = "Hey there, nice to meet you! I'm Florian, a computer science and design student form Munich, Germany. Welcome to my portfolio page where you can get to know more about me and my work.";
+const INTRO_TEXT = "Hey there, nice to meet you! I'm Florian, a computer science and design student form Munich, Germany. Welcome to my portfolio page, here you can get to know more about me and my work!";
 
 const Hero = () => {
   const { navigateWithTransition } = useTransition();
