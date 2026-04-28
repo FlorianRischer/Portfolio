@@ -6,7 +6,6 @@ import './About.css';
 import { imagesAPI, skillsAPI } from '../../services/api';
 import { usePageEntrance } from '../../hooks/usePageEntrance';
 import type { Skill as APISkill } from '../../services/api';
-import { PageDescription } from '../common/PageDescription';
 import AboutSidebar from './AboutSidebar';
 
 gsap.registerPlugin(ScrollTrigger);
