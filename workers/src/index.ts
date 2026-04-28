@@ -191,6 +191,7 @@ function parseProject(row: Record<string, unknown>) {
     images: JSON.parse(row.images as string || '[]'),
     screens: JSON.parse(row.screens as string || '[]'),
     featured: Boolean(row.featured),
+    useScreensAsGallery: Boolean(row.useScreensAsGallery),
     isVideoHero: /\.(mp4|webm|mov)$/i.test(filename),
   };
 }
@@ -207,6 +208,7 @@ interface ProjectInput {
   githubUrl?: string | null;
   featured?: boolean;
   order?: number;
+  useScreensAsGallery?: boolean;
 }
 
 async function createProject(env: Env, request: Request): Promise<Response> {
@@ -217,8 +219,8 @@ async function createProject(env: Env, request: Request): Promise<Response> {
   }
   
   const result = await env.DB.prepare(
-    `INSERT INTO projects (title, slug, description, shortDescription, category, technologies, techDescription, liveUrl, githubUrl, featured, "order", images, screens)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '[]', '[]')`
+    `INSERT INTO projects (title, slug, description, shortDescription, category, technologies, techDescription, liveUrl, githubUrl, featured, "order", images, screens, useScreensAsGallery)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '[]', '[]', ?)`
   ).bind(
     body.title,
     body.slug,
@@ -230,7 +232,8 @@ async function createProject(env: Env, request: Request): Promise<Response> {
     body.liveUrl || null,
     body.githubUrl || null,
     body.featured ? 1 : 0,
-    body.order || 0
+    body.order || 0,
+    body.useScreensAsGallery ? 1 : 0
   ).run();
 
   return jsonResponse({ slug: body.slug, message: 'Project created' }, 201);
@@ -256,6 +259,7 @@ async function updateProject(env: Env, slug: string, request: Request): Promise<
   if (body.githubUrl !== undefined) { updates.push('githubUrl = ?'); values.push(body.githubUrl); }
   if (body.featured !== undefined) { updates.push('featured = ?'); values.push(body.featured ? 1 : 0); }
   if (body.order !== undefined) { updates.push('"order" = ?'); values.push(body.order); }
+  if (body.useScreensAsGallery !== undefined) { updates.push('useScreensAsGallery = ?'); values.push(body.useScreensAsGallery ? 1 : 0); }
   if (body.slug !== undefined && body.slug !== slug) { updates.push('slug = ?'); values.push(body.slug); }
   
   if (updates.length === 0) {

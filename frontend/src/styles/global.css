@@ -9,7 +9,7 @@
   --color-blue: #3d66e1;
 
   /* Layout constraints — shared by BaseLayout / PageContainer */
-  --page-max-width: 1440px;
+  --page-max-width: 100%;
   --content-max-height: 100vh;
   --content-max-width: 85vw;
 

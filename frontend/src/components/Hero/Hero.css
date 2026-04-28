@@ -2,19 +2,19 @@
   height: var(--content-max-height);
   display: flex;
   align-items: center;
-  padding: clamp(4rem, 5vw, 4.375rem) var(--container-padding);
+  padding-top: 7vh;
   padding-bottom: 0;
   background: transparent;
   position: relative;
-  overflow: hidden;
+  overflow: show;
 }
 
 .hero__container {
-  max-width: 85vw;
+  max-width: var(--max-width-content);
   height: var(--content-max-height);
-  margin: 0 auto;
   width: 100%;
   position: relative;
+  margin: 0 auto;
 }
 
 /* Image Composition Section */

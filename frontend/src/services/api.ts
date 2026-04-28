@@ -71,6 +71,7 @@ export interface Project {
     description: string;
     imageUrl: string;
   }[];
+  useScreensAsGallery?: boolean;
   liveUrl?: string;
   githubUrl?: string;
   featured: boolean;

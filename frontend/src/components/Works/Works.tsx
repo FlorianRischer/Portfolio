@@ -17,6 +17,7 @@ interface WorksProject {
   isVideoHero: boolean;
   images: string[];
   screens: { title: string; description: string; imageUrl: string }[];
+  useScreensAsGallery?: boolean;
   liveUrl?: string;
   projectUrl: string;
 }
@@ -32,6 +33,7 @@ const convertProject = (p: APIProject): WorksProject => ({
   isVideoHero: p.isVideoHero || false,
   images: p.images || [],
   screens: p.screens || [],
+  useScreensAsGallery: p.useScreensAsGallery || false,
   liveUrl: p.liveUrl,
   projectUrl: `/works/${p.slug}`,
 });
