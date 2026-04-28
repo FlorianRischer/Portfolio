@@ -1,5 +1,7 @@
 // Author: Florian Rischer
 import { useState, useEffect, useRef, useCallback } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import './About.css';
 import { imagesAPI, skillsAPI } from '../../services/api';
 import { usePageEntrance } from '../../hooks/usePageEntrance';
@@ -7,7 +9,10 @@ import type { Skill as APISkill } from '../../services/api';
 import { PageDescription } from '../common/PageDescription';
 import AboutSidebar from './AboutSidebar';
 
+gsap.registerPlugin(ScrollTrigger);
+
 const aboutImage = imagesAPI.getUrl('about-image');
+const aboutMePortrait = imagesAPI.getUrl('about-me-portrait');
 
 interface Skill {
   name: string;
@@ -104,6 +109,34 @@ export default function About() {
     else sectionRefs.current.delete(name);
   }, []);
 
+  useEffect(() => {
+    if (!skills.length) return;
+    const cards = document.querySelectorAll('.about-me, .about-skill');
+    if (!cards.length) return;
+
+    gsap.set(cards, { scale: 0.9, y: 50 });
+
+    const triggers: ScrollTrigger[] = [];
+    cards.forEach((card) => {
+      const tween = gsap.to(card, {
+        scale: 1,
+        y: 0,
+        duration: 1.1,
+        ease: 'expo.out',
+        scrollTrigger: {
+          trigger: card,
+          start: 'top bottom',
+          once: true,
+        },
+      });
+      if (tween.scrollTrigger) triggers.push(tween.scrollTrigger);
+    });
+
+    return () => {
+      triggers.forEach((t) => t.kill());
+    };
+  }, [skills]);
+
   if (isLoading) return null;
 
   return (
@@ -126,11 +159,20 @@ export default function About() {
         {/* Landing section */}
         <section id="about-landing" ref={landingRef} className="about-landing" data-animate>
           <h1 className="about-landing__title">ABOUT</h1>
-          <PageDescription className="about__description">
-            I'm a Computer Science and Design Student at University of applied sciences in Munich,
-            Germany. Learning about the combination of both worlds is what makes my design process
-            developement
-          </PageDescription>
+          
+        </section>
+
+        {/* About Me section */}
+        <section className="about-me">
+          <div className="about-me__image">
+            <img src={aboutMePortrait} alt="Florian Rischer" className="about-me__img" />
+          </div>
+          <div className="about-me__text">
+            <h2 className="about-me__heading">About Me</h2>
+            <p className="about-me__body">
+              Hello again! As I already mentioned, my name is Florian Rischer. I'm 20 years old and from a small town in Germany near Munich. My interest and skills in UI/UX design and software development have been growing ever since. Aside from that, I love to get creative in my free time with activities such as painting and photography. Below you can find a list of my aquired skills.
+            </p>
+          </div>
         </section>
 
         {/* Skill cards */}

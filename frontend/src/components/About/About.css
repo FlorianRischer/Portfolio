@@ -18,7 +18,7 @@
   top: 15vh;
   left: 14vw;
   width: auto;
-  height: 60%;
+  height: 50%;
   pointer-events: none;
   z-index: 0;
   overflow: visible;
@@ -68,6 +68,55 @@
   bottom: 38vh;
 }
 
+/* ── About Me section ───────────────────────── */
+
+.about-me {
+  background-color: #fff;
+  border-radius: 0.4rem;
+  padding: clamp(2rem, 3vw, 3.5rem) clamp(1.5rem, 2vw, 2.5rem);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: clamp(2rem, 3vw, 3.5rem);
+  margin: 0 calc((100vw - var(--max-width-content)) / 2) 0 clamp(1rem, 2vw, 2rem);
+  will-change: transform;
+  transform-origin: center center;
+}
+
+.about-me__image {
+  flex-shrink: 0;
+  width: clamp(200px, 22vw, 380px);
+  border-radius: 0.4rem;
+  overflow: hidden;
+}
+
+.about-me__img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.about-me__text {
+  max-width: 36rem;
+}
+
+.about-me__heading {
+  font-family: 'Helvetica', sans-serif;
+  font-size: clamp(1.5rem, 2.5vw, 2.5rem);
+  font-weight: 700;
+  color: var(--color-black);
+  margin: 0 0 clamp(0.75rem, 1.2vw, 1.25rem);
+}
+
+.about-me__body {
+  font-family: 'Helvetica', sans-serif;
+  font-size: clamp(0.875rem, 1.05vw, 1.1rem);
+  font-weight: 400;
+  line-height: 1.6;
+  color: #555;
+  margin: 0;
+}
+
 /* ── Skill cards ────────────────────────────── */
 
 .about-skill {
@@ -79,10 +128,12 @@
   align-items: center;
   gap: clamp(2rem, 3vw, 3.5rem);
   margin: clamp(3rem, 5vw, 5rem) calc((100vw - var(--max-width-content)) / 2) 0 clamp(1rem, 2vw, 2rem);
+  will-change: transform;
+  transform-origin: center center;
 }
 
 .about-skill:first-of-type {
-  margin-top: 0;
+  margin-top: clamp(3rem, 5vw, 5rem);
 }
 
 .about-skill__info {
@@ -229,6 +280,15 @@
     text-align: right;
     margin-top: var(--spacing-md);
     padding: 0 var(--container-padding);
+  }
+
+  .about-me {
+    flex-direction: column;
+    padding: clamp(3rem, 6vw, 4rem) var(--container-padding);
+  }
+
+  .about-me__image {
+    width: 60%;
   }
 
   .about-skill {

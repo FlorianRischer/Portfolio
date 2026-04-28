@@ -1,5 +1,5 @@
 // Author: Florian Rischer
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import gsap from 'gsap';
 import { useTransition } from '../PageTransition/TransitionContext';
 import { usePageEntrance } from '../../hooks/usePageEntrance';
@@ -8,10 +8,28 @@ import { imagesAPI } from '../../services/api';
 
 const profileImg = imagesAPI.getUrl('profile-svg');
 
+const INTRO_TEXT = "Hey there, nice to meet you! I'm Florian, a computer science and design student form Munich, Germany. Welcome to my portfolio page where you can get to know more about me and my work.";
+
 const Hero = () => {
   const { navigateWithTransition } = useTransition();
   const containerRef = usePageEntrance<HTMLElement>();
   const arrowRef = useRef<SVGSVGElement>(null);
+  const [displayedText, setDisplayedText] = useState('');
+  const [cursorVisible, setCursorVisible] = useState(false);
+
+  const startTypewriter = useCallback(() => {
+    setCursorVisible(true);
+    let i = 0;
+    const interval = setInterval(() => {
+      i++;
+      setDisplayedText(INTRO_TEXT.slice(0, i));
+      if (i >= INTRO_TEXT.length) {
+        clearInterval(interval);
+        setTimeout(() => setCursorVisible(false), 600);
+      }
+    }, 28);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const svg = arrowRef.current;
@@ -47,7 +65,9 @@ const Hero = () => {
       duration: 0.5,
       ease: 'power2.out',
     }, '-=0.3');
-  }, []);
+
+    tl.call(() => { startTypewriter(); });
+  }, [startTypewriter]);
 
   return (
     <section id="home" className="hero" ref={containerRef}>
@@ -105,9 +125,13 @@ const Hero = () => {
           </div>
         </div>
 
-        <div className="hero__intro" data-animate>
-          <p className="hero__intro-text">
-            Hey there, nice to meet you! I'm Florian, a computer science and design student form Munich, Germany. Welcome to my portfolio page where you can get to know more about me and my work.
+        <div className="hero__intro">
+          <p className="hero__intro-text hero__intro-text--hidden" aria-hidden="true">
+            {INTRO_TEXT}
+          </p>
+          <p className="hero__intro-text hero__intro-text--visible">
+            {displayedText}
+            {cursorVisible && <span className="typewriter-cursor">|</span>}
           </p>
         </div>
       </div>

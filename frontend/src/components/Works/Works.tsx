@@ -1,10 +1,14 @@
 // Author: Florian Rischer
 import { useState, useEffect, useRef, useCallback } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import './Works.css';
 import WorksSidebar from './WorksSidebar';
 import WorksProjectSection from './WorksProjectSection';
 import { projectsAPI, imagesAPI, type Project as APIProject } from '../../services/api';
 import { usePageEntrance } from '../../hooks/usePageEntrance';
+
+gsap.registerPlugin(ScrollTrigger);
 
 interface WorksProject {
   id: string;
@@ -95,6 +99,34 @@ export default function Works() {
     if (el) sectionRefs.current.set(id, el);
     else sectionRefs.current.delete(id);
   }, []);
+
+  useEffect(() => {
+    if (!projects.length) return;
+    const cards = document.querySelectorAll('.works-project');
+    if (!cards.length) return;
+
+    gsap.set(cards, { scale: 0.9, y: 50 });
+
+    const triggers: ScrollTrigger[] = [];
+    cards.forEach((card) => {
+      const tween = gsap.to(card, {
+        scale: 1,
+        y: 0,
+        duration: 1.1,
+        ease: 'expo.out',
+        scrollTrigger: {
+          trigger: card,
+          start: 'top bottom',
+          once: true,
+        },
+      });
+      if (tween.scrollTrigger) triggers.push(tween.scrollTrigger);
+    });
+
+    return () => {
+      triggers.forEach((t) => t.kill());
+    };
+  }, [projects]);
 
   if (isLoading) return null;
 
