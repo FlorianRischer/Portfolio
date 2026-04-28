@@ -43,8 +43,18 @@ const resolveImageUrl = (url: string) => {
 };
 
 function HeroVideo({ src, className }: { src: string; className?: string }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.muted = true;
+    video.play().catch(() => {});
+  }, []);
+
   return (
     <video
+      ref={videoRef}
       src={src}
       className={className}
       preload="auto"

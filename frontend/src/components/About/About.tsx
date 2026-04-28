@@ -169,7 +169,7 @@ export default function About() {
           <div className="about-me__text">
             <h2 className="about-me__heading">About Me</h2>
             <p className="about-me__body">
-              Hello again! As I already mentioned, my name is Florian Rischer. I'm 20 years old and from a small town in Germany near Munich. My interest and skills in UI/UX design and software development have been growing ever since. Aside from that, I love to get creative in my free time with activities such as painting and photography. Below you can find a list of my aquired skills.
+              Hello again! As I already mentioned, my name is Florian Rischer. I'm 20 years old and from a small town in Germany near Munich. Two years ago I started my studies at Munich University of applied sciences where I'm currently in my 4th semester. My interest and skills in UI/UX design and software development have been growing ever since. Aside from that, I love to get creative in my free time with activities such as painting and photography. 
             </p>
           </div>
         </section>
