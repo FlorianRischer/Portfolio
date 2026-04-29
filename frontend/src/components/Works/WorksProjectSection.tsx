@@ -87,7 +87,7 @@ export default function WorksProjectSection({ project, index, registerRef }: Pro
       if (!el) return;
       const lenis = (window as unknown as Record<string, unknown>).__lenis as { scrollTo: (target: HTMLElement, opts?: Record<string, unknown>) => void } | undefined;
       if (lenis) {
-        lenis.scrollTo(el, { offset: -window.innerHeight / 2 + el.offsetHeight / 2 });
+        lenis.scrollTo(el, { offset: -40 });
       }
     });
   }, []);
