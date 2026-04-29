@@ -62,19 +62,6 @@ export default function MockupCarousel({
     setCurrentScreen((prev) => (prev < screens.length - 1 ? prev + 1 : 0));
   };
 
-  const goToScreen = (index: number) => {
-    if (isAnimating || index === currentScreen) return;
-    setIsAnimating(true);
-    setPreviousScreen(currentScreen);
-    
-    if (index > currentScreen) {
-      setDirection('right');
-    } else {
-      setDirection('left');
-    }
-    
-    setCurrentScreen(index);
-  };
 
   useEffect(() => {
     const timer = setTimeout(() => setIsAnimating(false), 1000);
@@ -174,17 +161,6 @@ export default function MockupCarousel({
               {screens[displayedScreen].description}
             </p>
 
-            {/* Indicator dots */}
-            <div className={`${className}__indicators`}>
-              {screens.map((_, index) => (
-                <button
-                  key={index}
-                  className={`${className}__dot ${index === currentScreen ? `${className}__dot--active` : ''} ${isAnimating && index === previousScreen ? `${className}__dot--switching` : ''} ${isAnimating && index === currentScreen ? `${className}__dot--switching-in` : ''}`}
-                  onClick={() => goToScreen(index)}
-                  aria-label={`Go to screen ${index + 1}`}
-                />
-              ))}
-            </div>
           </div>
         </div>
       </div>

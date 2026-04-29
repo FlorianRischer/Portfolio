@@ -169,11 +169,10 @@ export default function About() {
           <div className="about-me__text">
             <h2 className="about-me__heading">About me</h2>
             <p className="about-me__body">
-              Hello again! As I already mentioned, my name is Florian Rischer. I'm 20 years old and from a small town in Germany near Munich. Two years ago I started my studies at Munich University of applied sciences where I'm currently in my 4th semester. My interest and skills in UI/UX design and software development have been growing ever since. Aside from that, I love to get creative in my free time with activities such as painting and photography. 
+              Hello again! As I already mentioned, my name is Florian Rischer. I'm 20 years old and from a small town in Germany near Munich. After graduating in May 2024, I started my studies at Munich University of Applied Sciences in October the same year, where I'm currently in my 4th semester. My interest and skills in UI/UX design and software development have been growing ever since. Aside from that, I love to get creative in my free time with activities such as painting and photography.
             </p>
           </div>
         </section>
-
         {/* Skill cards */}
         {skills.map((skill, index) => (
           <article
