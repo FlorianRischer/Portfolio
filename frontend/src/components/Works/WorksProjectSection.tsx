@@ -156,16 +156,16 @@ export default function WorksProjectSection({ project, index, registerRef }: Pro
           className="works-project__gallery"
           style={{ '--gallery-cols': Math.max(galleryImages.length, 3) } as React.CSSProperties}
         >
+          {showingGalleryHero && (
+            <button
+              className="works-project__img-wrap works-project__img-wrap--placeholder"
+              onClick={() => handleSwap(null)}
+            >
+              <span className="works-project__placeholder-text">show mockup</span>
+            </button>
+          )}
           {galleryImages.map((img, i) => (
-            i === selectedGalleryIndex ? (
-              <button
-                key={i}
-                className="works-project__img-wrap works-project__img-wrap--placeholder"
-                onClick={() => handleSwap(null)}
-              >
-                <span className="works-project__placeholder-text">show mockup</span>
-              </button>
-            ) : (
+            i === selectedGalleryIndex ? null : (
               <button
                 key={i}
                 className="works-project__img-wrap"
