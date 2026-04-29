@@ -1,6 +1,5 @@
 import { useCallback, useState, useEffect, useRef } from 'react';
 import { imagesAPI } from '../../services/api';
-import { MockupCarousel, type Screen } from '../common/MockupCarousel';
 import './WorksProjectSection.css';
 
 interface ProjectData {
@@ -66,51 +65,13 @@ function HeroVideo({ src, className }: { src: string; className?: string }) {
   );
 }
 
-function ScreensOverlay({
-  screens,
-  title,
-  onClose,
-}: {
-  screens: Screen[];
-  title: string;
-  onClose: () => void;
-}) {
-  const overlayRef = useRef<HTMLDivElement>(null);
-  const closing = useRef(false);
-
-  const handleClose = useCallback(() => {
-    if (closing.current) return;
-    closing.current = true;
-    overlayRef.current?.classList.add('screens-overlay--closing');
-    setTimeout(onClose, 300);
-  }, [onClose]);
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') handleClose();
-    };
-    document.addEventListener('keydown', onKey);
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = '';
-    };
-  }, [handleClose]);
-
-  return (
-    <div ref={overlayRef} className="screens-overlay" onClick={handleClose}>
-      <div className="screens-overlay__content" onClick={(e) => e.stopPropagation()}>
-        <button className="screens-overlay__close" onClick={handleClose} aria-label="Close">
-          ✕
-        </button>
-        <MockupCarousel screens={screens} title={title} />
-      </div>
-    </div>
-  );
-}
-
 export default function WorksProjectSection({ project, index, registerRef }: Props) {
-  const [showScreens, setShowScreens] = useState(false);
+  const galleryImages: string[] = project.useScreensAsGallery
+    ? project.screens.map((s) => resolveImageUrl(s.imageUrl))
+    : project.images.map((img) => resolveImageUrl(img));
+
+  const [selectedGalleryIndex, setSelectedGalleryIndex] = useState<number | null>(null);
+  const heroRef = useRef<HTMLDivElement>(null);
 
   const handleRef = useCallback(
     (el: HTMLElement | null) => {
@@ -119,85 +80,96 @@ export default function WorksProjectSection({ project, index, registerRef }: Pro
     [project.id, registerRef],
   );
 
-  const galleryImages: string[] = project.useScreensAsGallery
-    ? project.screens.map((s) => resolveImageUrl(s.imageUrl))
-    : project.images.map((img) => resolveImageUrl(img));
+  const handleSwap = useCallback((newIndex: number | null) => {
+    setSelectedGalleryIndex(newIndex);
+    requestAnimationFrame(() => {
+      const el = heroRef.current;
+      if (!el) return;
+      const lenis = (window as unknown as Record<string, unknown>).__lenis as { scrollTo: (target: HTMLElement, opts?: Record<string, unknown>) => void } | undefined;
+      if (lenis) {
+        lenis.scrollTo(el, { offset: -window.innerHeight / 2 + el.offsetHeight / 2 });
+      }
+    });
+  }, []);
 
-  const screens: Screen[] = project.screens.map((s) => ({
-    description: '',
-    screenImage: resolveImageUrl(s.imageUrl),
-    scale: 1,
-  }));
-
-  const hasScreens = screens.length > 0;
+  const showingGalleryHero = selectedGalleryIndex !== null;
+  const heroUrl = showingGalleryHero ? galleryImages[selectedGalleryIndex] : project.thumbnailUrl;
 
   const num = String(index + 1).padStart(2, '0');
 
   return (
-    <>
-      <article id={project.id} ref={handleRef} className="works-project" data-animate>
-        <div className="works-project__info">
-          <div className="works-project__info-col works-project__info-col--title">
-            <span className="works-project__number">{num}</span>
-            <h2 className="works-project__title">{project.title}</h2>
-            <span className="works-project__category">
-              {categoryLabels[project.category] || project.category}
-            </span>
-          </div>
+    <article id={project.id} ref={handleRef} className="works-project" data-animate>
+      <div className="works-project__info">
+        <div className="works-project__info-col works-project__info-col--title">
+          <span className="works-project__number">{num}</span>
+          <h2 className="works-project__title">{project.title}</h2>
+          <span className="works-project__category">
+            {categoryLabels[project.category] || project.category}
+          </span>
+        </div>
 
-          <div className="works-project__info-col">
-            <span className="works-project__label">About</span>
-            <p className="works-project__description">{project.description}</p>
-          </div>
+        <div className="works-project__info-col">
+          <span className="works-project__label">About</span>
+          <p className="works-project__description">{project.description}</p>
+        </div>
 
-          <div className="works-project__info-col">
-            <span className="works-project__label">Technologies</span>
-            <div className="works-project__pills">
-              {project.technologies.map((tech, i) => (
-                <span key={i} className="works-project__pill">
-                  {tech}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <div className="works-project__info-col works-project__info-col--actions">
-            {project.liveUrl && (
-              <a
-                href={project.liveUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="works-project__action"
-              >
-                View Live ↗
-              </a>
-            )}
+        <div className="works-project__info-col">
+          <span className="works-project__label">Technologies</span>
+          <div className="works-project__pills">
+            {project.technologies.map((tech, i) => (
+              <span key={i} className="works-project__pill">
+                {tech}
+              </span>
+            ))}
           </div>
         </div>
 
-        <div className="works-project__hero">
-          {project.isVideoHero ? (
-            <HeroVideo src={project.thumbnailUrl} className="works-project__img" />
-          ) : (
-            <img
-              src={project.thumbnailUrl}
-              alt={project.title}
-              className="works-project__img"
-            />
+        <div className="works-project__info-col works-project__info-col--actions">
+          {project.liveUrl && (
+            <a
+              href={project.liveUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="works-project__action"
+            >
+              View Live ↗
+            </a>
           )}
         </div>
+      </div>
 
-        {galleryImages.length > 0 && (
-          <div
-            className="works-project__gallery"
-            style={{ '--gallery-cols': Math.max(galleryImages.length, 3) } as React.CSSProperties}
-          >
-            {galleryImages.map((img, i) => (
+      <div ref={heroRef} className={`works-project__hero${showingGalleryHero ? ' works-project__hero--gallery' : ''}`}>
+        {!showingGalleryHero && project.isVideoHero ? (
+          <HeroVideo src={heroUrl} className="works-project__img" />
+        ) : (
+          <img
+            key={heroUrl}
+            src={heroUrl}
+            alt={project.title}
+            className="works-project__img works-project__img--fade"
+          />
+        )}
+      </div>
+
+      {galleryImages.length > 0 && (
+        <div
+          className="works-project__gallery"
+          style={{ '--gallery-cols': Math.max(galleryImages.length, 3) } as React.CSSProperties}
+        >
+          {galleryImages.map((img, i) => (
+            i === selectedGalleryIndex ? (
+              <button
+                key={i}
+                className="works-project__img-wrap works-project__img-wrap--placeholder"
+                onClick={() => handleSwap(null)}
+              >
+                <span className="works-project__placeholder-text">show mockup</span>
+              </button>
+            ) : (
               <button
                 key={i}
                 className="works-project__img-wrap"
-                onClick={hasScreens ? () => setShowScreens(true) : undefined}
-                style={hasScreens ? { cursor: 'pointer' } : undefined}
+                onClick={() => handleSwap(i)}
               >
                 <img
                   src={img}
@@ -206,18 +178,10 @@ export default function WorksProjectSection({ project, index, registerRef }: Pro
                   loading="lazy"
                 />
               </button>
-            ))}
-          </div>
-        )}
-      </article>
-
-      {showScreens && (
-        <ScreensOverlay
-          screens={screens}
-          title={project.title}
-          onClose={() => setShowScreens(false)}
-        />
+            )
+          ))}
+        </div>
       )}
-    </>
+    </article>
   );
 }

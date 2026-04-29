@@ -63,7 +63,7 @@ const Header = () => {
                 <span className="header__nav-btn-label header__nav-btn-label--copied">copied!</span>
               </button>
             </li>
-            <li className="header__nav-item">
+            <li className="header__nav-item header__nav-item--social">
               <a href={LINKEDIN} target="_blank" rel="noopener noreferrer">in</a>
             </li>
           </ul>

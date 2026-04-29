@@ -14,6 +14,7 @@ import './components/PageTransition/PageTransition.css';
 function AppContent() {
   useEffect(() => {
     const lenis = new Lenis({ lerp: 0.1, wheelMultiplier: 1 });
+    (window as unknown as Record<string, unknown>).__lenis = lenis;
     let rafId: number;
     function raf(time: number) {
       lenis.raf(time);
@@ -23,6 +24,7 @@ function AppContent() {
     return () => {
       cancelAnimationFrame(rafId);
       lenis.destroy();
+      delete (window as unknown as Record<string, unknown>).__lenis;
     };
   }, []);
 

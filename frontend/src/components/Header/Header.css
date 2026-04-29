@@ -79,14 +79,22 @@
   transition: var(--transition-fast);
 }
 
-.header__nav-item a:hover,
+.header__nav-item a:hover {
+  background: #6b7bc8;
+  color: #fff;
+  text-shadow: 0.2px 0 0 currentColor, -0.2px 0 0 currentColor;
+}
+
+.header__nav-item--social a:hover,
 .header__nav-item .header__nav-btn:hover {
   background: #ffc4a0;
+  color: black;
   text-shadow: 0.2px 0 0 currentColor, -0.2px 0 0 currentColor;
 }
 
 .header__nav-item--active a {
-  background: #ffc4a0;
+  background: #6b7bc8;
+  color: #fff;
   text-shadow: 0.2px 0 0 currentColor, -0.2px 0 0 currentColor;
 }
 

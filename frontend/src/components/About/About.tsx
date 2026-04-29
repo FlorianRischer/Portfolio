@@ -198,16 +198,6 @@ export default function About() {
                 <p className="about-skill__description">{skill.description || ''}</p>
               </div>
 
-              <div className="about-skill__info-col">
-                <span className="about-skill__label">Proficiency</span>
-                <div className="about-skill__bar">
-                  <div className="about-skill__bar-bg" />
-                  <div
-                    className="about-skill__bar-fill"
-                    style={{ width: `${(skill.level / 5) * 100}%` }}
-                  />
-                </div>
-              </div>
             </div>
 
             <div className="about-skill__hero">
