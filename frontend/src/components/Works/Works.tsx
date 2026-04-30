@@ -7,6 +7,7 @@ import WorksSidebar from './WorksSidebar';
 import WorksProjectSection from './WorksProjectSection';
 import { projectsAPI, imagesAPI, type Project as APIProject } from '../../services/api';
 import { usePageEntrance } from '../../hooks/usePageEntrance';
+import Footer from '../Footer/Footer';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -132,28 +133,31 @@ export default function Works() {
 
   return (
     <div className="works-page" ref={containerRef}>
-      <WorksSidebar
-        projects={projects.map((p) => ({ id: p.id, title: p.title }))}
-        activeIndex={activeIndex}
-        onProjectClick={scrollToProject}
-      />
-      <div className="works-page__content">
-        <header className="works-page__header" data-animate>
-          <h1 className="works-page__heading">Selected Works</h1>
-          <p className="works-page__intro">
-            An overview of my projects — from design concepts to fully developed digital solutions,
-            reflecting my skills in visual design, UX/UI, and web development.
-          </p>
-        </header>
-        {projects.map((project, index) => (
-          <WorksProjectSection
-            key={project.id}
-            project={project}
-            index={index}
-            registerRef={registerRef}
-          />
-        ))}
+      <div className="works-page__main">
+        <WorksSidebar
+          projects={projects.map((p) => ({ id: p.id, title: p.title }))}
+          activeIndex={activeIndex}
+          onProjectClick={scrollToProject}
+        />
+        <div className="works-page__content">
+          <header className="works-page__header" data-animate>
+            <h1 className="works-page__heading">Selected Works</h1>
+            <p className="works-page__intro">
+              An overview of my projects — from design concepts to fully developed digital solutions,
+              reflecting my skills in visual design, UX/UI, and web development.
+            </p>
+          </header>
+          {projects.map((project, index) => (
+            <WorksProjectSection
+              key={project.id}
+              project={project}
+              index={index}
+              registerRef={registerRef}
+            />
+          ))}
+        </div>
       </div>
+      <Footer />
     </div>
   );
 }

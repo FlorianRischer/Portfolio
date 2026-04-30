@@ -111,13 +111,15 @@ const Hero = () => {
         <div className="hero__content" data-animate>
           <div className="hero__nav-buttons">
             <button
-              className="hero__nav-btn"
+              className="hero__nav-btn hero__nav-btn--fly-in"
+              style={{ animationDelay: '0.4s' }}
               onClick={() => navigateWithTransition('/about')}
             >
               ABOUT
             </button>
             <button
-              className="hero__nav-btn"
+              className="hero__nav-btn hero__nav-btn--fly-in"
+              style={{ animationDelay: '0.6s' }}
               onClick={() => navigateWithTransition('/works')}
             >
               WORKS

@@ -7,6 +7,7 @@ import { imagesAPI, skillsAPI } from '../../services/api';
 import { usePageEntrance } from '../../hooks/usePageEntrance';
 import type { Skill as APISkill } from '../../services/api';
 import AboutSidebar from './AboutSidebar';
+import Footer from '../Footer/Footer';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -144,68 +145,71 @@ export default function About() {
         <img src={aboutImage} alt="" className="about-page__bg-img" />
       </div>
 
-      <AboutSidebar
-        techSkills={techSkills.map((s) => ({ name: s.name, icon: s.icon }))}
-        designSkills={designSkills.map((s) => ({ name: s.name, icon: s.icon }))}
-        activeSkill={activeIndex >= 0 ? skills[activeIndex]?.name ?? null : null}
-        onSkillClick={(name) => {
-          const idx = skills.findIndex((s) => s.name === name);
-          if (idx !== -1) scrollToSkill(idx);
-        }}
-      />
+      <div className="about-page__main">
+        <AboutSidebar
+          techSkills={techSkills.map((s) => ({ name: s.name, icon: s.icon }))}
+          designSkills={designSkills.map((s) => ({ name: s.name, icon: s.icon }))}
+          activeSkill={activeIndex >= 0 ? skills[activeIndex]?.name ?? null : null}
+          onSkillClick={(name) => {
+            const idx = skills.findIndex((s) => s.name === name);
+            if (idx !== -1) scrollToSkill(idx);
+          }}
+        />
 
-      <div className="about-page__content">
-        {/* Landing section */}
-        <section id="about-landing" ref={landingRef} className="about-landing" data-animate>
-          <h1 className="about-landing__title">ABOUT</h1>
-          
-        </section>
+        <div className="about-page__content">
+          {/* Landing section */}
+          <section id="about-landing" ref={landingRef} className="about-landing" data-animate>
+            <h1 className="about-landing__title">ABOUT</h1>
 
-        {/* About Me section */}
-        <section className="about-me">
-          <div className="about-me__image">
-            <img src={aboutMePortrait} alt="Florian Rischer" className="about-me__img" />
-          </div>
-          <div className="about-me__text">
-            <h2 className="about-me__heading">About me</h2>
-            <p className="about-me__body">
-              Hello again! As I already mentioned, my name is Florian Rischer. I'm 20 years old and from a small town in Germany near Munich. After graduating in May 2024, I started my studies at Munich University of Applied Sciences in October the same year, where I'm currently in my 4th semester. My interest and skills in UI/UX design and software development have been growing ever since. Aside from that, I love to get creative in my free time with activities such as painting and photography.
-            </p>
-          </div>
-        </section>
-        {/* Skill cards */}
-        {skills.map((skill, index) => (
-          <article
-            key={skill.name}
-            id={skill.name}
-            ref={(el) => registerRef(skill.name, el)}
-            className="about-skill"
-            data-animate
-          >
-            <div className="about-skill__info">
-              <div className="about-skill__info-col about-skill__info-col--title">
-                <span className="about-skill__number">
-                  {String(index + 1).padStart(2, '0')}
-                </span>
-                <h2 className="about-skill__name">{skill.name}</h2>
-                <span className="about-skill__category">
-                  {skill.category === 'tech' ? 'Tech Skill' : 'Design Skill'}
-                </span>
+          </section>
+
+          {/* About Me section */}
+          <section className="about-me">
+            <div className="about-me__image">
+              <img src={aboutMePortrait} alt="Florian Rischer" className="about-me__img" />
+            </div>
+            <div className="about-me__text">
+              <h2 className="about-me__heading">About me</h2>
+              <p className="about-me__body">
+                Hello again! As I already mentioned, my name is Florian Rischer. I'm 20 years old and from a small town in Germany near Munich. After graduating in May 2024, I started my studies at Munich University of Applied Sciences in October the same year, where I'm currently in my 4th semester. My interest and skills in UI/UX design and software development have been growing ever since. Aside from that, I love to get creative in my free time with activities such as painting and photography.
+              </p>
+            </div>
+          </section>
+          {/* Skill cards */}
+          {skills.map((skill, index) => (
+            <article
+              key={skill.name}
+              id={skill.name}
+              ref={(el) => registerRef(skill.name, el)}
+              className="about-skill"
+              data-animate
+            >
+              <div className="about-skill__info">
+                <div className="about-skill__info-col about-skill__info-col--title">
+                  <span className="about-skill__number">
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+                  <h2 className="about-skill__name">{skill.name}</h2>
+                  <span className="about-skill__category">
+                    {skill.category === 'tech' ? 'Tech Skill' : 'Design Skill'}
+                  </span>
+                </div>
+
+                <div className="about-skill__info-col">
+                  <span className="about-skill__label">About</span>
+                  <p className="about-skill__description">{skill.description || ''}</p>
+                </div>
+
               </div>
 
-              <div className="about-skill__info-col">
-                <span className="about-skill__label">About</span>
-                <p className="about-skill__description">{skill.description || ''}</p>
+              <div className="about-skill__hero">
+                <img src={skill.icon} alt={skill.name} className="about-skill__icon" />
               </div>
-
-            </div>
-
-            <div className="about-skill__hero">
-              <img src={skill.icon} alt={skill.name} className="about-skill__icon" />
-            </div>
-          </article>
-        ))}
+            </article>
+          ))}
+        </div>
       </div>
+      <Footer />
     </div>
   );
 }

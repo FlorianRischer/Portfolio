@@ -7,6 +7,8 @@ import { TransitionProvider } from './components/PageTransition/TransitionContex
 import HomePage from './pages/HomePage';
 import WorksPage from './pages/WorksPage';
 import AboutPage from './pages/AboutPage';
+import ImpressumPage from './pages/ImpressumPage';
+import DatenschutzPage from './pages/DatenschutzPage';
 import { imagesAPI } from './services/api';
 import './styles/global.css';
 import './components/PageTransition/PageTransition.css';
@@ -51,6 +53,8 @@ function AppContent() {
           <Route path="/home" element={<HomePage />} />
           <Route path="/works" element={<WorksPage />} />
           <Route path="/about" element={<AboutPage />} />
+          <Route path="/impressum" element={<ImpressumPage />} />
+          <Route path="/datenschutz" element={<DatenschutzPage />} />
         </Routes>
       </div>
     </TransitionProvider>

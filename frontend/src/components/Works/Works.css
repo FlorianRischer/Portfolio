@@ -5,9 +5,15 @@
 
 .works-page {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   width: 100%;
   min-height: 100vh;
+}
+
+.works-page__main {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
 }
 
 .works-page__content {
