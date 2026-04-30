@@ -10,7 +10,7 @@ export default function Footer() {
       <div className="footer__content">
         <div className="footer__info">
           <span className="footer__name">Florian Rischer</span>
-          <span className="footer__subtitle">Computer Science & Design — HM Munich</span>
+          <span className="footer__subtitle">Computer Science & Design — Hochschule München</span>
         </div>
         <div className="footer__links">
           <div className="footer__links-col">
