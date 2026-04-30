@@ -85,10 +85,8 @@
   text-shadow: 0.2px 0 0 currentColor, -0.2px 0 0 currentColor;
 }
 
-.header__nav-item--social a:hover,
 .header__nav-item .header__nav-btn:hover {
   background: #ffc4a0;
-  color: black;
   text-shadow: 0.2px 0 0 currentColor, -0.2px 0 0 currentColor;
 }
 
@@ -144,6 +142,29 @@
 }
 
 .header__nav-btn--copied .header__nav-btn-label--copied {
+  opacity: 1;
+}
+
+/* LinkedIn button — same expand pattern as email */
+.header__linkedin-btn {
+  background: none !important;
+  white-space: nowrap;
+  overflow: hidden;
+  position: relative;
+  transition: padding 0.3s ease, background 0.3s ease, text-shadow 0.3s ease !important;
+}
+
+.header__linkedin-btn:hover {
+  background: #ffc4a0 !important;
+  color: black !important;
+  padding: 0.4rem 1.7rem;
+}
+
+.header__linkedin-btn:hover .header__nav-btn-label--default {
+  opacity: 0;
+}
+
+.header__linkedin-btn:hover .header__nav-btn-label--hover {
   opacity: 1;
 }
 

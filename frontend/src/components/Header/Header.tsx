@@ -47,11 +47,11 @@ const Header = () => {
 
         <nav className={`header__nav ${menuOpen ? 'header__nav--open' : ''}`}>
           <ul className="header__nav-list">
-            <li className={`header__nav-item ${location.pathname === '/works' ? 'header__nav-item--active' : ''}`}>
-              <a href="/works" onClick={(e) => handleNavigation(e, '/works')}>works</a>
-            </li>
             <li className={`header__nav-item ${location.pathname === '/about' ? 'header__nav-item--active' : ''}`}>
               <a href="/about" onClick={(e) => handleNavigation(e, '/about')}>about</a>
+            </li>
+            <li className={`header__nav-item ${location.pathname === '/works' ? 'header__nav-item--active' : ''}`}>
+              <a href="/works" onClick={(e) => handleNavigation(e, '/works')}>works</a>
             </li>
             <li className="header__nav-item">
               <button
@@ -64,7 +64,10 @@ const Header = () => {
               </button>
             </li>
             <li className="header__nav-item header__nav-item--social">
-              <a href={LINKEDIN} target="_blank" rel="noopener noreferrer">in</a>
+              <a href={LINKEDIN} target="_blank" rel="noopener noreferrer" className="header__linkedin-btn">
+                <span className="header__nav-btn-label header__nav-btn-label--default">in</span>
+                <span className="header__nav-btn-label header__nav-btn-label--hover">LinkedIn</span>
+              </a>
             </li>
           </ul>
         </nav>
